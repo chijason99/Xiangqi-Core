@@ -12,6 +12,8 @@ public class XiangqiBuilder : IXiangqiBuilder
 
     private Player _redPlayer { get; set; }
     private Player _blackPlayer { get; set; }
+    private string _competition { get; set; }
+    private DateTime _gameDate { get; set; }
 
     public XiangqiBuilder UseDefaultConfiguration()
     {
@@ -20,6 +22,9 @@ public class XiangqiBuilder : IXiangqiBuilder
 
         _redPlayer = new();
         _blackPlayer = new();
+
+        _competition = "Unknown";
+        _gameDate = DateTime.Today;
 
         return this;
     }
@@ -33,7 +38,12 @@ public class XiangqiBuilder : IXiangqiBuilder
 
     public XiangqiGame Build()
     {
-        return new XiangqiGame(initialFenString: _initialFen, sideToMove:_sideToMove, redPlayer: _redPlayer, blackPlayer: _blackPlayer);
+        return new XiangqiGame(initialFenString: _initialFen, 
+                               sideToMove:_sideToMove, 
+                               redPlayer: _redPlayer, 
+                               blackPlayer: _blackPlayer, 
+                               competition: _competition,
+                               gameDate: _gameDate);
     }
 
     public XiangqiBuilder HasRedPlayer(Action<Player> action)
@@ -54,6 +64,20 @@ public class XiangqiBuilder : IXiangqiBuilder
         action(blackPlayer);
 
         _blackPlayer = blackPlayer;
+
+        return this;
+    }
+
+    public XiangqiBuilder PlayedInCompetition(string competitionName)
+    {
+        _competition = competitionName;
+
+        return this;
+    }
+
+    public XiangqiBuilder PlayedOnDate(DateTime gameDate)
+    {
+        _gameDate = gameDate;
 
         return this;
     }
