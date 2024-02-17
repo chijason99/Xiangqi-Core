@@ -1,4 +1,4 @@
-﻿namespace xiangqi_core_test.Xiangqi_Core.Methods;
+﻿namespace XiangqiCoreTests.XiangqiCore.Methods;
 
 public static class Create_Xiangqi_Game_Tests
 {
@@ -6,7 +6,7 @@ public static class Create_Xiangqi_Game_Tests
     public static void ShouldCreateDefaultXiangqiGame_WhenCallingCreateWithDefaultMethod()
     {
         // Arrange
-        IXianqgiBuilder builder = new XiangqiBuilder();
+        XiangqiBuilder builder = new();
 
         // Act
         XiangqiGame xiangqiGame = builder.UseDefaultConfiguration().Build();
@@ -15,6 +15,12 @@ public static class Create_Xiangqi_Game_Tests
         xiangqiGame.InitialFenString.Should().Be("rnbakabnr/9/1c5c1/p1p1p1p1p/9/9/P1P1P1P1P/1C5C1/9/RNBAKABNR w");
 
         xiangqiGame.SideToMove.Should().Be(Side.Red);
+
+        xiangqiGame.RedPlayer.Name.Should().Be("Unknown");
+        xiangqiGame.RedPlayer.Team.Should().Be("Unknown");
+
+        xiangqiGame.BlackPlayer.Name.Should().Be("Unknown");
+        xiangqiGame.BlackPlayer.Team.Should().Be("Unknown");
     }
 
     [Theory]
@@ -25,7 +31,7 @@ public static class Create_Xiangqi_Game_Tests
     public static void ShouldCreateDefaultXiangqiGameWithCustomFenString_WhenCallingUseCustomFenMethod(string customFen)
     {
         // Arrange
-        IXianqgiBuilder builder = new XiangqiBuilder();
+        XiangqiBuilder builder = new();
 
         // Act
         XiangqiGame xiangqiGame = builder.UseDefaultConfiguration().UseCustomFen(customFen).Build();
@@ -34,4 +40,51 @@ public static class Create_Xiangqi_Game_Tests
         xiangqiGame.InitialFenString.Should().Be(customFen);
     }
 
+    [Theory]
+    [InlineData("許銀川", "廣東隊")]
+    [InlineData("Wang TianYi", "Hang Zhou")]
+    public static void ShouldRecordRedPlayerWithNameAndTeam_WhenCallingHasRedPlayerMethodWithNameAndTeam(string playerName, string teamName)
+    {
+        // Arrange
+        XiangqiBuilder builder = new();
+
+        // Act
+        XiangqiGame xiangqiGame = builder.UseDefaultConfiguration()
+                                        .HasRedPlayer(player =>
+                                        {
+                                            player.Name = playerName;
+                                            player.Team = teamName;
+                                        })
+                                        .Build();
+
+        // Assert
+        xiangqiGame.RedPlayer.Should().NotBeNull();
+
+        xiangqiGame.RedPlayer.Name.Should().Be(playerName);
+        xiangqiGame.RedPlayer.Team.Should().Be(teamName);
+    }
+
+    [Theory]
+    [InlineData("許銀川", "廣東隊")]
+    [InlineData("Wang TianYi", "Hang Zhou")]
+    public static void ShouldRecordBlackPlayerWithNameAndTeam_WhenCallingHasBlackPlayerMethodWithNameAndTeam(string playerName, string teamName)
+    {
+        // Arrange
+        XiangqiBuilder builder = new();
+
+        // Act
+        XiangqiGame xiangqiGame = builder.UseDefaultConfiguration()
+                                        .HasBlackPlayer(player =>
+                                        {
+                                            player.Name = playerName;
+                                            player.Team = teamName;
+                                        })
+                                        .Build();
+
+        // Assert
+        xiangqiGame.BlackPlayer.Should().NotBeNull();
+
+        xiangqiGame.BlackPlayer.Name.Should().Be(playerName);
+        xiangqiGame.BlackPlayer.Team.Should().Be(teamName);
+    }
 }
