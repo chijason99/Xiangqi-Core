@@ -1,6 +1,6 @@
-﻿namespace XiangqiCoreTests.XiangqiCore.Methods;
+﻿namespace XiangqiCoreTests.XiangqiCore.XiangqiBuilderTest;
 
-public static class Create_Xiangqi_Game_Tests
+public static class XiangqiBuilderTests
 {
     [Fact]
     public static void ShouldCreateDefaultXiangqiGame_WhenCallingCreateWithDefaultMethod()
