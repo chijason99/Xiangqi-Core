@@ -87,4 +87,36 @@ public static class XiangqiBuilderTests
         xiangqiGame.BlackPlayer.Name.Should().Be(playerName);
         xiangqiGame.BlackPlayer.Team.Should().Be(teamName);
     }
+
+    [Fact]
+    public static void ShouldCreateAGameWithCompetitionName_WhenCallingPlayedInCompetition()
+    {
+        // Arrange
+        XiangqiBuilder builder = new();
+
+        // Act
+        XiangqiGame xiangqiGame = builder.UseDefaultConfiguration()
+                                        .PlayedInCompetition("2017全港個人賽")
+                                        .Build();
+
+        // Assert
+        xiangqiGame.Competition.Should().Be("2017全港個人賽");
+    }
+
+    [Fact]
+    public static void ShouldCreateAGameWithDate_WhenCallingPlayedOnDate()
+    {
+        // Arrange
+        XiangqiBuilder builder = new();
+
+        // Act
+        XiangqiGame xiangqiGame = builder.UseDefaultConfiguration()
+                                        .PlayedOnDate(new DateTime(2019,9,13))
+                                        .Build();
+
+        // Assert
+        xiangqiGame.GameDate.Year.Should().Be(2019);
+        xiangqiGame.GameDate.Month.Should().Be(9);
+        xiangqiGame.GameDate.Day.Should().Be(13);
+    }
 }
