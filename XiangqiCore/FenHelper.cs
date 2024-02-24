@@ -1,6 +1,6 @@
 ﻿using System.Text.RegularExpressions;
 
-namespace XiangqiCore.FenHelper;
+namespace XiangqiCore;
 
 public static partial class FenHelper
 {

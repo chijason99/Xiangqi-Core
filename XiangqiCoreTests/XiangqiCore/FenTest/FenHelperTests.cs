@@ -1,5 +1,4 @@
-﻿using XiangqiCore.FenHelper;
-namespace xiangqi_core_test.XiangqiCore.FenTest;
+﻿namespace xiangqi_core_test.XiangqiCore.FenTest;
 public static class FenHelperTests
 {
     [Theory]

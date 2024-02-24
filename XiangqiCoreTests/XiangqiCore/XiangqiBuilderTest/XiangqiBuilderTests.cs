@@ -9,10 +9,15 @@ public static class XiangqiBuilderTests
         XiangqiBuilder builder = new();
 
         // Act
-        XiangqiGame xiangqiGame = builder.UseDefaultConfiguration().Build();
+        var result = builder.UseDefaultConfiguration().Build();
 
         // Assert
-        xiangqiGame.InitialFenString.Should().Be("rnbakabnr/9/1c5c1/p1p1p1p1p/9/9/P1P1P1P1P/1C5C1/9/RNBAKABNR w");
+        result.IsSuccess.Should().BeTrue();
+        result.Value.Should().NotBeNull();
+
+        XiangqiGame xiangqiGame = result.Value;
+
+        xiangqiGame.InitialFenString.Should().Be("rnbakabnr/9/1c5c1/p1p1p1p1p/9/9/P1P1P1P1P/1C5C1/9/RNBAKABNR w - - 0 0");
 
         xiangqiGame.SideToMove.Should().Be(Side.Red);
 
@@ -34,9 +39,14 @@ public static class XiangqiBuilderTests
         XiangqiBuilder builder = new();
 
         // Act
-        XiangqiGame xiangqiGame = builder.UseDefaultConfiguration().UseCustomFen(customFen).Build();
+        var result =  builder.UseDefaultConfiguration().UseCustomFen(customFen).Build();
 
         // Assert
+        result.IsSuccess.Should().BeTrue();
+        result.Value.Should().NotBeNull();
+
+        XiangqiGame xiangqiGame = result.Value;
+
         xiangqiGame.InitialFenString.Should().Be(customFen);
     }
 
@@ -49,7 +59,7 @@ public static class XiangqiBuilderTests
         XiangqiBuilder builder = new();
 
         // Act
-        XiangqiGame xiangqiGame = builder.UseDefaultConfiguration()
+        var result = builder.UseDefaultConfiguration()
                                         .HasRedPlayer(player =>
                                         {
                                             player.Name = playerName;
@@ -58,6 +68,11 @@ public static class XiangqiBuilderTests
                                         .Build();
 
         // Assert
+        result.IsSuccess.Should().BeTrue();
+        result.Value.Should().NotBeNull();
+
+        XiangqiGame xiangqiGame = result.Value;
+
         xiangqiGame.RedPlayer.Should().NotBeNull();
 
         xiangqiGame.RedPlayer.Name.Should().Be(playerName);
@@ -73,7 +88,7 @@ public static class XiangqiBuilderTests
         XiangqiBuilder builder = new();
 
         // Act
-        XiangqiGame xiangqiGame = builder.UseDefaultConfiguration()
+        var result = builder.UseDefaultConfiguration()
                                         .HasBlackPlayer(player =>
                                         {
                                             player.Name = playerName;
@@ -82,6 +97,11 @@ public static class XiangqiBuilderTests
                                         .Build();
 
         // Assert
+        result.IsSuccess.Should().BeTrue();
+        result.Value.Should().NotBeNull();
+
+        XiangqiGame xiangqiGame = result.Value;
+
         xiangqiGame.BlackPlayer.Should().NotBeNull();
 
         xiangqiGame.BlackPlayer.Name.Should().Be(playerName);
@@ -95,11 +115,16 @@ public static class XiangqiBuilderTests
         XiangqiBuilder builder = new();
 
         // Act
-        XiangqiGame xiangqiGame = builder.UseDefaultConfiguration()
-                                        .PlayedInCompetition("2017全港個人賽")
-                                        .Build();
+        var result = builder.UseDefaultConfiguration()
+                            .PlayedInCompetition("2017全港個人賽")
+                            .Build();
 
         // Assert
+        result.IsSuccess.Should().BeTrue();
+        result.Value.Should().NotBeNull();
+
+        XiangqiGame xiangqiGame = result.Value;
+
         xiangqiGame.Competition.Should().Be("2017全港個人賽");
     }
 
@@ -110,11 +135,16 @@ public static class XiangqiBuilderTests
         XiangqiBuilder builder = new();
 
         // Act
-        XiangqiGame xiangqiGame = builder.UseDefaultConfiguration()
-                                        .PlayedOnDate(new DateTime(2019,9,13))
-                                        .Build();
+        var result = builder.UseDefaultConfiguration()
+                            .PlayedOnDate(new DateTime(2019,9,13))
+                            .Build();
 
         // Assert
+        result.IsSuccess.Should().BeTrue();
+        result.Value.Should().NotBeNull();
+
+        XiangqiGame xiangqiGame = result.Value;
+
         xiangqiGame.GameDate.Year.Should().Be(2019);
         xiangqiGame.GameDate.Month.Should().Be(9);
         xiangqiGame.GameDate.Day.Should().Be(13);
