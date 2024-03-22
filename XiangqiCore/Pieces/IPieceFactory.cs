@@ -1,11 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using XiangqiCore.Pieces.PieceTypes;
+using XiangqiCore.Results;
 
 namespace XiangqiCore.Pieces;
 public interface IPieceFactory
 {
-    Piece CreatePiece();
+    Result<Piece> Create(PieceType pieceType, Side color, Coordinate coordinate);
 }
