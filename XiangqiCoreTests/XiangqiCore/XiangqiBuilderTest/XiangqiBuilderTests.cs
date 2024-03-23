@@ -1,4 +1,8 @@
-﻿namespace XiangqiCoreTests.XiangqiCore.XiangqiBuilderTest;
+﻿using XiangqiCore.Boards;
+using XiangqiCore.Pieces;
+using XiangqiCore.Pieces.PieceTypes;
+
+namespace XiangqiCoreTests.XiangqiCore.XiangqiBuilderTest;
 
 public static class XiangqiBuilderTests
 {
@@ -118,5 +122,41 @@ public static class XiangqiBuilderTests
         xiangqiGame.GameDate.Year.Should().Be(2019);
         xiangqiGame.GameDate.Month.Should().Be(9);
         xiangqiGame.GameDate.Day.Should().Be(13);
+    }
+
+    [Fact]
+    public static void ShouldCreateBoardInstanceWithSpecifiedPieceAndLocation_WhenCallingUseCustomPosition()
+    {
+        // Arrange
+        XiangqiBuilder builder = new();
+        EmptyPiece emptyPiece = new();
+
+        Coordinate redRookCoordinate = new(5, 6);
+        Coordinate redKingCoordinate = new(5, 1);
+        Coordinate blackKingCoordinate = new(4, 10);
+        Rook redRook = (Rook)PieceFactory.Create(PieceType.Rook, Side.Red, redRookCoordinate);
+        King redKing = (King)PieceFactory.Create(PieceType.King, Side.Red, redKingCoordinate);
+        King blackKing = (King)PieceFactory.Create(PieceType.King, Side.Black, blackKingCoordinate);
+
+        BoardConfig config = new() { };
+
+        config.AddPiece(PieceType.Rook, Side.Red, redRookCoordinate);
+        config.AddPiece(PieceType.King, Side.Red, redKingCoordinate);
+        config.AddPiece(PieceType.King, Side.Black, blackKingCoordinate);
+
+        // Act
+        XiangqiGame xiangqiGame = builder
+                                    .UseDefaultConfiguration()
+                                    .UseBoardConfig(config)
+                                    .Build();
+
+        // Assert
+        xiangqiGame.Board.GetPieceAtPosition(redRookCoordinate).Should().NotBe(emptyPiece);
+        xiangqiGame.Board.GetPieceAtPosition(redKingCoordinate).Should().NotBe(emptyPiece);
+        xiangqiGame.Board.GetPieceAtPosition(blackKingCoordinate).Should().NotBe(emptyPiece);
+
+        xiangqiGame.Board.GetPieceAtPosition(redRookCoordinate).Should().Be(redRook);
+        xiangqiGame.Board.GetPieceAtPosition(redKingCoordinate).Should().Be(redKing);
+        xiangqiGame.Board.GetPieceAtPosition(blackKingCoordinate).Should().Be(blackKing);
     }
 }

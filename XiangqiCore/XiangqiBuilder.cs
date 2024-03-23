@@ -1,4 +1,6 @@
-﻿namespace XiangqiCore;
+﻿using XiangqiCore.Boards;
+
+namespace XiangqiCore;
 
 public class XiangqiBuilder : IXiangqiBuilder
 {
@@ -14,6 +16,9 @@ public class XiangqiBuilder : IXiangqiBuilder
     private Player _blackPlayer { get; set; }
     private string _competition { get; set; }
     private DateTime _gameDate { get; set; }
+
+    private bool _useBoardConfig { get; set; } = false;
+    private BoardConfig? _boardConfig { get; set; } = null;
 
     public XiangqiBuilder UseDefaultConfiguration()
     {
@@ -37,8 +42,8 @@ public class XiangqiBuilder : IXiangqiBuilder
     }
 
     public XiangqiGame Build()
-         => XiangqiGame.Create(initialFenString: _initialFen, sideToMove:_sideToMove, redPlayer: _redPlayer, 
-                               blackPlayer: _blackPlayer, competition: _competition, gameDate: _gameDate);
+         => XiangqiGame.Create(initialFenString: _initialFen, sideToMove: _sideToMove, redPlayer: _redPlayer,
+                               blackPlayer: _blackPlayer, competition: _competition, gameDate: _gameDate, useBoardConfig: _useBoardConfig, boardConfig: _boardConfig);
 
     public XiangqiBuilder HasRedPlayer(Action<Player> action)
     {
@@ -49,8 +54,8 @@ public class XiangqiBuilder : IXiangqiBuilder
         _redPlayer = redPlayer;
 
         return this;
-    }    
-    
+    }
+
     public XiangqiBuilder HasBlackPlayer(Action<Player> action)
     {
         Player blackPlayer = new();
@@ -72,6 +77,14 @@ public class XiangqiBuilder : IXiangqiBuilder
     public XiangqiBuilder PlayedOnDate(DateTime gameDate)
     {
         _gameDate = gameDate;
+
+        return this;
+    }
+
+    public XiangqiBuilder UseBoardConfig(BoardConfig config)
+    {
+        _boardConfig = config;
+        _useBoardConfig = true;
 
         return this;
     }
