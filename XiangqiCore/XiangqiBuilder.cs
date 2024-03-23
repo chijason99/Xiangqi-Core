@@ -16,7 +16,7 @@ public class XiangqiBuilder : IXiangqiBuilder
     private Player _blackPlayer { get; set; }
     private string _competition { get; set; }
     private DateTime _gameDate { get; set; }
-    
+
     private bool _useBoardConfig { get; set; } = false;
     private BoardConfig? _boardConfig { get; set; } = null;
 
@@ -42,7 +42,7 @@ public class XiangqiBuilder : IXiangqiBuilder
     }
 
     public XiangqiGame Build()
-         => XiangqiGame.Create(initialFenString: _initialFen, sideToMove:_sideToMove, redPlayer: _redPlayer, 
+         => XiangqiGame.Create(initialFenString: _initialFen, sideToMove: _sideToMove, redPlayer: _redPlayer,
                                blackPlayer: _blackPlayer, competition: _competition, gameDate: _gameDate, useBoardConfig: _useBoardConfig, boardConfig: _boardConfig);
 
     public XiangqiBuilder HasRedPlayer(Action<Player> action)
@@ -54,8 +54,8 @@ public class XiangqiBuilder : IXiangqiBuilder
         _redPlayer = redPlayer;
 
         return this;
-    }    
-    
+    }
+
     public XiangqiBuilder HasBlackPlayer(Action<Player> action)
     {
         Player blackPlayer = new();

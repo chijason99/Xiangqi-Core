@@ -1,4 +1,5 @@
-﻿using XiangqiCore.Pieces.PieceTypes;
+﻿using XiangqiCore.Pieces;
+using XiangqiCore.Pieces.PieceTypes;
 
 namespace xiangqi_core_test.XiangqiCore.FenTest;
 public static class FenHelperTests
@@ -169,16 +170,16 @@ public static class FenHelperTests
     }
 
     [Theory]
-    [InlineData("n2cb1N2", 8, new int[]{1, 2, 5, 7, 8})]
-    [InlineData("2PN5", 10, new int[]{0, 1, 4, 5, 6, 7, 8})]
-    [InlineData("rnbakabnr", 10, new int[]{ })]
-    [InlineData("1C2BC3", 10, new int[]{ 0, 2, 3, 6, 7, 8 })]
+    [InlineData("n2cb1N2", 8, new int[] { 1, 2, 5, 7, 8 })]
+    [InlineData("2PN5", 10, new int[] { 0, 1, 4, 5, 6, 7, 8 })]
+    [InlineData("rnbakabnr", 10, new int[] { })]
+    [InlineData("1C2BC3", 10, new int[] { 0, 2, 3, 6, 7, 8 })]
     public static void ShouldParseFenRowAndReturnCorrectCoordinates_WhenGivenAValidFenRowString(string fenRow, int rowNumber, int[] emptyCoordinatesIndex)
     {
         // Arrange
         Coordinate[] expectedResult = Enumerable.Range(1, 9)
-                                                .Select((x, index) => emptyCoordinatesIndex.Any(x => x == index) ? 
-                                                                      Coordinate.Empty : 
+                                                .Select((x, index) => emptyCoordinatesIndex.Any(x => x == index) ?
+                                                                      Coordinate.Empty :
                                                                       new Coordinate(x, rowNumber))
                                                 .ToArray();
 
@@ -203,10 +204,10 @@ public static class FenHelperTests
                                     { new Pawn(new(1, 4), Side.Red), new Cannon(new(2, 4), Side.Black), new Rook(new(3, 4), Side.Black), new EmptyPiece(), new EmptyPiece(), new EmptyPiece(), new Pawn(new(7,4), Side.Red), new EmptyPiece(), new Pawn(new(9,4), Side.Red)  },
                                     { new EmptyPiece(), new EmptyPiece(), new Pawn(new(3, 5), Side.Red), new EmptyPiece(), new Pawn(new(5,5), Side.Red), new EmptyPiece(), new EmptyPiece(), new Cannon(new(8, 5), Side.Black), new EmptyPiece()  },
                                     { new EmptyPiece(), new EmptyPiece(), new EmptyPiece(), new EmptyPiece(), new EmptyPiece(), new EmptyPiece(), new Pawn(new(7,6), Side.Black), new EmptyPiece(), new EmptyPiece()  },
-                                    { new Pawn(new(1, 7), Side.Black), new EmptyPiece(), new Pawn(new(3, 7), Side.Black), new EmptyPiece(), new Pawn(new(5, 7), Side.Black), new EmptyPiece(), new Rook(new(7,7), Side.Red), new EmptyPiece(), new Pawn(new(9,7), Side.Black)  }, 
-                                    { new EmptyPiece(), new EmptyPiece(), new Knight(new(3, 8), Side.Black), new EmptyPiece(), new Bishop(new(5,8), Side.Black), new EmptyPiece(), new EmptyPiece(), new EmptyPiece(), new EmptyPiece()  }, 
-                                    { new EmptyPiece(), new EmptyPiece(), new EmptyPiece(), new EmptyPiece(), new Advisor(new(5,9), Side.Black), new EmptyPiece(), new EmptyPiece(), new EmptyPiece(), new EmptyPiece()  }, 
-                                    { new EmptyPiece(), new EmptyPiece(), new EmptyPiece(), new EmptyPiece(), new King(new(5,10), Side.Black), new Advisor(new (6,10), Side.Black), new Bishop(new(7,10), Side.Black), new Rook(new(8,10), Side.Black), new EmptyPiece()  }, 
+                                    { new Pawn(new(1, 7), Side.Black), new EmptyPiece(), new Pawn(new(3, 7), Side.Black), new EmptyPiece(), new Pawn(new(5, 7), Side.Black), new EmptyPiece(), new Rook(new(7,7), Side.Red), new EmptyPiece(), new Pawn(new(9,7), Side.Black)  },
+                                    { new EmptyPiece(), new EmptyPiece(), new Knight(new(3, 8), Side.Black), new EmptyPiece(), new Bishop(new(5,8), Side.Black), new EmptyPiece(), new EmptyPiece(), new EmptyPiece(), new EmptyPiece()  },
+                                    { new EmptyPiece(), new EmptyPiece(), new EmptyPiece(), new EmptyPiece(), new Advisor(new(5,9), Side.Black), new EmptyPiece(), new EmptyPiece(), new EmptyPiece(), new EmptyPiece()  },
+                                    { new EmptyPiece(), new EmptyPiece(), new EmptyPiece(), new EmptyPiece(), new King(new(5,10), Side.Black), new Advisor(new (6,10), Side.Black), new Bishop(new(7,10), Side.Black), new Rook(new(8,10), Side.Black), new EmptyPiece()  },
                                   };
         // Act
         var actualResult = FenHelper.CreatePositionFromFen(sampleFen);
@@ -218,5 +219,28 @@ public static class FenHelperTests
         Assert.Equal(expectedResult.GetLength(1), actualResult.GetLength(1));
 
         Assert.True(Enumerable.Range(0, 10).All(i => Enumerable.Range(0, 9).All(j => expectedResult[i, j].Equals(actualResult[i, j]))));
+    }
+
+    [Theory]
+    [InlineData("2bak1b2/r3a4/nc1c2n2/p1p1p1p1p/3R5/2P6/P3P1PrP/1CN1C1N2/R8/2BAKAB2 w - - 0 0")]
+    [InlineData("2bak4/r3a4/n3c1n1b/p1p3p1p/4P4/2P3P2/P2Rc2rP/1C2C1N2/4AR3/2BAK1B2 w - - 4 15")]
+    [InlineData("r1bakab1r/9/nc2c1n2/p1p1p1p1p/9/9/P1P1P1P1P/1C2C1N2/3R5/RNBAKAB2 b - - 7 4")]
+    [InlineData("3akn3/4aP3/nr2b3b/p1p3p1p/5R3/2P3P2/P4R2P/4B4/4A4/3AK1B2 b - - 2 26")]
+    public static void ShouldReturnCorrectFen_WhenCallingGetFenFromPosition(string sampleFen)
+    {
+        // Arrange
+        string positionFen = sampleFen.Split(" ").First();
+        XiangqiBuilder builder = new();
+
+        var gameInstance = builder
+                            .UseDefaultConfiguration()
+                            .UseCustomFen(sampleFen)
+                            .Build();
+
+        // Act
+        string resultFen = gameInstance.Board.GetFenFromPosition;
+
+        // Assert
+        resultFen.Should().BeEquivalentTo(positionFen);
     }
 }

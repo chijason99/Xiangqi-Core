@@ -51,6 +51,10 @@ public static partial class FenHelper
     [GeneratedRegex(@"^([1-9rbaknpc]+)[\/]([1-9rbaknpc]+)[\/]([1-9rbaknpc]+)[\/]([1-9rbaknpc]+)[\/]([1-9rbaknpc]+)[\/]([1-9rbaknpc]+)[\/]([1-9rbaknpc]+)[\/]([1-9rbaknpc]+)[\/]([1-9rbaknpc]+)[\/]([1-9rbaknpc]+)\s([bw]).{5}(\d+)\s(\d+)", RegexOptions.IgnoreCase, "en-GB")]
     private static partial Regex FenRegex();
 
+    // Getting all the consecutive ones in the row
+    [GeneratedRegex(@"1+")]
+    private static partial Regex GetAllConsecutiveOnesRegex();
+
     public static Piece[,] CreatePositionFromFen(string fenInput)
     {
         Regex fenRegex = FenRegex();
@@ -118,4 +122,32 @@ public static partial class FenHelper
         => string.Join("", fenRow.Select(x => char.IsDigit(x) ? SplitCharDigitToStringOfOne(x) : x.ToString()));
 
     public static Side GetSideFromFenChar(char piece) => char.IsDigit(piece) ? Side.None : char.IsUpper(piece) ? Side.Red : Side.Black;
+
+    public static string GetFenFromPosition(Piece[,] position)
+    {
+        var groupedFenRows = position
+                                .Cast<Piece>()
+                                .Select((piece, index) => new { character = piece.GetFenCharacter, index })
+                                .GroupBy(x => x.index / 9);
+
+        var groupedFenRowsString = groupedFenRows
+                                    .Select(group => string.Join("", group.Select(x => x.character)));
+
+        var cleanedFenRowsString = groupedFenRowsString
+                                    .Select(ConcatOnesInFenRow)
+                                    .Reverse();
+
+        return string.Join("/", cleanedFenRowsString);
+    }
+
+    private static string ConcatOnesInFenRow(string fenRow)
+    {
+        Regex getAllConsecutiveOnesRegex = GetAllConsecutiveOnesRegex();
+
+        MatchEvaluator getLengthOfConsecutiveOnesEvaluator = new(GetLengthOfConsecutiveOnes);
+
+        return getAllConsecutiveOnesRegex.Replace(fenRow, getLengthOfConsecutiveOnesEvaluator);
+    }
+
+    private static string GetLengthOfConsecutiveOnes(Match match) => match.Length.ToString();
 }

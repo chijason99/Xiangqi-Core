@@ -38,5 +38,6 @@ public class Board
 
         return Position[row, column];
     }
-        
+
+    public string GetFenFromPosition => FenHelper.GetFenFromPosition(Position);
 }
