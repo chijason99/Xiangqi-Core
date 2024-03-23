@@ -1,4 +1,4 @@
-﻿namespace XiangqiCore.Pieces;
+﻿namespace XiangqiCore;
 public readonly struct Coordinate()
 {
     private const int _minRow = 1;
@@ -11,10 +11,10 @@ public readonly struct Coordinate()
     {
         bool isEmptyCoordinate = column == _emptyCoordinateValue && row == _emptyCoordinateValue;
 
-        if ((row < _minRow || row > _maxRow) && !isEmptyCoordinate )
+        if ((row < _minRow || row > _maxRow) && !isEmptyCoordinate)
             throw new ArgumentOutOfRangeException(nameof(row), $"Row must be between {_minRow} and {_maxRow}.");
 
-        if ((column < _minColumn || column > _maxColumn) && !isEmptyCoordinate )
+        if ((column < _minColumn || column > _maxColumn) && !isEmptyCoordinate)
             throw new ArgumentOutOfRangeException(nameof(column), $"Column must be between {_minColumn} and {_maxColumn}.");
 
         Row = row;
@@ -24,5 +24,5 @@ public readonly struct Coordinate()
     public int Column { get; init; }
     public int Row { get; init; }
 
-    public static Coordinate Empty => new (-1, -1);
+    public static Coordinate Empty => new(-1, -1);
 }

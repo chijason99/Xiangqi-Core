@@ -40,25 +40,44 @@ public static partial class FenHelper
     [GeneratedRegex(@"^([1-9rbaknpc]+)[\/]([1-9rbaknpc]+)[\/]([1-9rbaknpc]+)[\/]([1-9rbaknpc]+)[\/]([1-9rbaknpc]+)[\/]([1-9rbaknpc]+)[\/]([1-9rbaknpc]+)[\/]([1-9rbaknpc]+)[\/]([1-9rbaknpc]+)[\/]([1-9rbaknpc]+)\s([bw]).{5}(\d+)\s(\d+)", RegexOptions.IgnoreCase, "en-GB")]
     private static partial Regex FenRegex();
 
-    //public static Board CreateBoardFromFen(string fen)
-    //{
+    public static Piece[,] CreateBoardFromFen(string fenInput)
+    {
+        Regex fenRegex = FenRegex();
+        Match match = fenRegex.Match(fenInput);
 
-    //}
+        Piece[,] result = new Piece[10, 9];
 
-    public static Piece[] ParseSingleRow(string fenRow)
+        for(int i = 10; i > 0; i--)
+        {
+            var fenRow = match.Groups[i].Value;
+            var rowNumberInResult = 10 - i;
+            var actualRowNumber = rowNumberInResult + 1;
+
+            Piece[] parsedFen = ParseSingleRow(fenRow, actualRowNumber);
+            
+            for(int j = 0; j < 9; j++)
+            {
+                result[rowNumberInResult, j] = parsedFen[j];
+            }
+        }
+
+        return result;
+    }
+
+    public static Piece[] ParseSingleRow(string fenRow, int rowNumber)
     {
         var cleanedFenRow = fenRow
                             .Select(x => char.IsDigit(x) ? SplitCharDigitToStringOfOne(x) : x.ToString());
 
         return string.Join("", cleanedFenRow)
-                    .Select(x =>
+                    .Select((x, index) =>
                     {
                         if (char.IsDigit(x))
                             return PieceFactory.CreateEmptyPiece();
 
                         PieceType targetPieceType = FenCharacterMap.GetValueOrDefault(char.ToLower(x));
                         Side targetSide = GetSideFromFenChar(x);
-                        Coordinate targetCoordinate = Coordinate.Empty;
+                        Coordinate targetCoordinate = new (column: index + 1, row: rowNumber);
 
                         return PieceFactory.Create(targetPieceType, targetSide, targetCoordinate);
                     })
