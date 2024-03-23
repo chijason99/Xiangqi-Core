@@ -1,4 +1,6 @@
-﻿namespace XiangqiCore;
+﻿using XiangqiCore.Boards;
+
+namespace XiangqiCore;
 
 public interface IXiangqiBuilder
 {
@@ -8,5 +10,6 @@ public interface IXiangqiBuilder
     XiangqiBuilder HasBlackPlayer(Action<Player> acction);
     XiangqiBuilder PlayedInCompetition(string competitionName);
     XiangqiBuilder PlayedOnDate(DateTime gameDate);
+    XiangqiBuilder UseBoardConfig(BoardConfig config);
     XiangqiGame Build();
 }
