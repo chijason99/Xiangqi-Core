@@ -2,13 +2,13 @@
 
 public class XiangqiBuilder : IXiangqiBuilder
 {
-    private const string _defaultStartingPositionFen = "rnbakabnr/9/1c5c1/p1p1p1p1p/9/9/P1P1P1P1P/1C5C1/9/RNBAKABNR w";
+    private const string _defaultStartingPositionFen = "rnbakabnr/9/1c5c1/p1p1p1p1p/9/9/P1P1P1P1P/1C5C1/9/RNBAKABNR w - - 0 0";
 
     public XiangqiBuilder()
     {
     }
-    private string _initialFen { get; set; } = _defaultStartingPositionFen;
-    private Side _sideToMove { get; set; } = Side.Red;
+    private string _initialFen { get; set; }
+    private Side _sideToMove { get; set; }
 
     private Player _redPlayer { get; set; }
     private Player _blackPlayer { get; set; }
@@ -37,14 +37,8 @@ public class XiangqiBuilder : IXiangqiBuilder
     }
 
     public XiangqiGame Build()
-    {
-        return new XiangqiGame(initialFenString: _initialFen, 
-                               sideToMove:_sideToMove, 
-                               redPlayer: _redPlayer, 
-                               blackPlayer: _blackPlayer, 
-                               competition: _competition,
-                               gameDate: _gameDate);
-    }
+         => XiangqiGame.Create(initialFenString: _initialFen, sideToMove:_sideToMove, redPlayer: _redPlayer, 
+                               blackPlayer: _blackPlayer, competition: _competition, gameDate: _gameDate);
 
     public XiangqiBuilder HasRedPlayer(Action<Player> action)
     {

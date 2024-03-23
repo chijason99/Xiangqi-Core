@@ -1,10 +1,13 @@
-﻿namespace XiangqiCore;
+﻿using XiangqiCore.Boards;
+using XiangqiCore.Exceptions;
+
+namespace XiangqiCore;
 
 public class XiangqiGame
 {
     internal XiangqiGame() { }
 
-    internal XiangqiGame(string initialFenString, 
+    private XiangqiGame(string initialFenString, 
                          Side sideToMove, 
                          Player redPlayer, 
                          Player blackPlayer, 
@@ -17,6 +20,9 @@ public class XiangqiGame
         BlackPlayer = blackPlayer;
         Competition = competition;
         GameDate = gameDate;
+
+        CreatedDate = DateTime.Today;
+        UpdatedDate = DateTime.Today;
     }
     public string InitialFenString { get; init; }
 
@@ -28,4 +34,21 @@ public class XiangqiGame
     public string Competition { get; private set; }
 
     public DateTime GameDate { get; private set; }
+    public DateTime CreatedDate { get; private set; }
+    public DateTime UpdatedDate { get; private set; }
+
+    public Board Board { get; private set; }
+
+
+    public static XiangqiGame Create(string initialFenString, Side sideToMove, Player redPlayer, Player blackPlayer,
+                                     string competition, DateTime gameDate)
+    {
+        bool isFenValid = FenHelper.Validate(initialFenString);
+
+        if (!isFenValid) throw new InvalidFenException(initialFenString);
+
+        XiangqiGame createdGameInstance = new(initialFenString, sideToMove, redPlayer, blackPlayer, competition, gameDate);
+
+        return createdGameInstance;
+    }
 }

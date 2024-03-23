@@ -12,7 +12,7 @@ public static class XiangqiBuilderTests
         XiangqiGame xiangqiGame = builder.UseDefaultConfiguration().Build();
 
         // Assert
-        xiangqiGame.InitialFenString.Should().Be("rnbakabnr/9/1c5c1/p1p1p1p1p/9/9/P1P1P1P1P/1C5C1/9/RNBAKABNR w");
+        xiangqiGame.InitialFenString.Should().Be("rnbakabnr/9/1c5c1/p1p1p1p1p/9/9/P1P1P1P1P/1C5C1/9/RNBAKABNR w - - 0 0");
 
         xiangqiGame.SideToMove.Should().Be(Side.Red);
 
@@ -96,8 +96,8 @@ public static class XiangqiBuilderTests
 
         // Act
         XiangqiGame xiangqiGame = builder.UseDefaultConfiguration()
-                                        .PlayedInCompetition("2017全港個人賽")
-                                        .Build();
+                            .PlayedInCompetition("2017全港個人賽")
+                            .Build();
 
         // Assert
         xiangqiGame.Competition.Should().Be("2017全港個人賽");
@@ -111,8 +111,8 @@ public static class XiangqiBuilderTests
 
         // Act
         XiangqiGame xiangqiGame = builder.UseDefaultConfiguration()
-                                        .PlayedOnDate(new DateTime(2019,9,13))
-                                        .Build();
+                            .PlayedOnDate(new DateTime(2019,9,13))
+                            .Build();
 
         // Assert
         xiangqiGame.GameDate.Year.Should().Be(2019);
