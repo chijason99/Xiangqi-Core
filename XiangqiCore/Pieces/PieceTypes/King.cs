@@ -15,4 +15,5 @@ public sealed class King : Piece
     public override IValidationStrategy ValidationStrategy { get; }
 
     public override PieceType GetPieceType => PieceType.King;
+    public override char FenCharacter => 'k';
 }

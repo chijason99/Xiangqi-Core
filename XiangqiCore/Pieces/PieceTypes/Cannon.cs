@@ -11,4 +11,5 @@ public sealed class Cannon : Piece
     }
     public override PieceType GetPieceType => PieceType.Cannon;
     public override IValidationStrategy ValidationStrategy { get; }
+    public override char FenCharacter => 'c';
 }

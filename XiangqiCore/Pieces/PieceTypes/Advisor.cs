@@ -16,4 +16,6 @@ public sealed class Advisor : Piece
     public override IValidationStrategy ValidationStrategy { get; }
 
     public override PieceType GetPieceType => PieceType.Advisor;
+
+    public override char FenCharacter => 'a';
 }

@@ -11,5 +11,5 @@ public sealed class Knight : Piece
     }
     public override IValidationStrategy ValidationStrategy { get; }
     public override PieceType GetPieceType => PieceType.Knight;
-
+    public override char FenCharacter => 'n';
 }

@@ -17,10 +17,10 @@ public static partial class FenHelper
         if (match.Groups.Count != expectedNumberOfGroups) return false;
 
         // Validate each FEN row
-        return Enumerable.Range(1, 10).All(index => ValidateSingleFenRow(match.Groups[index].Value));
+        return Enumerable.Range(1, 10).All(index => ValidateFenRow(match.Groups[index].Value));
     }
 
-    private static bool ValidateSingleFenRow(string fenRow)
+    public static bool ValidateFenRowColumns(string fenRow)
     {
         int totalNumberOfColumnsInRow = fenRow
                                         .Select(c => char.IsDigit(c) ? int.Parse(c.ToString()) : 1)
@@ -29,6 +29,17 @@ public static partial class FenHelper
         return totalNumberOfColumnsInRow == 9;
     }
 
+    public static bool ValidateFenRowCharacters(string fenRow)
+    {
+        var flattenedFenRow = FlattenFenRow(fenRow);
+
+        return flattenedFenRow
+                .Where(x => !char.IsDigit(x))
+                .All(piece => FenCharacterMap.ContainsKey(char.ToLower(piece)));
+    }
+
+    public static bool ValidateFenRow(string fenRow)
+        => ValidateFenRowCharacters(fenRow) && ValidateFenRowColumns(fenRow);
 
     // Tried splitting the FEN string before, so try with regex this time
     // Regex Key
@@ -53,7 +64,7 @@ public static partial class FenHelper
             var rowNumberInResult = 10 - i;
             var actualRowNumber = rowNumberInResult + 1;
 
-            Piece[] parsedFen = ParseSingleRow(fenRow, actualRowNumber);
+            Piece[] parsedFen = ParseFenRow(fenRow, actualRowNumber);
             
             for(int j = 0; j < 9; j++)
             {
@@ -64,12 +75,11 @@ public static partial class FenHelper
         return result;
     }
 
-    public static Piece[] ParseSingleRow(string fenRow, int rowNumber)
+    public static Piece[] ParseFenRow(string fenRow, int rowNumber)
     {
-        var cleanedFenRow = fenRow
-                            .Select(x => char.IsDigit(x) ? SplitCharDigitToStringOfOne(x) : x.ToString());
+        var flattenedFenRow = FlattenFenRow(fenRow);
 
-        return string.Join("", cleanedFenRow)
+        return flattenedFenRow
                     .Select((x, index) =>
                     {
                         if (char.IsDigit(x))
@@ -103,6 +113,9 @@ public static partial class FenHelper
 
         return string.Join("", Enumerable.Repeat("1", parsedNum));
     }
+
+    public static string FlattenFenRow(string fenRow)
+        => string.Join("", fenRow.Select(x => char.IsDigit(x) ? SplitCharDigitToStringOfOne(x) : x.ToString()));
 
     public static Side GetSideFromFenChar(char piece) => char.IsDigit(piece) ? Side.None : char.IsUpper(piece) ? Side.Red : Side.Black;
 }

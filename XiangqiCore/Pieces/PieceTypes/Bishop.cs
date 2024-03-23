@@ -12,4 +12,5 @@ public sealed class Bishop : Piece
     public override IValidationStrategy ValidationStrategy { get; }
 
     public override PieceType GetPieceType => PieceType.Bishop;
+    public override char FenCharacter => 'b';
 }

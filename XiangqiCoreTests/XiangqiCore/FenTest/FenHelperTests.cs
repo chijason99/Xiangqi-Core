@@ -33,6 +33,68 @@ public static class FenHelperTests
     }
 
     [Theory]
+    [InlineData("rnbakabnr")]
+    [InlineData("n2cb1n2")]
+    [InlineData("2PN5")]
+    [InlineData("4kabr1")]
+    public static void ShouldReturnTrue_WhenCallingValidateFenRowCharacters_WithValidFenRow(string fenRow)
+    {
+        // Arrange
+        // Act
+        bool result = FenHelper.ValidateFenRowCharacters(fenRow);
+
+        // Assert
+        result.Should().BeTrue();
+    }
+
+    [Theory]
+    [InlineData("rnbjkabnr")]
+    [InlineData("n2cb1I2")]
+    [InlineData("1mPN5")]
+    [InlineData("z4kabr1")]
+    public static void ShouldReturnFalse_WhenCallingValidateFenRowCharacters_WithInvalidFenRow(string fenRow)
+    {
+        // Arrange
+        // Act
+        bool result = FenHelper.ValidateFenRowCharacters(fenRow);
+
+        // Assert
+        result.Should().BeFalse();
+    }
+
+    [Theory]
+    [InlineData("rnbakabnr")]
+    [InlineData("n2cb1n2")]
+    [InlineData("2PN5")]
+    [InlineData("4kabr1")]
+    [InlineData("9")]
+    public static void ShouldReturnTrue_WhenCallingValidateFenRowColumns_WithValidFenRow(string fenRow)
+    {
+        // Arrange
+        // Act
+        bool result = FenHelper.ValidateFenRowColumns(fenRow);
+
+        // Assert
+        result.Should().BeTrue();
+    }
+
+    [Theory]
+    [InlineData("rnbdskabnr")]
+    [InlineData("n3cb1c2")]
+    [InlineData("1n1PN5")]
+    [InlineData("6n1PN6")]
+    public static void ShouldReturnFalse_WhenCallingValidateFenRowColumns_WithInvalidFenRow(string fenRow)
+    {
+        // Arrange
+        // Act
+        bool result = FenHelper.ValidateFenRowColumns(fenRow);
+
+        // Assert
+        result.Should().BeFalse();
+    }
+
+
+    [Theory]
     [InlineData("rnbakabnr", new PieceType[] { PieceType.Rook, PieceType.Knight, PieceType.Bishop, PieceType.Advisor, PieceType.King, PieceType.Advisor, PieceType.Bishop, PieceType.Knight, PieceType.Rook })]
     [InlineData("2PN5", new PieceType[] { PieceType.None, PieceType.None, PieceType.Pawn, PieceType.Knight, PieceType.None, PieceType.None, PieceType.None, PieceType.None, PieceType.None })]
     [InlineData("1C2BC3", new PieceType[] { PieceType.None, PieceType.Cannon, PieceType.None, PieceType.None, PieceType.Bishop, PieceType.Cannon, PieceType.None, PieceType.None, PieceType.None })]
@@ -43,7 +105,7 @@ public static class FenHelperTests
         const int rowNumberPlaceHolder = 1;
 
         // Act
-        var result = FenHelper.ParseSingleRow(fenRow, rowNumberPlaceHolder);
+        var result = FenHelper.ParseFenRow(fenRow, rowNumberPlaceHolder);
 
         // Assert
         var actualResult = result.Select(x => x.GetPieceType);
@@ -62,7 +124,7 @@ public static class FenHelperTests
         const int rowNumberPlaceHolder = 1;
 
         // Act
-        var result = FenHelper.ParseSingleRow(fenRow, rowNumberPlaceHolder);
+        var result = FenHelper.ParseFenRow(fenRow, rowNumberPlaceHolder);
 
         // Assert
         var actualResult = result.Select(x => x.Side);
@@ -121,7 +183,7 @@ public static class FenHelperTests
                                                 .ToArray();
 
         // Act
-        var actualResult = FenHelper.ParseSingleRow(fenRow, rowNumber)
+        var actualResult = FenHelper.ParseFenRow(fenRow, rowNumber)
                                     .Select(x => x.Coordinate);
 
         // Assert

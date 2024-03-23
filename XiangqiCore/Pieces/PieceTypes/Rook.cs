@@ -11,5 +11,5 @@ public sealed class Rook : Piece
     }
     public override IValidationStrategy ValidationStrategy { get; }
     public override PieceType GetPieceType => PieceType.Rook;
-
+    public override char FenCharacter => 'r';
 }

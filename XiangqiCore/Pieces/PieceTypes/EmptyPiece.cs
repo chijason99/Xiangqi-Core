@@ -7,4 +7,6 @@ public class EmptyPiece : Piece
 
     public override IValidationStrategy ValidationStrategy => throw new NotImplementedException();
     public override PieceType GetPieceType => PieceType.None;
+
+    public override char FenCharacter => '1';
 }

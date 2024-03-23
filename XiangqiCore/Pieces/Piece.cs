@@ -24,4 +24,6 @@ public abstract class Piece(Coordinate coordinate, Side side)
     public virtual int[] GetAvailableRows() => [1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
     public virtual int[] GetAvailableColumns() => [1, 2, 3, 4, 5, 6, 7, 8, 9];
     public abstract PieceType GetPieceType { get; }
+    public abstract char FenCharacter { get; }
+    public char GetFenCharacter => Side == Side.Red ? char.ToUpper(FenCharacter) : Side == Side.Black ? char.ToLower(FenCharacter) : FenCharacter;
 }

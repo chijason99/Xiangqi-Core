@@ -12,4 +12,6 @@ public sealed class Pawn : Piece
     public override IValidationStrategy ValidationStrategy { get; }
 
     public override PieceType GetPieceType => PieceType.Pawn;
+
+    public override char FenCharacter => 'p';
 }
