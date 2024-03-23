@@ -1,5 +1,4 @@
 ﻿using XiangqiCore.Pieces;
-using XiangqiCore.Results.Errors;
 
 namespace XiangqiCore.Boards;
 public class Board

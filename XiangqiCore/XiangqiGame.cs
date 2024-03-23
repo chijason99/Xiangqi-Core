@@ -1,6 +1,5 @@
 ﻿using XiangqiCore.Boards;
-using XiangqiCore.Results;
-using XiangqiCore.Results.Errors;
+using XiangqiCore.Exceptions;
 
 namespace XiangqiCore;
 
@@ -41,15 +40,15 @@ public class XiangqiGame
     public Board Board { get; private set; }
 
 
-    public static Result<XiangqiGame> Create(string initialFenString, Side sideToMove, Player redPlayer, Player blackPlayer,
+    public static XiangqiGame Create(string initialFenString, Side sideToMove, Player redPlayer, Player blackPlayer,
                                      string competition, DateTime gameDate)
     {
         bool isFenValid = FenHelper.Validate(initialFenString);
 
-        if (!isFenValid) return Result<XiangqiGame>.Failure(CreateXiangqiGameError.InvalidFen);
+        if (!isFenValid) throw new InvalidFenException(initialFenString);
 
         XiangqiGame createdGameInstance = new(initialFenString, sideToMove, redPlayer, blackPlayer, competition, gameDate);
 
-        return Result<XiangqiGame>.Success(createdGameInstance);
+        return createdGameInstance;
     }
 }

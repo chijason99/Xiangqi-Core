@@ -11,18 +11,12 @@ public static class PieceTests
         // Arrange
 
         // Act
-        var redKingResult = PieceFactory.Create(PieceType.King, Side.Red, new Coordinate(1, 4));
-        var blackKingResult = PieceFactory.Create(PieceType.King, Side.Black, new Coordinate(5, 10));
+        var redKing = PieceFactory.Create(PieceType.King, Side.Red, new Coordinate(1, 4));
+        var blackKing = PieceFactory.Create(PieceType.King, Side.Black, new Coordinate(5, 10));
 
         // Assert
-        redKingResult.Should().NotBeNull();
-        blackKingResult.Should().NotBeNull();
-
-        redKingResult.IsSuccess.Should().BeTrue();
-        blackKingResult.IsSuccess.Should().BeTrue();
-
-        var redKing = redKingResult.Value;
-        var blackKing = blackKingResult.Value;
+        redKing.Should().NotBeNull();
+        blackKing.Should().NotBeNull();
 
         Assert.IsType<King>(redKing);
         Assert.IsType<King>(blackKing);
@@ -46,18 +40,12 @@ public static class PieceTests
         // Arrange
 
         // Act
-        var redRookResult = PieceFactory.Create(PieceType.Rook, Side.Red, new Coordinate(3, 7));
-        var blackRookResult = PieceFactory.Create(PieceType.Rook, Side.Black, new Coordinate(4, 1));
+        var redRook = PieceFactory.Create(PieceType.Rook, Side.Red, new Coordinate(3, 7));
+        var blackRook = PieceFactory.Create(PieceType.Rook, Side.Black, new Coordinate(4, 1));
 
         // Assert
-        redRookResult.Should().NotBeNull();
-        blackRookResult.Should().NotBeNull();
-
-        redRookResult.IsSuccess.Should().BeTrue();
-        blackRookResult.IsSuccess.Should().BeTrue();
-
-        var redRook = redRookResult.Value;
-        var blackRook = blackRookResult.Value;
+        redRook.Should().NotBeNull();
+        blackRook.Should().NotBeNull();
 
         Assert.IsType<Rook>(redRook);
         Assert.IsType<Rook>(blackRook);
@@ -81,18 +69,12 @@ public static class PieceTests
         // Arrange
 
         // Act
-        var redKnightResult = PieceFactory.Create(PieceType.Knight, Side.Red, new Coordinate(9, 7));
-        var blackKnightResult = PieceFactory.Create(PieceType.Knight, Side.Black, new Coordinate(4, 10));
+        var redKnight = PieceFactory.Create(PieceType.Knight, Side.Red, new Coordinate(9, 7));
+        var blackKnight = PieceFactory.Create(PieceType.Knight, Side.Black, new Coordinate(4, 10));
 
         // Assert
-        redKnightResult.Should().NotBeNull();
-        blackKnightResult.Should().NotBeNull();
-
-        redKnightResult.IsSuccess.Should().BeTrue();
-        blackKnightResult.IsSuccess.Should().BeTrue();
-
-        var redKnight = redKnightResult.Value;
-        var blackKnight = blackKnightResult.Value;
+        redKnight.Should().NotBeNull();
+        blackKnight.Should().NotBeNull();
 
         Assert.IsType<Knight>(redKnight);
         Assert.IsType<Knight>(blackKnight);
@@ -116,18 +98,12 @@ public static class PieceTests
         // Arrange
 
         // Act
-        var redCannonResult = PieceFactory.Create(PieceType.Cannon, Side.Red, new Coordinate(5, 5));
-        var blackCannonResult = PieceFactory.Create(PieceType.Cannon, Side.Black, new Coordinate(2, 1));
+        var redCannon = PieceFactory.Create(PieceType.Cannon, Side.Red, new Coordinate(5, 5));
+        var blackCannon = PieceFactory.Create(PieceType.Cannon, Side.Black, new Coordinate(2, 1));
 
         // Assert
-        redCannonResult.Should().NotBeNull();
-        blackCannonResult.Should().NotBeNull();
-
-        redCannonResult.IsSuccess.Should().BeTrue();
-        blackCannonResult.IsSuccess.Should().BeTrue();
-
-        var redCannon = redCannonResult.Value;
-        var blackCannon = blackCannonResult.Value;
+        redCannon.Should().NotBeNull();
+        blackCannon.Should().NotBeNull();
 
         Assert.IsType<Cannon>(redCannon);
         Assert.IsType<Cannon>(blackCannon);
@@ -151,18 +127,12 @@ public static class PieceTests
         // Arrange
 
         // Act
-        var redAdvisorResult = PieceFactory.Create(PieceType.Advisor, Side.Red, new Coordinate(5, 5));
-        var blackAdvisorResult = PieceFactory.Create(PieceType.Advisor, Side.Black, new Coordinate(2, 1));
+        var redAdvisor = PieceFactory.Create(PieceType.Advisor, Side.Red, new Coordinate(5, 5));
+        var blackAdvisor = PieceFactory.Create(PieceType.Advisor, Side.Black, new Coordinate(2, 1));
 
         // Assert
-        redAdvisorResult.Should().NotBeNull();
-        blackAdvisorResult.Should().NotBeNull();
-
-        redAdvisorResult.IsSuccess.Should().BeTrue();
-        blackAdvisorResult.IsSuccess.Should().BeTrue();
-
-        var redAdvisor = redAdvisorResult.Value;
-        var blackAdvisor = blackAdvisorResult.Value;
+        redAdvisor.Should().NotBeNull();
+        blackAdvisor.Should().NotBeNull();
 
         Assert.IsType<Advisor>(redAdvisor);
         Assert.IsType<Advisor>(blackAdvisor);
@@ -186,18 +156,12 @@ public static class PieceTests
         // Arrange
 
         // Act
-        var redBishopResult = PieceFactory.Create(PieceType.Bishop, Side.Red, new Coordinate(5, 5));
-        var blackBishopResult = PieceFactory.Create(PieceType.Bishop, Side.Black, new Coordinate(2, 1));
+        var redBishop = PieceFactory.Create(PieceType.Bishop, Side.Red, new Coordinate(5, 5));
+        var blackBishop = PieceFactory.Create(PieceType.Bishop, Side.Black, new Coordinate(2, 1));
 
         // Assert
-        redBishopResult.Should().NotBeNull();
-        blackBishopResult.Should().NotBeNull();
-
-        redBishopResult.IsSuccess.Should().BeTrue();
-        blackBishopResult.IsSuccess.Should().BeTrue();
-
-        var redBishop = redBishopResult.Value;
-        var blackBishop = blackBishopResult.Value;
+        redBishop.Should().NotBeNull();
+        blackBishop.Should().NotBeNull();
 
         Assert.IsType<Bishop>(redBishop);
         Assert.IsType<Bishop>(blackBishop);
@@ -221,18 +185,12 @@ public static class PieceTests
         // Arrange
 
         // Act
-        var redPawnResult = PieceFactory.Create(PieceType.Pawn, Side.Red, new Coordinate(5, 5));
-        var blackPawnResult = PieceFactory.Create(PieceType.Pawn, Side.Black, new Coordinate(2, 1));
+        var redPawn = PieceFactory.Create(PieceType.Pawn, Side.Red, new Coordinate(5, 5));
+        var blackPawn = PieceFactory.Create(PieceType.Pawn, Side.Black, new Coordinate(2, 1));
 
         // Assert
-        redPawnResult.Should().NotBeNull();
-        blackPawnResult.Should().NotBeNull();
-
-        redPawnResult.IsSuccess.Should().BeTrue();
-        blackPawnResult.IsSuccess.Should().BeTrue();
-
-        var redPawn = redPawnResult.Value;
-        var blackPawn = blackPawnResult.Value;
+        redPawn.Should().NotBeNull();
+        blackPawn.Should().NotBeNull();
 
         Assert.IsType<Pawn>(redPawn);
         Assert.IsType<Pawn>(blackPawn);

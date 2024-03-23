@@ -17,9 +17,7 @@ public static class AreCoordinatesValidTests
     public static void ShouldReturnTrue_WhenGivenValidCoordinates_ForRedKing(int column, int row) 
     {
         // Arrange
-        var result = PieceFactory.Create(PieceType.King, Side.Red, new Coordinate(5, 2));
-
-        King redKing = (King)result.Value;
+        King redKing = (King)PieceFactory.Create(PieceType.King, Side.Red, new Coordinate(5, 2));
 
         Coordinate destination = new(column, row);
         // Act
@@ -42,9 +40,7 @@ public static class AreCoordinatesValidTests
     public static void ShouldReturnTrue_WhenGivenValidCoordinates_ForBlackKing(int column, int row)
     {
         // Arrange
-        var result = PieceFactory.Create(PieceType.King, Side.Black, new Coordinate(5, 2));
-
-        King blackKing = (King)result.Value;
+        King blackKing = (King)PieceFactory.Create(PieceType.King, Side.Black, new Coordinate(5, 9));
 
         Coordinate destination = new(column, row);
         // Act
@@ -67,9 +63,7 @@ public static class AreCoordinatesValidTests
     public static void ShouldReturnFalse_WhenGivenInvalidCoordinates_ForRedKing(int column, int row)
     {
         // Arrange
-        var result = PieceFactory.Create(PieceType.King, Side.Red, new Coordinate(5, 2));
-
-        King redKing = (King)result.Value;
+        King redKing = (King)PieceFactory.Create(PieceType.King, Side.Red, new Coordinate(5, 2));
 
         Coordinate destination = new(column, row);
         // Act
@@ -92,9 +86,7 @@ public static class AreCoordinatesValidTests
     public static void ShouldReturnFalse_WhenGivenInvalidCoordinates_ForBlackKing(int column, int row)
     {
         // Arrange
-        var result = PieceFactory.Create(PieceType.King, Side.Black, new Coordinate(5, 2));
-
-        King blackKing = (King)result.Value;
+        King blackKing = (King)PieceFactory.Create(PieceType.King, Side.Black, new Coordinate(5, 9));
 
         Coordinate destination = new(column, row);
         // Act
@@ -115,9 +107,7 @@ public static class AreCoordinatesValidTests
     public static void ShouldReturnTrue_WhenGivenValidCoordinates_ForRedBishop(int column, int row)
     {
         // Arrange
-        var result = PieceFactory.Create(PieceType.Bishop, Side.Red, new Coordinate(3, 1));
-
-        Bishop redBishop = (Bishop)result.Value;
+        Bishop redBishop = (Bishop)PieceFactory.Create(PieceType.Bishop, Side.Red, new Coordinate(3, 1));
 
         Coordinate destination = new(column, row);
         // Act

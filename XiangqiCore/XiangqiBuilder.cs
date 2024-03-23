@@ -1,5 +1,4 @@
-﻿using XiangqiCore.Results;
-namespace XiangqiCore;
+﻿namespace XiangqiCore;
 
 public class XiangqiBuilder : IXiangqiBuilder
 {
@@ -37,7 +36,7 @@ public class XiangqiBuilder : IXiangqiBuilder
         return this;
     }
 
-    public Result<XiangqiGame> Build()
+    public XiangqiGame Build()
          => XiangqiGame.Create(initialFenString: _initialFen, sideToMove:_sideToMove, redPlayer: _redPlayer, 
                                blackPlayer: _blackPlayer, competition: _competition, gameDate: _gameDate);
 

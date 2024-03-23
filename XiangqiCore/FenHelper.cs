@@ -54,13 +54,13 @@ public static partial class FenHelper
                     .Select(x =>
                     {
                         if (char.IsDigit(x))
-                            return PieceFactory.CreateEmptyPiece().Value;
+                            return PieceFactory.CreateEmptyPiece();
 
                         PieceType targetPieceType = FenCharacterMap.GetValueOrDefault(char.ToLower(x));
                         Side targetSide = GetSideFromFenChar(x);
                         Coordinate targetCoordinate = Coordinate.Empty;
 
-                        return PieceFactory.Create(targetPieceType, targetSide, targetCoordinate).Value;
+                        return PieceFactory.Create(targetPieceType, targetSide, targetCoordinate);
                     })
                     .ToArray();
     }

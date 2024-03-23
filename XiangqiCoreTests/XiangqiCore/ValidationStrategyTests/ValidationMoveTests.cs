@@ -12,9 +12,7 @@ public static class ValidateMoveTests
     public static void ShouldReturnTrue_WhenGivenValidMoves_ForKing(int column, int row)
     {
         // Arrange
-        var result = PieceFactory.Create(PieceType.King, Side.Red, new Coordinate(column: 5, row: 2));
-
-        King king = (King)result.Value;
+        King king = (King)PieceFactory.Create(PieceType.King, Side.Red, new Coordinate(column: 5, row: 2));
 
         Coordinate destination = new(column, row);
 
@@ -33,9 +31,7 @@ public static class ValidateMoveTests
     public static void ShouldReturnFalse_WhenGivenInValidMoves_ForKing(int column, int row)
     {
         // Arrange
-        var result = PieceFactory.Create(PieceType.King, Side.Red, new Coordinate(column: 5, row: 2));
-
-        King king = (King)result.Value;
+        var king = (King)PieceFactory.Create(PieceType.King, Side.Red, new Coordinate(column: 5, row: 2));
 
         Coordinate destination = new(column, row);
 
