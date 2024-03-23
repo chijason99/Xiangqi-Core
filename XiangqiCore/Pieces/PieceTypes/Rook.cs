@@ -1,4 +1,5 @@
-﻿using XiangqiCore.Pieces.ValidationStrategy;
+﻿using XiangqiCore.Pieces.PieceTypes;
+using XiangqiCore.Pieces.ValidationStrategy;
 
 namespace XiangqiCore.Pieces;
 public sealed class Rook : Piece
@@ -9,4 +10,6 @@ public sealed class Rook : Piece
         ValidationStrategy = new RookValidationStrategy();
     }
     public override IValidationStrategy ValidationStrategy { get; }
+    public override PieceType GetPieceType => PieceType.Rook;
+
 }

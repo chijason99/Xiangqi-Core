@@ -1,4 +1,5 @@
 ﻿using XiangqiCore.Attributes;
+using XiangqiCore.Pieces.PieceTypes;
 using XiangqiCore.Pieces.ValidationStrategy;
 
 namespace XiangqiCore.Pieces;
@@ -13,4 +14,6 @@ public sealed class Advisor : Piece
         ValidationStrategy = new AdvisorValidationStrategy();
     }
     public override IValidationStrategy ValidationStrategy { get; }
+
+    public override PieceType GetPieceType => PieceType.Advisor;
 }

@@ -17,4 +17,6 @@ public static class PieceFactory
             PieceType.Pawn => Result<Piece>.Success(new Pawn(coordinate, color)),
             _ => Result<Piece>.Failure(CreatePieceError.InvalidPieceTypeError)
         };
+
+    public static Result<Piece> CreateEmptyPiece() => Result<Piece>.Success(new EmptyPiece());
 }

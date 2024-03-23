@@ -3,10 +3,10 @@ public class BishopValidationStrategy : IValidationStrategy
 {
     public bool AreCoordinatesValid(Side color, Coordinate destination)
     {
-        HashSet<Coordinate> possibleCoordinatesForRedBishop = [new Coordinate(1, 3), new Coordinate(3, 1), new Coordinate(3, 5),
-                                                              new Coordinate(7, 1), new Coordinate(7, 3), new Coordinate(9, 3)];
+        HashSet<Coordinate> possibleCoordinatesForRedBishop = [new Coordinate(1, 3), new Coordinate(3, 1), new Coordinate(3, 5), new Coordinate(5, 3),
+                                                              new Coordinate(7, 1), new Coordinate(7, 5), new Coordinate(9, 3)];
 
-        HashSet<Coordinate> possibleCoordinatesForBlackBishop = [new Coordinate(1, 8), new Coordinate(3, 6), new Coordinate(3, 10),
+        HashSet<Coordinate> possibleCoordinatesForBlackBishop = [new Coordinate(1, 8), new Coordinate(3, 6), new Coordinate(3, 10), new Coordinate(5, 8),
                                                               new Coordinate(7, 6), new Coordinate(7, 10), new Coordinate(9, 8)];
 
         return color switch

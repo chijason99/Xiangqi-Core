@@ -1,4 +1,7 @@
-﻿namespace xiangqi_core_test.XiangqiCore.FenTest;
+﻿using XiangqiCore.Pieces.PieceTypes;
+using static XiangqiCore.Pieces.PieceTypes.PieceType;
+
+namespace xiangqi_core_test.XiangqiCore.FenTest;
 public static class FenHelperTests
 {
     [Theory]
@@ -28,5 +31,75 @@ public static class FenHelperTests
         bool result = FenHelper.Validate(sampleFen);
         // Assert
         result.Should().BeFalse();
+    }
+
+    [Theory]
+    [InlineData("rnbakabnr", new PieceType[]{ Rook, Knight, Bishop, Advisor, PieceType.King, Advisor, Bishop, Knight, Rook})]
+    [InlineData("2PN5", new PieceType[]{ None, None, Pawn, Knight, None, None, None, None, None })]
+    [InlineData("1C2BC3", new PieceType[]{ None, Cannon, None, None, Bishop, Cannon, None, None, None })]
+    [InlineData("n2cb1n2", new PieceType[]{ Knight, None, None, Cannon, Bishop, None, Knight, None, None })]
+    public static void ShouldParseFenRowAndReturnCorrectPieces_WhenGivenAValidFenRowString(string fenRow, PieceType[] expectedResult)
+    {
+        // Arrange
+        // Act
+        var result = FenHelper.ParseSingleRow(fenRow);
+
+        // Assert
+        var actualResult = result.Select(x => x.GetPieceType);
+
+        Assert.Equal(actualResult, expectedResult);
+    }
+
+    [Theory]
+    [InlineData("rnbakabnr", new Side[] { Side.Black, Side.Black, Side.Black, Side.Black, Side.Black, Side.Black, Side.Black, Side.Black, Side.Black })]
+    [InlineData("2PN5", new Side[] { Side.None, Side.None, Side.Red, Side.Red, Side.None, Side.None, Side.None, Side.None, Side.None })]
+    [InlineData("1C2BC3", new Side[] { Side.None, Side.Red, Side.None, Side.None, Side.Red, Side.Red, Side.None, Side.None, Side.None })]
+    [InlineData("n2cb1N2", new Side[] { Side.Black, Side.None, Side.None, Side.Black, Side.Black, Side.None, Side.Red, Side.None, Side.None })]
+    public static void ShouldParseFenRowAndReturnCorrectSides_WhenGivenAValidFenRowString(string fenRow, Side[] expectedResult)
+    {
+        // Arrange
+        // Act
+        var result = FenHelper.ParseSingleRow(fenRow);
+
+        // Assert
+        var actualResult = result.Select(x => x.Side);
+
+        Assert.Equal(actualResult, expectedResult);
+    }
+
+    [Theory]
+    [InlineData('1', "1")]
+    [InlineData('2', "11")]
+    [InlineData('3', "111")]
+    [InlineData('4', "1111")]
+    [InlineData('5', "11111")]
+    [InlineData('6', "111111")]
+    [InlineData('7', "1111111")]
+    [InlineData('8', "11111111")]
+    [InlineData('9', "111111111")]
+    public static void ShouldTurnCharDigitIntoStringOfOne_WhenGivenACharDigit(char digit, string expectedResult)
+    {
+        // Arrange
+        // Act
+        var actualResult = FenHelper.SplitCharDigitToStringOfOne(digit);
+
+        // Assert
+        actualResult.Should().Be(expectedResult);
+    }
+
+    [Theory]
+    [InlineData('c', Side.Black)]
+    [InlineData('K', Side.Red)]
+    [InlineData('r', Side.Black)]
+    [InlineData('P', Side.Red)]
+    [InlineData('1', Side.None)]
+    public static void ShouldReturnCorrectSides_WhenGivenACharOfPiece(char piece, Side expectedResult)
+    {
+        // Arrange
+        // Act
+        var actualResult = FenHelper.GetSideFromFenChar(piece);
+
+        // Assert
+        actualResult.Should().Be(expectedResult);
     }
 }

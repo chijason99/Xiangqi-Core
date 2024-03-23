@@ -14,8 +14,5 @@ public sealed class King : Piece
     }
     public override IValidationStrategy ValidationStrategy { get; }
 
-    public override int[] GetAvailableColumns()
-    {
-
-    }
+    public override PieceType GetPieceType => PieceType.King;
 }

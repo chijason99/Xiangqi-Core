@@ -105,15 +105,13 @@ public static class AreCoordinatesValidTests
     }
 
     [Theory]
-    [InlineData(8, 7)]
-    [InlineData(7, 3)]
-    [InlineData(5, 3)]
+    [InlineData(1, 3)]
+    [InlineData(3, 1)]
     [InlineData(3, 5)]
-    [InlineData(2, 2)]
-    [InlineData(9, 10)]
-    [InlineData(3, 2)]
-    [InlineData(1, 1)]
-    [InlineData(2, 5)]
+    [InlineData(5, 3)]
+    [InlineData(7, 1)]
+    [InlineData(7, 5)]
+    [InlineData(9, 3)]
     public static void ShouldReturnTrue_WhenGivenValidCoordinates_ForRedBishop(int column, int row)
     {
         // Arrange
@@ -123,7 +121,7 @@ public static class AreCoordinatesValidTests
 
         Coordinate destination = new(column, row);
         // Act
-        bool isDestinationValid = redBishop.ValidationStrategy.AreCoordinatesValid(Side.Black, destination);
+        bool isDestinationValid = redBishop.ValidationStrategy.AreCoordinatesValid(Side.Red, destination);
 
         // Assert
         isDestinationValid.Should().BeTrue();

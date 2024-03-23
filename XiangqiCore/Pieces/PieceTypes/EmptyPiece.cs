@@ -6,4 +6,5 @@ public class EmptyPiece : Piece
     public EmptyPiece() : base(Coordinate.Empty, Side.None){ }
 
     public override IValidationStrategy ValidationStrategy => throw new NotImplementedException();
+    public override PieceType GetPieceType => PieceType.None;
 }

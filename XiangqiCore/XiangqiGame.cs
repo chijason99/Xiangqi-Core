@@ -1,4 +1,5 @@
-﻿using XiangqiCore.Results;
+﻿using XiangqiCore.Boards;
+using XiangqiCore.Results;
 using XiangqiCore.Results.Errors;
 
 namespace XiangqiCore;
@@ -36,6 +37,8 @@ public class XiangqiGame
     public DateTime GameDate { get; private set; }
     public DateTime CreatedDate { get; private set; }
     public DateTime UpdatedDate { get; private set; }
+
+    public Board Board { get; private set; }
 
 
     public static Result<XiangqiGame> Create(string initialFenString, Side sideToMove, Player redPlayer, Player blackPlayer,

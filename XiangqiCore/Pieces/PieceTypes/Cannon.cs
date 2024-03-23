@@ -1,4 +1,5 @@
-﻿using XiangqiCore.Pieces.ValidationStrategy;
+﻿using XiangqiCore.Pieces.PieceTypes;
+using XiangqiCore.Pieces.ValidationStrategy;
 
 namespace XiangqiCore.Pieces;
 public sealed class Cannon : Piece
@@ -8,5 +9,6 @@ public sealed class Cannon : Piece
     {
         ValidationStrategy = new CannonValidationStrategy();
     }
+    public override PieceType GetPieceType => PieceType.Cannon;
     public override IValidationStrategy ValidationStrategy { get; }
 }

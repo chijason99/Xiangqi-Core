@@ -1,4 +1,6 @@
 ﻿using System.Text.RegularExpressions;
+using XiangqiCore.Pieces;
+using XiangqiCore.Pieces.PieceTypes;
 
 namespace XiangqiCore;
 
@@ -37,4 +39,51 @@ public static partial class FenHelper
     // \s(\d+) : separated by a white space, then capture the round number
     [GeneratedRegex(@"^([1-9rbaknpc]+)[\/]([1-9rbaknpc]+)[\/]([1-9rbaknpc]+)[\/]([1-9rbaknpc]+)[\/]([1-9rbaknpc]+)[\/]([1-9rbaknpc]+)[\/]([1-9rbaknpc]+)[\/]([1-9rbaknpc]+)[\/]([1-9rbaknpc]+)[\/]([1-9rbaknpc]+)\s([bw]).{5}(\d+)\s(\d+)", RegexOptions.IgnoreCase, "en-GB")]
     private static partial Regex FenRegex();
+
+    //public static Board CreateBoardFromFen(string fen)
+    //{
+
+    //}
+
+    public static Piece[] ParseSingleRow(string fenRow)
+    {
+        var cleanedFenRow = fenRow
+                            .Select(x => char.IsDigit(x) ? SplitCharDigitToStringOfOne(x) : x.ToString());
+
+        return string.Join("", cleanedFenRow)
+                    .Select(x =>
+                    {
+                        if (char.IsDigit(x))
+                            return PieceFactory.CreateEmptyPiece().Value;
+
+                        PieceType targetPieceType = FenCharacterMap.GetValueOrDefault(char.ToLower(x));
+                        Side targetSide = GetSideFromFenChar(x);
+                        Coordinate targetCoordinate = Coordinate.Empty;
+
+                        return PieceFactory.Create(targetPieceType, targetSide, targetCoordinate).Value;
+                    })
+                    .ToArray();
+    }
+
+    public static Dictionary<char, PieceType> FenCharacterMap
+        => new ()
+        {
+            { 'k', PieceType.King },
+            { 'c', PieceType.Cannon },
+            { 'r', PieceType.Rook },
+            { 'b', PieceType.Bishop },
+            { 'p', PieceType.Pawn },
+            { 'n', PieceType.Knight },
+            { 'a', PieceType.Advisor },
+            { '1', PieceType.None }
+        };
+
+    public static string SplitCharDigitToStringOfOne(char num)
+    {
+        int parsedNum = int.Parse(num.ToString());
+
+        return string.Join("", Enumerable.Repeat("1", parsedNum));
+    }
+
+    public static Side GetSideFromFenChar(char piece) => char.IsDigit(piece) ? Side.None : char.IsUpper(piece) ? Side.Red : Side.Black;
 }

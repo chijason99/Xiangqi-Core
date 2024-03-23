@@ -1,4 +1,5 @@
-﻿using XiangqiCore.Pieces.ValidationStrategy;
+﻿using XiangqiCore.Pieces.PieceTypes;
+using XiangqiCore.Pieces.ValidationStrategy;
 
 namespace XiangqiCore.Pieces;
 public sealed class Pawn : Piece
@@ -9,4 +10,6 @@ public sealed class Pawn : Piece
         ValidationStrategy = new PawnValidationStrategy();
     }
     public override IValidationStrategy ValidationStrategy { get; }
+
+    public override PieceType GetPieceType => PieceType.Pawn;
 }
