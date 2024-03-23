@@ -209,7 +209,7 @@ public static class FenHelperTests
                                     { new EmptyPiece(), new EmptyPiece(), new EmptyPiece(), new EmptyPiece(), new King(new(5,10), Side.Black), new Advisor(new (6,10), Side.Black), new Bishop(new(7,10), Side.Black), new Rook(new(8,10), Side.Black), new EmptyPiece()  }, 
                                   };
         // Act
-        var actualResult = FenHelper.CreateBoardFromFen(sampleFen);
+        var actualResult = FenHelper.CreatePositionFromFen(sampleFen);
 
         // Assert
 

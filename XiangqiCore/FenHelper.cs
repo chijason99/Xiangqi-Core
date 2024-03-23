@@ -51,7 +51,7 @@ public static partial class FenHelper
     [GeneratedRegex(@"^([1-9rbaknpc]+)[\/]([1-9rbaknpc]+)[\/]([1-9rbaknpc]+)[\/]([1-9rbaknpc]+)[\/]([1-9rbaknpc]+)[\/]([1-9rbaknpc]+)[\/]([1-9rbaknpc]+)[\/]([1-9rbaknpc]+)[\/]([1-9rbaknpc]+)[\/]([1-9rbaknpc]+)\s([bw]).{5}(\d+)\s(\d+)", RegexOptions.IgnoreCase, "en-GB")]
     private static partial Regex FenRegex();
 
-    public static Piece[,] CreateBoardFromFen(string fenInput)
+    public static Piece[,] CreatePositionFromFen(string fenInput)
     {
         Regex fenRegex = FenRegex();
         Match match = fenRegex.Match(fenInput);

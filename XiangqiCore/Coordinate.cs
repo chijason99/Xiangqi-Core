@@ -10,11 +10,13 @@ public readonly struct Coordinate()
     public Coordinate(int column, int row) : this()
     {
         bool isEmptyCoordinate = column == _emptyCoordinateValue && row == _emptyCoordinateValue;
+        bool isInvalidRow = row < _minRow || row > _maxRow;
+        bool isInvalidColumn = column < _minColumn || column > _maxColumn;
 
-        if ((row < _minRow || row > _maxRow) && !isEmptyCoordinate)
+        if (isInvalidRow && !isEmptyCoordinate)
             throw new ArgumentOutOfRangeException(nameof(row), $"Row must be between {_minRow} and {_maxRow}.");
 
-        if ((column < _minColumn || column > _maxColumn) && !isEmptyCoordinate)
+        if (isInvalidColumn && !isEmptyCoordinate)
             throw new ArgumentOutOfRangeException(nameof(column), $"Column must be between {_minColumn} and {_maxColumn}.");
 
         Row = row;

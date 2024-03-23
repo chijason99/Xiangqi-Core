@@ -39,15 +39,17 @@ public class XiangqiGame
 
     public Board Board { get; private set; }
 
-
     public static XiangqiGame Create(string initialFenString, Side sideToMove, Player redPlayer, Player blackPlayer,
-                                     string competition, DateTime gameDate)
+                                     string competition, DateTime gameDate, bool useBoardConfig = false, BoardConfig? boardConfig = null)
     {
         bool isFenValid = FenHelper.Validate(initialFenString);
 
         if (!isFenValid) throw new InvalidFenException(initialFenString);
 
-        XiangqiGame createdGameInstance = new(initialFenString, sideToMove, redPlayer, blackPlayer, competition, gameDate);
+        XiangqiGame createdGameInstance = new(initialFenString, sideToMove, redPlayer, blackPlayer, competition, gameDate)
+        {
+            Board = useBoardConfig ? new Board(boardConfig!) : new Board(initialFenString)
+        };
 
         return createdGameInstance;
     }
