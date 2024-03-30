@@ -88,4 +88,16 @@ public class XiangqiBuilder : IXiangqiBuilder
 
         return this;
     }
+
+    public XiangqiBuilder UseBoardConfig(Action<BoardConfig> action)
+    {
+        BoardConfig config = new();
+
+        action.Invoke(config);
+
+        _boardConfig = config;
+        _useBoardConfig = true;
+
+        return this;
+    }
 }

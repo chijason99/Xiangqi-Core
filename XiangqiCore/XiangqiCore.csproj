@@ -4,6 +4,15 @@
     <TargetFramework>net8.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
+    <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
+    <Title>XiangqiCore</Title>
+    <Authors>Jason Chi</Authors>
+    <Company />
+    <Description>A lightweight xiangqi library for users to create xiangqi related applications</Description>
   </PropertyGroup>
+
+  <ItemGroup>
+    <Folder Include="Attributes\" />
+  </ItemGroup>
 
 </Project>

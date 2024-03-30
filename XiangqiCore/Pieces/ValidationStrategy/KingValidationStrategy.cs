@@ -1,25 +1,19 @@
-﻿namespace XiangqiCore.Pieces.ValidationStrategy;
-public class KingValidationStrategy : IValidationStrategy
-{
-    public bool AreCoordinatesValid(Side color, Coordinate destination)
-    {
-        HashSet<Coordinate> possibleCoordinatesForRedKing = [new Coordinate(4, 1), new Coordinate(4, 2), new Coordinate(4, 3),
-                                                             new Coordinate(5, 1), new Coordinate(5, 2), new Coordinate(5, 3),
-                                                             new Coordinate(6, 1), new Coordinate(6, 2), new Coordinate(6, 3)];        
-        
-        HashSet<Coordinate> possibleCoordinatesForBlackKing = [new Coordinate(4, 8), new Coordinate(4, 9), new Coordinate(4, 10),
-                                                             new Coordinate(5, 8), new Coordinate(5, 9), new Coordinate(5, 10),
-                                                             new Coordinate(6, 8), new Coordinate(6, 9), new Coordinate(6, 10)];
+﻿using XiangqiCore.Boards;
+using XiangqiCore.Extension;
+using XiangqiCore.Pieces.PieceTypes;
 
-        return color switch
-        {
-            Side.Red => possibleCoordinatesForRedKing.Contains(destination),
-            Side.Black => possibleCoordinatesForBlackKing.Contains(destination),
-            _ => throw new ArgumentException("Please provide a valid side")
-        };
+namespace XiangqiCore.Pieces.ValidationStrategy;
+public class KingValidationStrategy : DefaultValidationStrategy
+{
+    public override bool AreCoordinatesValid(Side color, Coordinate destination)
+    {
+        int[] palaceRows = GetPossibleRows(color);
+        int[] palaceColumns = GetPossibleColumns();
+
+        return palaceColumns.Contains(destination.Column) && palaceRows.Contains(destination.Row);
     }
 
-    public bool ValidateMove(Coordinate startingPosition, Coordinate destination)
+    public override bool ValidateMoveLogicForPiece(Piece[,] boardPosition, Coordinate startingPosition, Coordinate destination)
     {
         if(startingPosition.Row != destination.Row && startingPosition.Column != destination.Column)
             return false;
@@ -34,4 +28,8 @@ public class KingValidationStrategy : IValidationStrategy
 
         return false;
     }
+
+    public override int[] GetPossibleRows(Side color) => Board.GetPalaceRows(color);
+
+    public override int[] GetPossibleColumns() => Board.GetPalaceColumns;
 }

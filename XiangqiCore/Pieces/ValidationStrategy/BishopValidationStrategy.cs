@@ -1,7 +1,7 @@
 ﻿namespace XiangqiCore.Pieces.ValidationStrategy;
-public class BishopValidationStrategy : IValidationStrategy
+public class BishopValidationStrategy : DefaultValidationStrategy
 {
-    public bool AreCoordinatesValid(Side color, Coordinate destination)
+    public override bool AreCoordinatesValid(Side color, Coordinate destination)
     {
         HashSet<Coordinate> possibleCoordinatesForRedBishop = [new Coordinate(1, 3), new Coordinate(3, 1), new Coordinate(3, 5), new Coordinate(5, 3),
                                                               new Coordinate(7, 1), new Coordinate(7, 5), new Coordinate(9, 3)];
@@ -17,7 +17,22 @@ public class BishopValidationStrategy : IValidationStrategy
         };
     }
 
-    public bool ValidateMove(Coordinate startingPosition, Coordinate destination)
+    public override int[] GetPossibleColumns()
+    {
+        throw new NotImplementedException();
+    }
+
+    public override int[] GetPossibleRows(Side color)
+    {
+        throw new NotImplementedException();
+    }
+
+    public override bool IsProposedMoveValid(Piece[,] boardPosition, Coordinate startingPoint, Coordinate destination)
+    {
+        throw new NotImplementedException();
+    }
+
+    public override bool ValidateMoveLogicForPiece(Piece[,] boardPosition ,Coordinate startingPosition, Coordinate destination)
     {
         return true;
     }

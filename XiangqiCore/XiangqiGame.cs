@@ -1,5 +1,6 @@
 ﻿using XiangqiCore.Boards;
 using XiangqiCore.Exceptions;
+using XiangqiCore.Pieces;
 
 namespace XiangqiCore;
 
@@ -24,7 +25,7 @@ public class XiangqiGame
         CreatedDate = DateTime.Today;
         UpdatedDate = DateTime.Today;
     }
-    public string InitialFenString { get; init; }
+    public string InitialFenString { get; private set; }
 
     public Side SideToMove { get; private set; }
 
@@ -39,6 +40,8 @@ public class XiangqiGame
 
     public Board Board { get; private set; }
 
+    public Piece[,] GetBoardPosition => Board.Position;
+
     public static XiangqiGame Create(string initialFenString, Side sideToMove, Player redPlayer, Player blackPlayer,
                                      string competition, DateTime gameDate, bool useBoardConfig = false, BoardConfig? boardConfig = null)
     {
@@ -48,8 +51,11 @@ public class XiangqiGame
 
         XiangqiGame createdGameInstance = new(initialFenString, sideToMove, redPlayer, blackPlayer, competition, gameDate)
         {
-            Board = useBoardConfig ? new Board(boardConfig!) : new Board(initialFenString)
+            Board = useBoardConfig ? new Board(boardConfig!) : new Board(initialFenString),
         };
+
+        if (useBoardConfig)
+            createdGameInstance.InitialFenString = FenHelper.GetFenFromPosition(createdGameInstance.Board.Position);
 
         return createdGameInstance;
     }
