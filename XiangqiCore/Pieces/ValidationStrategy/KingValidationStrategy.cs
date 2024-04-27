@@ -1,35 +1,36 @@
 ﻿using XiangqiCore.Boards;
-using XiangqiCore.Extension;
-using XiangqiCore.Pieces.PieceTypes;
 
 namespace XiangqiCore.Pieces.ValidationStrategy;
 public class KingValidationStrategy : DefaultValidationStrategy
 {
-    public override bool AreCoordinatesValid(Side color, Coordinate destination)
-    {
-        int[] palaceRows = GetPossibleRows(color);
-        int[] palaceColumns = GetPossibleColumns();
-
-        return palaceColumns.Contains(destination.Column) && palaceRows.Contains(destination.Row);
-    }
-
     public override bool ValidateMoveLogicForPiece(Piece[,] boardPosition, Coordinate startingPosition, Coordinate destination)
     {
-        if(startingPosition.Row != destination.Row && startingPosition.Column != destination.Column)
+        bool isMovingInTheSameRow = startingPosition.Row == destination.Row;
+        bool isMovingInTheSameColumn = startingPosition.Column == destination.Column;
+
+        if (!isMovingInTheSameColumn && !isMovingInTheSameRow)
             return false;
 
-        // Move horizontally
-        if(startingPosition.Row == destination.Row)
-            return startingPosition.Column == destination.Column + 1 || startingPosition.Column == destination.Column - 1;
+        if (isMovingInTheSameRow)
+        {
+            bool isMovingLeftOneStep = startingPosition.Column == destination.Column - 1;
+            bool isMovingRightOneStep = startingPosition.Column == destination.Column + 1;
+            
+            return isMovingLeftOneStep || isMovingRightOneStep;
+        }
 
-        // Move vertically
-        if (startingPosition.Column == destination.Column)
-            return startingPosition.Row == destination.Row + 1 || startingPosition.Row == destination.Row - 1;
+        if (isMovingInTheSameColumn)
+        {
+            bool isMovingUpOneStep = startingPosition.Row == destination.Row - 1;
+            bool isMovingDownOneStep = startingPosition.Row == destination.Row + 1;
+
+            return isMovingUpOneStep || isMovingDownOneStep;
+        }
 
         return false;
     }
 
     public override int[] GetPossibleRows(Side color) => Board.GetPalaceRows(color);
 
-    public override int[] GetPossibleColumns() => Board.GetPalaceColumns;
+    public override int[] GetPossibleColumns() => Board.GetGetPalaceColumns();
 }

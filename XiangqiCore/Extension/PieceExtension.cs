@@ -10,4 +10,10 @@ public static class PieceExtension
 
         return position[rowInPositionArray, columnInPositionArray];
     }
+
+    public static IEnumerable<Piece> GetPiecesOnRow(this Piece[,] position, int row)
+    => position
+        .Cast<Piece>()
+        .Where(x => x.Coordinate.Row == row && x.GetPieceType != Pieces.PieceTypes.PieceType.None)
+        .OrderBy(x => x.Coordinate.Column);
 }

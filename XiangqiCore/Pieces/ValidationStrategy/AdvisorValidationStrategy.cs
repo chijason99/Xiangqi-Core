@@ -1,28 +1,24 @@
-﻿namespace XiangqiCore.Pieces.ValidationStrategy;
+﻿using XiangqiCore.Boards;
+
+namespace XiangqiCore.Pieces.ValidationStrategy;
 public class AdvisorValidationStrategy : DefaultValidationStrategy
 {
-    public override bool AreCoordinatesValid(Side color, Coordinate destination)
-    {
-        throw new NotImplementedException();
-    }
+    public override int[] GetPossibleColumns() => Board.GetGetPalaceColumns();
 
-    public override int[] GetPossibleColumns()
-    {
-        throw new NotImplementedException();
-    }
-
-    public override int[] GetPossibleRows(Side color)
-    {
-        throw new NotImplementedException();
-    }
-
-    public override bool IsProposedMoveValid(Piece[,] boardPosition, Coordinate startingPoint, Coordinate destination)
-    {
-        throw new NotImplementedException();
-    }
+    public override int[] GetPossibleRows(Side color) => Board.GetPalaceRows(color);
 
     public override bool ValidateMoveLogicForPiece(Piece[,] boardPosition, Coordinate startingPosition, Coordinate destination)
     {
-        return true;
+        bool isMovingUp = destination.Row == startingPosition.Row + 1 ;
+        bool isMovingDown = destination.Row == startingPosition.Row - 1 ;
+        bool isMovingLeft = destination.Column == startingPosition.Column - 1 ;
+        bool isMovingRight = destination.Column == startingPosition.Column + 1 ;
+
+        bool isMovingTopLeft = isMovingUp && isMovingLeft;
+        bool isMovingTopRight = isMovingUp && isMovingRight;
+        bool isMovingBottomLeft = isMovingDown && isMovingLeft;
+        bool isMovingBottomRight = isMovingDown && isMovingRight;
+
+        return isMovingTopLeft || isMovingTopRight || isMovingBottomLeft || isMovingBottomRight;
     }
 }

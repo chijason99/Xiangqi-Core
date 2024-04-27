@@ -1,25 +1,11 @@
 ﻿namespace XiangqiCore.Pieces.ValidationStrategy;
 public class RookValidationStrategy : DefaultValidationStrategy
 {
-    public override bool AreCoordinatesValid(Side color, Coordinate destination) => true;
-
-    public override int[] GetPossibleColumns()
-    {
-        throw new NotImplementedException();
-    }
-
-    public override int[] GetPossibleRows(Side color)
-    {
-        throw new NotImplementedException();
-    }
-
-    public override bool IsProposedMoveValid(Piece[,] boardPosition, Coordinate startingPoint, Coordinate destination)
-    {
-        throw new NotImplementedException();
-    }
-
     public override bool ValidateMoveLogicForPiece(Piece[,] boardPosition, Coordinate startingPosition, Coordinate destination)
     {
+        if (startingPosition.Row != destination.Row && startingPosition.Column != destination.Column)
+            return false;
+
         return true;
     }
 }
