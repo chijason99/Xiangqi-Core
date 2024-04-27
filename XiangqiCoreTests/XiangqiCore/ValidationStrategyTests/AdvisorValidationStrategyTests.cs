@@ -35,7 +35,7 @@ public static class AdvisorValidationStrategyTests
     [InlineData(5, 2)]
     [InlineData(3, 4)]
     [InlineData(5, 1)]
-    public static void ValidateMoveLogicForPieceShouldReturnFalse_WhenGivenValidMoves_ForRedAdvisor(int column, int row)
+    public static void ValidateMoveLogicForPieceShouldReturnFalse_WhenGivenInvalidMoves_ForRedAdvisor(int column, int row)
     {
         // Arrange
         XiangqiBuilder builder = new();
@@ -87,7 +87,7 @@ public static class AdvisorValidationStrategyTests
     [InlineData(5, 7)]
     [InlineData(5, 9)]
     [InlineData(5, 10)]
-    public static void ValidateMoveLogicForPieceShouldReturnFalse_WhenGivenValidMoves_ForBlackAdvisor(int column, int row)
+    public static void ValidateMoveLogicForPieceShouldReturnFalse_WhenGivenInvalidMoves_ForBlackAdvisor(int column, int row)
     {
         // Arrange
         XiangqiBuilder builder = new();

@@ -1,9 +1,8 @@
-﻿using XiangqiCore.Pieces;
-using XiangqiCore.Pieces.PieceTypes;
+﻿using XiangqiCore.Pieces.PieceTypes;
 using XiangqiCore.Pieces.ValidationStrategy;
 
 namespace xiangqi_core_test.XiangqiCore.PieceTest;
-public static class PieceTests
+public static class PieceFactoryTests
 {
     [Fact]
     public static void ShouldCreateKing_WhenCreatingKingInPieceFactory()

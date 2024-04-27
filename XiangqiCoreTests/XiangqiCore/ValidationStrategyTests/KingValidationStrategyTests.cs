@@ -35,7 +35,7 @@ public static class ValidateMoveTests
     [InlineData(6, 1)]
     [InlineData(4, 1)]
     [InlineData(6, 3)]
-    public static void ValidateMoveLogicForPieceShouldReturnFalse_WhenGivenInValidMoves_ForKing(int column, int row)
+    public static void ValidateMoveLogicForPieceShouldReturnFalse_WhenGivenInvalidMoves_ForKing(int column, int row)
     {
         // Arrange
         XiangqiBuilder builder = new();
