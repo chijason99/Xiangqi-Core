@@ -1,4 +1,5 @@
 ﻿using XiangqiCore.Pieces;
+using XiangqiCore.Pieces.PieceTypes;
 
 namespace XiangqiCore.Extension;
 public static class PieceExtension
@@ -10,6 +11,9 @@ public static class PieceExtension
 
         return position[rowInPositionArray, columnInPositionArray];
     }
+
+    public static bool HasPieceAtPosition(this Piece[,] position, Coordinate coordinateToCheck)
+     => position.GetPieceAtPosition(coordinateToCheck) is not EmptyPiece;
 
     public static IEnumerable<Piece> GetPiecesOnRow(this Piece[,] position, int row)
     => position
