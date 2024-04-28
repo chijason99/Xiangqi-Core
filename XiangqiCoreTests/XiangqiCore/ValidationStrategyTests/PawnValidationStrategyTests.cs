@@ -56,7 +56,7 @@ public static class PawnValidationStrategyTests
         Side side = pawnValidationTestData.Side;
 
         XiangqiGame game =  builder
-                            .UseDefaultConfiguration()
+                            .UseEmptyBoard()
                             .UseBoardConfig(config => config.AddPiece(PieceType.Pawn, side, pawnCoordinate))
                             .Build();
         // Act

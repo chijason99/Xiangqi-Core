@@ -5,6 +5,7 @@ namespace XiangqiCore;
 public class XiangqiBuilder : IXiangqiBuilder
 {
     private const string _defaultStartingPositionFen = "rnbakabnr/9/1c5c1/p1p1p1p1p/9/9/P1P1P1P1P/1C5C1/9/RNBAKABNR w - - 0 0";
+    private const string _emptyStartingPositionFen = "9/9/9/9/9/9/9/9/9/9 w - - 0 0";
 
     public XiangqiBuilder()
     {
@@ -37,6 +38,13 @@ public class XiangqiBuilder : IXiangqiBuilder
     public XiangqiBuilder UseCustomFen(string customFen)
     {
         _initialFen = customFen;
+
+        return this;
+    }
+
+    public XiangqiBuilder UseEmptyBoard()
+    {
+        _initialFen = _emptyStartingPositionFen;
 
         return this;
     }
