@@ -18,6 +18,6 @@ public static class PieceExtension
     public static IEnumerable<Piece> GetPiecesOnRow(this Piece[,] position, int row)
     => position
         .Cast<Piece>()
-        .Where(x => x.Coordinate.Row == row && x.GetPieceType != Pieces.PieceTypes.PieceType.None)
+        .Where(x => x.Coordinate.Row == row && x.PieceType != Pieces.PieceTypes.PieceType.None)
         .OrderBy(x => x.Coordinate.Column);
 }

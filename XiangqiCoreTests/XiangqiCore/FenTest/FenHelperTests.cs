@@ -109,7 +109,7 @@ public static class FenHelperTests
         var result = FenHelper.ParseFenRow(fenRow, rowNumberPlaceHolder);
 
         // Assert
-        var actualResult = result.Select(x => x.GetPieceType);
+        var actualResult = result.Select(x => x.PieceType);
 
         Assert.Equal(actualResult, expectedResult);
     }

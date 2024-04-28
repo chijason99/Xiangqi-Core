@@ -9,7 +9,7 @@ public sealed class Cannon : Piece
     {
         ValidationStrategy = new CannonValidationStrategy();
     }
-    public override PieceType GetPieceType => PieceType.Cannon;
+    public override PieceType PieceType => PieceType.Cannon;
     public override IValidationStrategy ValidationStrategy { get; }
     public override char FenCharacter => 'c';
 }

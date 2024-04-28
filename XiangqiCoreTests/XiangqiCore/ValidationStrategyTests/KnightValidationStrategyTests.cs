@@ -86,7 +86,7 @@ public static class KnightValidationStrategyTests
                             .UseBoardConfig(config => 
                                 { 
                                     config.AddPiece(PieceType.Knight, Side.Red, knightCoordinate); 
-                                    config.AddPiece(PieceType.Rook, Side.Black, obstacleCoordinate); 
+                                    config.AddRandomPiece(obstacleCoordinate); 
                                 })
                             .Build();
         // Act

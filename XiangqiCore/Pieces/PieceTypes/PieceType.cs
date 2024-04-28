@@ -1,4 +1,6 @@
-﻿namespace XiangqiCore.Pieces.PieceTypes;
+﻿using XiangqiCore.Attributes;
+
+namespace XiangqiCore.Pieces.PieceTypes;
 public enum PieceType
 {
     King,
@@ -8,5 +10,6 @@ public enum PieceType
     Advisor,
     Bishop,
     Pawn,
+    [IgnoreFromRandomPick]
     None
 }

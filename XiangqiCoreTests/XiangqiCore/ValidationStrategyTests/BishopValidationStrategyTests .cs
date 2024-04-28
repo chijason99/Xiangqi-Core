@@ -18,7 +18,7 @@ public static class BishopValidationStrategyTests
         Coordinate bishopCoordinate = new(5, 3);
 
         XiangqiGame game =  builder
-                            .UseDefaultConfiguration()
+                            .UseEmptyBoard()
                             .UseBoardConfig(config => config.AddPiece(PieceType.Bishop, Side.Red, bishopCoordinate))
                             .Build();
         // Act
@@ -44,7 +44,7 @@ public static class BishopValidationStrategyTests
         Coordinate bishopCoordinate = new(5, 3);
 
         XiangqiGame game = builder
-                            .UseDefaultConfiguration()
+                            .UseEmptyBoard()
                             .UseBoardConfig(config => config.AddPiece(PieceType.Bishop, Side.Red, bishopCoordinate))
                             .Build();
         // Act
@@ -70,7 +70,7 @@ public static class BishopValidationStrategyTests
         Coordinate bishopCoordinate = new(5, 8);
 
         XiangqiGame game = builder
-                            .UseDefaultConfiguration()
+                            .UseEmptyBoard()
                             .UseBoardConfig(config => config.AddPiece(PieceType.Bishop, Side.Black, bishopCoordinate))
                             .Build();
         // Act
@@ -96,7 +96,7 @@ public static class BishopValidationStrategyTests
         Coordinate bishopCoordinate = new(5, 8);
 
         XiangqiGame game = builder
-                            .UseDefaultConfiguration()
+                            .UseEmptyBoard()
                             .UseBoardConfig(config => config.AddPiece(PieceType.Bishop, Side.Red, bishopCoordinate))
                             .Build();
         // Act

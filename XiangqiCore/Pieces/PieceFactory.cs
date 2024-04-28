@@ -1,4 +1,5 @@
 ﻿using XiangqiCore.Exceptions;
+using XiangqiCore.Extension;
 using XiangqiCore.Pieces.PieceTypes;
 
 namespace XiangqiCore.Pieces;
@@ -18,4 +19,12 @@ public static class PieceFactory
         };
 
     public static Piece CreateEmptyPiece() => new EmptyPiece();
+
+    public static Piece CreateRandomPiece(Coordinate coordinate)
+    {
+        PieceType randomPieceType = EnumHelper<PieceType>.GetRandomValue();
+        Side randomSide = EnumHelper<Side>.GetRandomValue();
+
+        return Create(randomPieceType, randomSide, coordinate);
+    }
 }
