@@ -1,4 +1,5 @@
 ﻿using LinqKit;
+using System.Drawing;
 using XiangqiCore.Pieces;
 using XiangqiCore.Pieces.PieceTypes;
 
@@ -68,5 +69,17 @@ public static class PieceExtension
             predicate.And(piece => piece.Coordinate.Row < startingPosition.Row && piece.Coordinate.Row > destination.Row);
 
         return piecesOnRow.Count(predicate);
+    }
+
+    public static bool IsDestinationContainingFriendlyPiece(this Piece[,] boardPosition, Coordinate startingPosition, Coordinate destination)
+    {
+        Side side = boardPosition.GetPieceAtPosition(startingPosition).Side;
+
+        return boardPosition.HasPieceAtPosition(destination) && boardPosition.GetPieceAtPosition(destination).Side == side;
+    }
+    
+    public static bool WillExposeKingToDanger(this Piece[,] boardPosition, Coordinate startingPosition, Coordinate destination)
+    {
+        return false;
     }
 }

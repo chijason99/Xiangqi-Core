@@ -1,6 +1,5 @@
 ﻿using XiangqiCore.Boards;
 using XiangqiCore.Extension;
-using XiangqiCore.Pieces.PieceTypes;
 
 namespace XiangqiCore.Pieces.ValidationStrategy;
 public class DefaultValidationStrategy : IValidationStrategy
@@ -25,16 +24,8 @@ public class DefaultValidationStrategy : IValidationStrategy
 
         return validationStrategy.AreCoordinatesValid(side, destination) &&
                validationStrategy.ValidateMoveLogicForPiece(boardPosition, startingPoint, destination) &&
-               !WillExposeKingToDanger(boardPosition, startingPoint, destination) &&
-               !IsDestinationContainingHavingFriendlyPiece(boardPosition, side, destination);
+               !boardPosition.WillExposeKingToDanger(startingPoint, destination) &&
+               !boardPosition.IsDestinationContainingFriendlyPiece(startingPoint, destination);
     }
     public virtual bool ValidateMoveLogicForPiece(Piece[,] boardPosition, Coordinate startingPoint, Coordinate destination) => true;
-
-    public bool WillExposeKingToDanger(Piece[,] boardPosition, Coordinate startingPoint, Coordinate destination)
-    {
-        return false;
-    }
-
-    public bool IsDestinationContainingHavingFriendlyPiece(Piece[,] boardPosition,Side color ,Coordinate destination)
-      => !boardPosition.GetPieceAtPosition(destination).Equals(new EmptyPiece()) && boardPosition.GetPieceAtPosition(destination).Side == color;
 }

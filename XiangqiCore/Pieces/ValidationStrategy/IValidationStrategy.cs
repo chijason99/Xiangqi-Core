@@ -3,7 +3,9 @@ public interface IValidationStrategy
 {
     /// <summary>
     /// Check if making this move would break any rules against the move logic of the piece
-    /// For example, check if the cannon is going across pieces without capturing.
+    /// This method does not validate against capturing a same color piece,
+    /// nor does it validate against pieces being in a invalid position(King getting out of the palace for example)
+    /// These other conditions are validated through other methods
     /// <param name="boardPosition"></param>
     /// <param name="startingPoint"></param>
     /// <param name="destination"></param>
@@ -17,8 +19,6 @@ public interface IValidationStrategy
     /// <param name="destination"></param>
     /// <returns>A boolean indicating if the destination is valid or not</returns>
     bool AreCoordinatesValid(Side color, Coordinate destination);
-
-    bool WillExposeKingToDanger(Piece[,] boardPosition, Coordinate startingPoint, Coordinate destination);
 
     int[] GetPossibleRows(Side color);
     
