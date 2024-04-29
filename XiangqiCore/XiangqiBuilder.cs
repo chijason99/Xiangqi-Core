@@ -10,7 +10,7 @@ public class XiangqiBuilder : IXiangqiBuilder
     public XiangqiBuilder()
     {
     }
-    private string _initialFen { get; set; }
+    private string _initialFen { get; set; } = _defaultStartingPositionFen;
     private Side _sideToMove { get; set; }
 
     private Player _redPlayer { get; set; }

@@ -16,7 +16,11 @@ public class Board
         Position = FenHelper.CreatePositionFromFen(fenString);
     }
 
-    public Board(BoardConfig config) : this()
+    /// <summary>
+    /// Use the BoardConfig to override existing pieces on board
+    /// </summary>
+    /// <param name="config"></param>
+    public Board(string fenString, BoardConfig config) : this(fenString)
     {
         foreach (var keyValuePair in config.PiecesToAdd)
             SetPieceAtPosition(keyValuePair.Key, keyValuePair.Value);

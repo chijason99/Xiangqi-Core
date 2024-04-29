@@ -83,6 +83,7 @@ public static class RookValidationStrategyTests
 
         XiangqiGame game = builder
                             .UseCustomFen(startingFen)
+                            .UseBoardConfig(config => config.AddPiece(PieceType.Rook, Side.Red, startingPosition))
                             .Build();
         // Act
         Rook rook = (Rook)game.BoardPosition.GetPieceAtPosition(startingPosition);

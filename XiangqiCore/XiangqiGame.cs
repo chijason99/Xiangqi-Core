@@ -51,7 +51,7 @@ public class XiangqiGame
 
         XiangqiGame createdGameInstance = new(initialFenString, sideToMove, redPlayer, blackPlayer, competition, gameDate)
         {
-            Board = useBoardConfig ? new Board(boardConfig!) : new Board(initialFenString),
+            Board = useBoardConfig ? new Board(initialFenString, boardConfig!) : new Board(initialFenString),
         };
 
         if (useBoardConfig)
