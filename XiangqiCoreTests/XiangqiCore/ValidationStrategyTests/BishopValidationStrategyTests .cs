@@ -22,9 +22,9 @@ public static class BishopValidationStrategyTests
                             .UseBoardConfig(config => config.AddPiece(PieceType.Bishop, Side.Red, bishopCoordinate))
                             .Build();
         // Act
-        Bishop bishop = (Bishop)game.GetBoardPosition.GetPieceAtPosition(bishopCoordinate);
+        Bishop bishop = (Bishop)game.BoardPosition.GetPieceAtPosition(bishopCoordinate);
 
-        bool isMoveValid = bishop.ValidationStrategy.ValidateMoveLogicForPiece(game.GetBoardPosition, bishopCoordinate, destination);
+        bool isMoveValid = bishop.ValidationStrategy.ValidateMoveLogicForPiece(game.BoardPosition, bishopCoordinate, destination);
 
         // Assert
         isMoveValid.Should().BeTrue();
@@ -48,9 +48,9 @@ public static class BishopValidationStrategyTests
                             .UseBoardConfig(config => config.AddPiece(PieceType.Bishop, Side.Red, bishopCoordinate))
                             .Build();
         // Act
-        Bishop bishop = (Bishop)game.GetBoardPosition.GetPieceAtPosition(bishopCoordinate);
+        Bishop bishop = (Bishop)game.BoardPosition.GetPieceAtPosition(bishopCoordinate);
 
-        bool isMoveValid = bishop.ValidationStrategy.ValidateMoveLogicForPiece(game.GetBoardPosition, bishopCoordinate, destination);
+        bool isMoveValid = bishop.ValidationStrategy.ValidateMoveLogicForPiece(game.BoardPosition, bishopCoordinate, destination);
 
         // Assert
         isMoveValid.Should().BeFalse();
@@ -74,9 +74,9 @@ public static class BishopValidationStrategyTests
                             .UseBoardConfig(config => config.AddPiece(PieceType.Bishop, Side.Black, bishopCoordinate))
                             .Build();
         // Act
-        Bishop bishop = (Bishop)game.GetBoardPosition.GetPieceAtPosition(bishopCoordinate);
+        Bishop bishop = (Bishop)game.BoardPosition.GetPieceAtPosition(bishopCoordinate);
 
-        bool isMoveValid = bishop.ValidationStrategy.ValidateMoveLogicForPiece(game.GetBoardPosition, bishopCoordinate, destination);
+        bool isMoveValid = bishop.ValidationStrategy.ValidateMoveLogicForPiece(game.BoardPosition, bishopCoordinate, destination);
 
         // Assert
         isMoveValid.Should().BeTrue();
@@ -100,9 +100,9 @@ public static class BishopValidationStrategyTests
                             .UseBoardConfig(config => config.AddPiece(PieceType.Bishop, Side.Red, bishopCoordinate))
                             .Build();
         // Act
-        Bishop bishop = (Bishop)game.GetBoardPosition.GetPieceAtPosition(bishopCoordinate);
+        Bishop bishop = (Bishop)game.BoardPosition.GetPieceAtPosition(bishopCoordinate);
 
-        bool isMoveValid = bishop.ValidationStrategy.ValidateMoveLogicForPiece(game.GetBoardPosition, bishopCoordinate, destination);
+        bool isMoveValid = bishop.ValidationStrategy.ValidateMoveLogicForPiece(game.BoardPosition, bishopCoordinate, destination);
 
         // Assert
         isMoveValid.Should().BeFalse();

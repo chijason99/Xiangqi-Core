@@ -24,7 +24,7 @@ public static class ValidateMoveTests
         // Act
         King king = (King)game.Board.GetPieceAtPosition(kingCoordinate);
 
-        bool isMoveValid = king.ValidationStrategy.ValidateMoveLogicForPiece(game.GetBoardPosition, king.Coordinate, destination);
+        bool isMoveValid = king.ValidationStrategy.ValidateMoveLogicForPiece(game.BoardPosition, king.Coordinate, destination);
 
         // Assert
         isMoveValid.Should().BeTrue();
@@ -51,7 +51,7 @@ public static class ValidateMoveTests
         King king = (King)game.Board.GetPieceAtPosition(kingCoordinate);
 
         // Act
-        bool isMoveValid = king.ValidationStrategy.ValidateMoveLogicForPiece(game.GetBoardPosition, king.Coordinate, destination);
+        bool isMoveValid = king.ValidationStrategy.ValidateMoveLogicForPiece(game.BoardPosition, king.Coordinate, destination);
 
         // Assert
         isMoveValid.Should().BeFalse();
@@ -72,7 +72,7 @@ public static class ValidateMoveTests
         King king = (King)game.Board.GetPieceAtPosition(startingPoint);
         IValidationStrategy validationStrategy = king.ValidationStrategy;
         // Act
-        bool result = validationStrategy.ValidateMoveLogicForPiece(game.GetBoardPosition, startingPoint, destination);
+        bool result = validationStrategy.ValidateMoveLogicForPiece(game.BoardPosition, startingPoint, destination);
         // Assert
         result.Should().BeTrue();
     }

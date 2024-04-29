@@ -61,9 +61,9 @@ public static class KnightValidationStrategyTests
                             .UseBoardConfig(config => config.AddPiece(PieceType.Knight, Side.Red, knightCoordinate))
                             .Build();
         // Act
-        Knight knight = (Knight)game.GetBoardPosition.GetPieceAtPosition(knightCoordinate);
+        Knight knight = (Knight)game.BoardPosition.GetPieceAtPosition(knightCoordinate);
 
-        bool isMoveValid = knight.ValidationStrategy.ValidateMoveLogicForPiece(game.GetBoardPosition, knightCoordinate, destination);
+        bool isMoveValid = knight.ValidationStrategy.ValidateMoveLogicForPiece(game.BoardPosition, knightCoordinate, destination);
         bool expectedResult = knightValidationTestData.ExpectedResult;
 
         // Assert
@@ -90,9 +90,9 @@ public static class KnightValidationStrategyTests
                                 })
                             .Build();
         // Act
-        Knight knight = (Knight)game.GetBoardPosition.GetPieceAtPosition(knightCoordinate);
+        Knight knight = (Knight)game.BoardPosition.GetPieceAtPosition(knightCoordinate);
 
-        bool isMoveValid = knight.ValidationStrategy.ValidateMoveLogicForPiece(game.GetBoardPosition, knightCoordinate, destination);
+        bool isMoveValid = knight.ValidationStrategy.ValidateMoveLogicForPiece(game.BoardPosition, knightCoordinate, destination);
         bool expectedResult = knightObstacleValidationTestData.ExpectedResult;
 
         // Assert

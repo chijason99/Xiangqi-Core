@@ -22,9 +22,9 @@ public static class AdvisorValidationStrategyTests
                             .UseBoardConfig(config => config.AddPiece(PieceType.Advisor, Side.Red, advisorCoordinate))
                             .Build();
         // Act
-        Advisor advisor = (Advisor)game.GetBoardPosition.GetPieceAtPosition(advisorCoordinate);
+        Advisor advisor = (Advisor)game.BoardPosition.GetPieceAtPosition(advisorCoordinate);
 
-        bool isMoveValid = advisor.ValidationStrategy.ValidateMoveLogicForPiece(game.GetBoardPosition, advisorCoordinate, destination);
+        bool isMoveValid = advisor.ValidationStrategy.ValidateMoveLogicForPiece(game.BoardPosition, advisorCoordinate, destination);
 
         // Assert
         isMoveValid.Should().BeTrue();
@@ -48,9 +48,9 @@ public static class AdvisorValidationStrategyTests
                             .UseBoardConfig(config => config.AddPiece(PieceType.Advisor, Side.Red, advisorCoordinate))
                             .Build();
         // Act
-        Advisor advisor = (Advisor)game.GetBoardPosition.GetPieceAtPosition(advisorCoordinate);
+        Advisor advisor = (Advisor)game.BoardPosition.GetPieceAtPosition(advisorCoordinate);
 
-        bool isMoveValid = advisor.ValidationStrategy.ValidateMoveLogicForPiece(game.GetBoardPosition, advisorCoordinate, destination);
+        bool isMoveValid = advisor.ValidationStrategy.ValidateMoveLogicForPiece(game.BoardPosition, advisorCoordinate, destination);
 
         // Assert
         isMoveValid.Should().BeFalse();
@@ -74,9 +74,9 @@ public static class AdvisorValidationStrategyTests
                             .UseBoardConfig(config => config.AddPiece(PieceType.Advisor, Side.Black, advisorCoordinate))
                             .Build();
         // Act
-        Advisor advisor = (Advisor)game.GetBoardPosition.GetPieceAtPosition(advisorCoordinate);
+        Advisor advisor = (Advisor)game.BoardPosition.GetPieceAtPosition(advisorCoordinate);
 
-        bool isMoveValid = advisor.ValidationStrategy.ValidateMoveLogicForPiece(game.GetBoardPosition, advisorCoordinate, destination);
+        bool isMoveValid = advisor.ValidationStrategy.ValidateMoveLogicForPiece(game.BoardPosition, advisorCoordinate, destination);
 
         // Assert
         isMoveValid.Should().BeTrue();
@@ -100,9 +100,9 @@ public static class AdvisorValidationStrategyTests
                             .UseBoardConfig(config => config.AddPiece(PieceType.Advisor, Side.Red, advisorCoordinate))
                             .Build();
         // Act
-        Advisor advisor = (Advisor)game.GetBoardPosition.GetPieceAtPosition(advisorCoordinate);
+        Advisor advisor = (Advisor)game.BoardPosition.GetPieceAtPosition(advisorCoordinate);
 
-        bool isMoveValid = advisor.ValidationStrategy.ValidateMoveLogicForPiece(game.GetBoardPosition, advisorCoordinate, destination);
+        bool isMoveValid = advisor.ValidationStrategy.ValidateMoveLogicForPiece(game.BoardPosition, advisorCoordinate, destination);
 
         // Assert
         isMoveValid.Should().BeFalse();

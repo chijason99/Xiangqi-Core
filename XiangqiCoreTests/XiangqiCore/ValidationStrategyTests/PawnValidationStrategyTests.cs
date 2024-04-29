@@ -60,9 +60,9 @@ public static class PawnValidationStrategyTests
                             .UseBoardConfig(config => config.AddPiece(PieceType.Pawn, side, pawnCoordinate))
                             .Build();
         // Act
-        Pawn pawn = (Pawn)game.GetBoardPosition.GetPieceAtPosition(pawnCoordinate);
+        Pawn pawn = (Pawn)game.BoardPosition.GetPieceAtPosition(pawnCoordinate);
 
-        bool isMoveValid = pawn.ValidationStrategy.ValidateMoveLogicForPiece(game.GetBoardPosition, pawnCoordinate, destination);
+        bool isMoveValid = pawn.ValidationStrategy.ValidateMoveLogicForPiece(game.BoardPosition, pawnCoordinate, destination);
         bool expectedResult = pawnValidationTestData.ExpectedResult;
         // Assert
         isMoveValid.Should().Be(expectedResult);

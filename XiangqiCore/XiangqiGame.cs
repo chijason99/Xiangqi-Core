@@ -40,7 +40,7 @@ public class XiangqiGame
 
     public Board Board { get; private set; }
 
-    public Piece[,] GetBoardPosition => Board.Position;
+    public Piece[,] BoardPosition => Board.Position;
 
     public static XiangqiGame Create(string initialFenString, Side sideToMove, Player redPlayer, Player blackPlayer,
                                      string competition, DateTime gameDate, bool useBoardConfig = false, BoardConfig? boardConfig = null)
