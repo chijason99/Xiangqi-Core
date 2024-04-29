@@ -1,37 +1,36 @@
-﻿namespace XiangqiCore.Pieces.ValidationStrategy;
-public class KingValidationStrategy : IValidationStrategy
+﻿using XiangqiCore.Boards;
+
+namespace XiangqiCore.Pieces.ValidationStrategy;
+public class KingValidationStrategy : DefaultValidationStrategy
 {
-    public bool AreCoordinatesValid(Side color, Coordinate destination)
+    public override bool ValidateMoveLogicForPiece(Piece[,] boardPosition, Coordinate startingPosition, Coordinate destination)
     {
-        HashSet<Coordinate> possibleCoordinatesForRedKing = [new Coordinate(4, 1), new Coordinate(4, 2), new Coordinate(4, 3),
-                                                             new Coordinate(5, 1), new Coordinate(5, 2), new Coordinate(5, 3),
-                                                             new Coordinate(6, 1), new Coordinate(6, 2), new Coordinate(6, 3)];        
-        
-        HashSet<Coordinate> possibleCoordinatesForBlackKing = [new Coordinate(4, 8), new Coordinate(4, 9), new Coordinate(4, 10),
-                                                             new Coordinate(5, 8), new Coordinate(5, 9), new Coordinate(5, 10),
-                                                             new Coordinate(6, 8), new Coordinate(6, 9), new Coordinate(6, 10)];
+        bool isMovingInTheSameRow = startingPosition.Row == destination.Row;
+        bool isMovingInTheSameColumn = startingPosition.Column == destination.Column;
 
-        return color switch
-        {
-            Side.Red => possibleCoordinatesForRedKing.Contains(destination),
-            Side.Black => possibleCoordinatesForBlackKing.Contains(destination),
-            _ => throw new ArgumentException("Please provide a valid side")
-        };
-    }
-
-    public bool ValidateMove(Coordinate startingPosition, Coordinate destination)
-    {
-        if(startingPosition.Row != destination.Row && startingPosition.Column != destination.Column)
+        if (!isMovingInTheSameColumn && !isMovingInTheSameRow)
             return false;
 
-        // Move horizontally
-        if(startingPosition.Row == destination.Row)
-            return startingPosition.Column == destination.Column + 1 || startingPosition.Column == destination.Column - 1;
+        if (isMovingInTheSameRow)
+        {
+            bool isMovingLeftOneStep = startingPosition.Column == destination.Column - 1;
+            bool isMovingRightOneStep = startingPosition.Column == destination.Column + 1;
+            
+            return isMovingLeftOneStep || isMovingRightOneStep;
+        }
 
-        // Move vertically
-        if (startingPosition.Column == destination.Column)
-            return startingPosition.Row == destination.Row + 1 || startingPosition.Row == destination.Row - 1;
+        if (isMovingInTheSameColumn)
+        {
+            bool isMovingUpOneStep = startingPosition.Row == destination.Row - 1;
+            bool isMovingDownOneStep = startingPosition.Row == destination.Row + 1;
+
+            return isMovingUpOneStep || isMovingDownOneStep;
+        }
 
         return false;
     }
+
+    public override int[] GetPossibleRows(Side color) => Board.GetPalaceRows(color);
+
+    public override int[] GetPossibleColumns() => Board.GetGetPalaceColumns();
 }

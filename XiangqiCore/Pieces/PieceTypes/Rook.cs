@@ -10,6 +10,6 @@ public sealed class Rook : Piece
         ValidationStrategy = new RookValidationStrategy();
     }
     public override IValidationStrategy ValidationStrategy { get; }
-    public override PieceType GetPieceType => PieceType.Rook;
+    public override PieceType PieceType => PieceType.Rook;
     public override char FenCharacter => 'r';
 }

@@ -1,9 +1,8 @@
-﻿using XiangqiCore.Pieces;
-using XiangqiCore.Pieces.PieceTypes;
+﻿using XiangqiCore.Pieces.PieceTypes;
 using XiangqiCore.Pieces.ValidationStrategy;
 
 namespace xiangqi_core_test.XiangqiCore.PieceTest;
-public static class PieceTests
+public static class PieceFactoryTests
 {
     [Fact]
     public static void ShouldCreateKing_WhenCreatingKingInPieceFactory()
@@ -206,5 +205,17 @@ public static class PieceTests
 
         blackPawn.Coordinate.Row.Should().Be(1);
         blackPawn.Coordinate.Column.Should().Be(2);
+    }
+
+    [Fact]
+    public static void ShouldCreateRandomPiece_WhenCreatingRandomPieceInPieceFactory()
+    {
+        // Arrange
+        Coordinate randomCoordinate = new Coordinate(5, 5);
+        Piece randomPiece = PieceFactory.CreateRandomPiece(randomCoordinate);
+
+        // Assert
+        randomPiece.PieceType.Should().NotBe(PieceType.None);
+        randomPiece.Side.Should().NotBe(Side.None);
     }
 }

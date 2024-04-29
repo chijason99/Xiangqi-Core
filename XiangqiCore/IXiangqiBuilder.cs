@@ -11,5 +11,6 @@ public interface IXiangqiBuilder
     XiangqiBuilder PlayedInCompetition(string competitionName);
     XiangqiBuilder PlayedOnDate(DateTime gameDate);
     XiangqiBuilder UseBoardConfig(BoardConfig config);
+    XiangqiBuilder UseBoardConfig(Action<BoardConfig> action);
     XiangqiGame Build();
 }
