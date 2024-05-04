@@ -17,6 +17,8 @@ public static class KnightValidationStrategyTests
             yield return new object[] { new KnightValidationTestData(new Coordinate(6, 5), new Coordinate(7, 3), ExpectedResult: true) };
             yield return new object[] { new KnightValidationTestData(new Coordinate(6, 5), new Coordinate(8, 6), ExpectedResult: true) };
             yield return new object[] { new KnightValidationTestData(new Coordinate(6, 5), new Coordinate(8, 4), ExpectedResult: true) };
+            yield return new object[] { new KnightValidationTestData(new Coordinate(1, 10), new Coordinate(2, 8), ExpectedResult: true) };
+            yield return new object[] { new KnightValidationTestData(new Coordinate(9, 5), new Coordinate(7, 6), ExpectedResult: true) };
 
             // Invalid move for knight
             yield return new object[] { new KnightValidationTestData(new Coordinate(6, 5), new Coordinate(4, 7), ExpectedResult: false) };

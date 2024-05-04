@@ -42,14 +42,22 @@ public class KnightValidationStrategy : DefaultValidationStrategy
         int startingRow = startingPosition.Row;
         int startingColumn = startingPosition.Column;
 
-        return knighMoveDirection switch
+        // Add this here to prevent error when trying to get obstacle coordinates that exceed the allowed range
+        try
         {
-            KnighMoveMainDirection.Up => new Coordinate(startingColumn, startingRow + 1),
-            KnighMoveMainDirection.Down => new Coordinate(startingColumn, startingRow - 1),
-            KnighMoveMainDirection.Left => new Coordinate(startingColumn - 1, startingRow),
-            KnighMoveMainDirection.Right => new Coordinate(startingColumn + 1, startingRow),
-            _ => throw new ArgumentException("Invalid knight move direction")
-        };
+            return knighMoveDirection switch
+            {
+                KnighMoveMainDirection.Up => new Coordinate(startingColumn, startingRow + 1),
+                KnighMoveMainDirection.Down => new Coordinate(startingColumn, startingRow - 1),
+                KnighMoveMainDirection.Left => new Coordinate(startingColumn - 1, startingRow),
+                KnighMoveMainDirection.Right => new Coordinate(startingColumn + 1, startingRow),
+                _ => throw new ArgumentException("Invalid knight move direction")
+            };
+        }
+        catch (ArgumentOutOfRangeException ex)
+        {
+            return Coordinate.Empty;
+        }
     }
 
     private enum KnighMoveMainDirection

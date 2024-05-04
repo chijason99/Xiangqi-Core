@@ -12,9 +12,9 @@ public class DefaultValidationStrategy : IValidationStrategy
         return palaceColumns.Contains(destination.Column) && palaceRows.Contains(destination.Row);
     }
 
-    public virtual int[] GetPossibleColumns() => Board.GetGetAllColumns();
+    public virtual int[] GetPossibleColumns() => Board.GetAllColumns();
 
-    public virtual int[] GetPossibleRows(Side color) => Board.GetGetAllRows();
+    public virtual int[] GetPossibleRows(Side color) => Board.GetAllRows();
 
     public bool IsProposedMoveValid(Piece[,] boardPosition, Coordinate startingPoint, Coordinate destination)
     {

@@ -1,5 +1,4 @@
 ﻿using LinqKit;
-using System.Drawing;
 using XiangqiCore.Pieces;
 using XiangqiCore.Pieces.PieceTypes;
 
@@ -17,7 +16,7 @@ public static class PieceExtension
     }
 
     public static bool HasPieceAtPosition(this Piece[,] position, Coordinate coordinateToCheck)
-     => position.GetPieceAtPosition(coordinateToCheck) is not EmptyPiece;
+     => coordinateToCheck.Equals(Coordinate.Empty) || position.GetPieceAtPosition(coordinateToCheck) is not EmptyPiece;
 
     public static IEnumerable<Piece> GetPiecesOnRow(this Piece[,] position, int row)
     => position
@@ -78,8 +77,97 @@ public static class PieceExtension
         return boardPosition.HasPieceAtPosition(destination) && boardPosition.GetPieceAtPosition(destination).Side == side;
     }
     
+    public static void SetPieceAtPosition(this Piece[,] boardPosition, Coordinate targetCoordinates, Piece targetPiece)
+    {
+        int row = targetCoordinates.Row - 1;
+        int column = targetCoordinates.Column - 1;
+
+        boardPosition[row, column] = targetPiece;
+    }
+
     public static bool WillExposeKingToDanger(this Piece[,] boardPosition, Coordinate startingPosition, Coordinate destination)
     {
+        if (!boardPosition.HasPieceAtPosition(startingPosition))
+            throw new ArgumentException("The starting position must contain a piece");
+
+        Piece pieceToMove = boardPosition.GetPieceAtPosition(startingPosition);
+        Side targetKingSide = pieceToMove.Side;
+        Piece[,] positionAfterSimulation = boardPosition.SimulateMove(startingPosition, destination);
+        King targetKing = positionAfterSimulation.GetPiecesOfType<King>(targetKingSide).Single();
+
+        // Check Against Rook
+        if (positionAfterSimulation.IsKingAttackedBy<Rook>(targetKing.Coordinate))
+            return true;
+
+        // Check Against King
+        if (positionAfterSimulation.IsKingExposedDirectlyToEnemyKing(targetKing.Coordinate))
+            return true;
+
+        // Check Against Cannon
+        if (positionAfterSimulation.IsKingAttackedBy<Cannon>(targetKing.Coordinate))
+            return true;
+
+        // Check Against Pawn
+        if (positionAfterSimulation.IsKingAttackedBy<Pawn>(targetKing.Coordinate))
+            return true;
+
+        // Check Against Knight
+        if (positionAfterSimulation.IsKingAttackedBy<Knight>(targetKing.Coordinate))
+            return true;
+
         return false;
+    }
+
+    public static IEnumerable<TPieceType> GetPiecesOfType<TPieceType>(this Piece[,] boardPosition, Side side) where TPieceType : Piece
+        => boardPosition
+                .OfType<TPieceType>()
+                .Where(piece => piece.Side == side);
+
+    public static bool IsKingAttackedBy<TPieceType>(this Piece[,] boardPosition, Coordinate kingCoordinate) where TPieceType : Piece
+    {
+        King kingToCheck = (King)boardPosition.GetPieceAtPosition(kingCoordinate);
+        Side enemySide = kingToCheck.Side.GetOppositeSide();
+        IEnumerable<TPieceType> enemyPieces = boardPosition.GetPiecesOfType<TPieceType>(enemySide);
+
+        if (!enemyPieces.Any())
+            return false;
+
+        foreach(TPieceType enemyPiece in enemyPieces)
+        {
+            if (enemyPiece.ValidationStrategy.ValidateMoveLogicForPiece(boardPosition, enemyPiece.Coordinate, kingCoordinate))
+                return true;
+        }
+
+        return false;
+    }
+    
+    public static bool IsKingExposedDirectlyToEnemyKing(this Piece[,] boardPosition, Coordinate kingCoordinate)
+    {
+        King targetKing = (King)boardPosition.GetPieceAtPosition(kingCoordinate);
+        King opponentKing = boardPosition
+                                .GetPiecesOfType<King>(targetKing.Side.GetOppositeSide())
+                                .Single();
+
+        if (targetKing.Coordinate.Column != opponentKing.Coordinate.Column)
+            return false;
+
+        return boardPosition.CountPiecesBetweenOnColumn(kingCoordinate, opponentKing.Coordinate) == 0;
+    }
+
+    public static Piece[,] SimulateMove(this Piece[,] boardPosition, Coordinate staringPosition, Coordinate destination)
+    {
+        if (!boardPosition.HasPieceAtPosition(staringPosition))
+            throw new ArgumentException("There must be a piece at the starting position on the board");
+
+        Piece pieceAtStartingPosition = boardPosition.GetPieceAtPosition(staringPosition);
+
+        Piece[,] boardPositionClone = (Piece[,]) boardPosition.Clone();
+        Piece movedPiece = PieceFactory.Create(pieceAtStartingPosition.PieceType, pieceAtStartingPosition.Side, destination);
+        Piece emptyPiece = PieceFactory.CreateEmptyPiece();
+
+        boardPositionClone.SetPieceAtPosition(staringPosition, emptyPiece);
+        boardPositionClone.SetPieceAtPosition(destination, movedPiece);
+
+        return boardPositionClone;
     }
 }
