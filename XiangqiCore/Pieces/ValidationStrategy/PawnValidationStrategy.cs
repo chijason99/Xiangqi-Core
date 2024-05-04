@@ -12,8 +12,8 @@ public class PawnValidationStrategy : DefaultValidationStrategy
 
         return color switch
                 {
-                    Side.Red => Board.GetGetAllRows().Except(unavailableRowsForRedPawn).ToArray(),
-                    Side.Black => Board.GetGetAllRows().Except(unavailableRowsForBlackPawn).ToArray(),
+                    Side.Red => Board.GetAllRows().Except(unavailableRowsForRedPawn).ToArray(),
+                    Side.Black => Board.GetAllRows().Except(unavailableRowsForBlackPawn).ToArray(),
                     _ => throw new InvalidSideException(color)
                 };
     }
@@ -29,6 +29,6 @@ public class PawnValidationStrategy : DefaultValidationStrategy
         bool isMovingRight = startingPosition.Column + 1 == destination.Column;
         bool pawnHasCrossedTheRiver = pawn.Side == Side.Red ? startingPosition.Row >= blackRiverRow : startingPosition.Row <= redRiverRow;
 
-        return isMovingForward || (pawnHasCrossedTheRiver && (isMovingLeft || isMovingRight));
+        return (isMovingForward && !(isMovingLeft || isMovingRight)) || (pawnHasCrossedTheRiver && ((isMovingLeft || isMovingRight) && !isMovingForward));
     }
 }

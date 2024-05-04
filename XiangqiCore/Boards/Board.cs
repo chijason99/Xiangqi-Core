@@ -28,21 +28,15 @@ public class Board
 
     public Piece[,] Position { get; private set; }
 
-    public void SetPieceAtPosition(Coordinate targetCoordinates, Piece targetPiece)
-    {
-        int row = targetCoordinates.Row - 1;
-        int column = targetCoordinates.Column - 1;
-
-        Position[row, column] = targetPiece;
-    }
+    public void SetPieceAtPosition(Coordinate targetCoordinates, Piece targetPiece) => Position.SetPieceAtPosition(targetCoordinates, targetPiece);
 
     public Piece GetPieceAtPosition(Coordinate targetCoordinates) => Position.GetPieceAtPosition(targetCoordinates);
 
     public string GetFenFromPosition => FenHelper.GetFenFromPosition(Position);
 
-    public static int[] GetGetAllRows() => [1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
+    public static int[] GetAllRows() => [1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
 
-    public static int[] GetGetAllColumns() => [1, 2, 3, 4, 5, 6, 7, 8, 9];
+    public static int[] GetAllColumns() => [1, 2, 3, 4, 5, 6, 7, 8, 9];
 
     public static int[] GetPalaceRows(Side color)
         => color == Side.Red ? [1, 2, 3] : color == Side.Black ? [ 8, 9, 10] : throw new ArgumentException("Please provide the correct Side that you are looking for");

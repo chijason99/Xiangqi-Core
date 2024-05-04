@@ -14,7 +14,6 @@ public class EnumHelper<T> where T : Enum
                     .FirstOrDefault();
     }
 
-
     private static List<T> ExcludeIgnoreRandomItemsFromEnum()
     {
         List<T> result = [];
@@ -30,5 +29,15 @@ public class EnumHelper<T> where T : Enum
         }
 
         return result;
+    }
+}
+
+public static class EnumExtension
+{
+    public static Side GetOppositeSide(this Side side)
+    {
+        if (side == Side.None) throw new ArgumentException("Please use either Side.Red or Side.Black as the parameter");
+
+        return side == Side.Black ? Side.Red : Side.Black;
     }
 }
