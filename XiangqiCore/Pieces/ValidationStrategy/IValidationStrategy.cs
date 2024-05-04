@@ -23,4 +23,6 @@ public interface IValidationStrategy
     int[] GetPossibleRows(Side color);
     
     int[] GetPossibleColumns();
+
+    bool IsProposedMoveValid(Piece[,] boardPosition, Coordinate startingPoint, Coordinate destination);
 }

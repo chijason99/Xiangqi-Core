@@ -37,14 +37,21 @@ public class BishopValidationStrategy : DefaultValidationStrategy
         int startingRow = startingPosition.Row;
         int startingColumn = startingPosition.Column;
 
-        return bishopMoveDirection switch
+        try
         {
-            BishopMoveDirection.TopLeft => new Coordinate(startingRow + 1, startingColumn - 1),
-            BishopMoveDirection.TopRight => new Coordinate(startingRow + 1, startingColumn + 1),
-            BishopMoveDirection.BottomLeft => new Coordinate(startingRow - 1, startingColumn - 1),
-            BishopMoveDirection.BottomRight => new Coordinate(startingRow - 1, startingColumn + 1),
-            _ => throw new ArgumentException("Invalid bishop move direction")
-        };
+            return bishopMoveDirection switch
+            {
+                BishopMoveDirection.TopLeft => new Coordinate(startingRow + 1, startingColumn - 1),
+                BishopMoveDirection.TopRight => new Coordinate(startingRow + 1, startingColumn + 1),
+                BishopMoveDirection.BottomLeft => new Coordinate(startingRow - 1, startingColumn - 1),
+                BishopMoveDirection.BottomRight => new Coordinate(startingRow - 1, startingColumn + 1),
+                _ => throw new ArgumentException("Invalid bishop move direction")
+            };
+        }
+        catch(ArgumentOutOfRangeException ex)
+        {
+            return Coordinate.Empty;
+        }
     }
 
     private enum BishopMoveDirection
