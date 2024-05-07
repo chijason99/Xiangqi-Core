@@ -1,5 +1,6 @@
 ﻿using XiangqiCore.Boards;
 using XiangqiCore.Exceptions;
+using XiangqiCore.Extension;
 using XiangqiCore.Pieces;
 
 namespace XiangqiCore;
@@ -49,7 +50,9 @@ public class XiangqiGame
 
         if (!isFenValid) throw new InvalidFenException(initialFenString);
 
-        XiangqiGame createdGameInstance = new(initialFenString, sideToMove, redPlayer, blackPlayer, competition, gameDate)
+        Side sideToMoveFromFen = FenHelper.GetSideToMoveFromFen(initialFenString);
+
+        XiangqiGame createdGameInstance = new(initialFenString, sideToMoveFromFen, redPlayer, blackPlayer, competition, gameDate)
         {
             Board = useBoardConfig ? new Board(initialFenString, boardConfig!) : new Board(initialFenString),
         };
@@ -58,5 +61,23 @@ public class XiangqiGame
             createdGameInstance.InitialFenString = FenHelper.GetFenFromPosition(createdGameInstance.Board.Position);
 
         return createdGameInstance;
+    }
+
+    public bool Move(Coordinate startingPosition, Coordinate destination)
+    {
+        if (!BoardPosition.HasPieceAtPosition(startingPosition))
+            return false;
+
+        Piece pieceToMove = BoardPosition.GetPieceAtPosition(startingPosition);
+
+        if (pieceToMove.Side != SideToMove)
+            return false;
+
+        if (!pieceToMove.ValidationStrategy.IsProposedMoveValid(BoardPosition, startingPosition, destination))
+            return false;
+
+        BoardPosition.MakeMove(startingPosition, destination);
+
+        return true;
     }
 }

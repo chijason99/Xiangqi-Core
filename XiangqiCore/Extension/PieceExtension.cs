@@ -154,20 +154,25 @@ public static class PieceExtension
         return boardPosition.CountPiecesBetweenOnColumn(kingCoordinate, opponentKing.Coordinate) == 0;
     }
 
-    public static Piece[,] SimulateMove(this Piece[,] boardPosition, Coordinate staringPosition, Coordinate destination)
+    public static Piece[,] SimulateMove(this Piece[,] boardPosition, Coordinate startingPosition, Coordinate destination)
     {
-        if (!boardPosition.HasPieceAtPosition(staringPosition))
+        if (!boardPosition.HasPieceAtPosition(startingPosition))
             throw new ArgumentException("There must be a piece at the starting position on the board");
 
-        Piece pieceAtStartingPosition = boardPosition.GetPieceAtPosition(staringPosition);
-
         Piece[,] boardPositionClone = (Piece[,]) boardPosition.Clone();
+        boardPositionClone.MakeMove(startingPosition, destination);
+
+        return boardPositionClone;
+    }
+
+    public static void MakeMove(this Piece[,] boardPosition, Coordinate startingPosition, Coordinate destination)
+    {
+        Piece pieceAtStartingPosition = boardPosition.GetPieceAtPosition(startingPosition);
+
         Piece movedPiece = PieceFactory.Create(pieceAtStartingPosition.PieceType, pieceAtStartingPosition.Side, destination);
         Piece emptyPiece = PieceFactory.CreateEmptyPiece();
 
-        boardPositionClone.SetPieceAtPosition(staringPosition, emptyPiece);
-        boardPositionClone.SetPieceAtPosition(destination, movedPiece);
-
-        return boardPositionClone;
+        boardPosition.SetPieceAtPosition(startingPosition, emptyPiece);
+        boardPosition.SetPieceAtPosition(destination, movedPiece);
     }
 }

@@ -41,5 +41,5 @@ public class Board
     public static int[] GetPalaceRows(Side color)
         => color == Side.Red ? [1, 2, 3] : color == Side.Black ? [ 8, 9, 10] : throw new ArgumentException("Please provide the correct Side that you are looking for");
 
-    public static int[] GetGetPalaceColumns() => [4, 5, 6];
+    public static int[] GetPalaceColumns() => [4, 5, 6];
 }

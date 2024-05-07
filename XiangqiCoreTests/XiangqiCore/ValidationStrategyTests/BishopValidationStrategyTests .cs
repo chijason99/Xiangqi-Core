@@ -4,6 +4,20 @@ using XiangqiCore.Pieces.PieceTypes;
 namespace xiangqi_core_test.XiangqiCore.ValidationStrategyTests;
 public static class BishopValidationStrategyTests
 {
+    public static IEnumerable<object []> BishopObstacleTestData
+    {
+        get
+        {
+            yield return new object[] { new BishopObstacleTestData(new Coordinate(9, 3), new Coordinate(7, 5), new Coordinate(8, 4), ExpectedResult: false)};
+            yield return new object[] { new BishopObstacleTestData(new Coordinate(9, 3), new Coordinate(7, 1), new Coordinate(8, 2), ExpectedResult: false)};
+            yield return new object[] { new BishopObstacleTestData(new Coordinate(5, 3), new Coordinate(7, 5), new Coordinate(6, 4), ExpectedResult: false)};
+            yield return new object[] { new BishopObstacleTestData(new Coordinate(5, 3), new Coordinate(7, 1), new Coordinate(6, 2), ExpectedResult: false)};
+            yield return new object[] { new BishopObstacleTestData(new Coordinate(1, 3), new Coordinate(3, 5), new Coordinate(2, 4), ExpectedResult: false)};
+            yield return new object[] { new BishopObstacleTestData(new Coordinate(1, 3), new Coordinate(3, 1), new Coordinate(2, 2), ExpectedResult: false)};
+        }
+    }
+
+
     [Theory]
     [InlineData(3, 1)]
     [InlineData(3, 5)]
@@ -83,28 +97,30 @@ public static class BishopValidationStrategyTests
     }
 
     [Theory]
-    [InlineData(4, 1)]
-    [InlineData(5, 7)]
-    [InlineData(5, 9)]
-    [InlineData(5, 10)]
-    public static void ValidateMoveLogicForPieceShouldReturnFalse_WhenGivenInvalidMoves_ForBlackAdvisor(int column, int row)
+    [MemberData(nameof(BishopObstacleTestData))]
+    public static void ValidateMoveLogicForPiece_ShouldReturnExpectedResult_WithObstacles(BishopObstacleTestData testData)
     {
         // Arrange
         XiangqiBuilder builder = new();
 
-        Coordinate destination = new(column, row);
-        Coordinate bishopCoordinate = new(5, 8);
-
         XiangqiGame game = builder
                             .UseEmptyBoard()
-                            .UseBoardConfig(config => config.AddPiece(PieceType.Bishop, Side.Red, bishopCoordinate))
+                            .UseBoardConfig(config =>
+                            {
+                                config.AddPiece(PieceType.Bishop, Side.Red, testData.BishopPosiiton);
+                                config.AddRandomPiece(testData.ObstaclePosition);
+                            })
                             .Build();
-        // Act
-        Bishop bishop = (Bishop)game.BoardPosition.GetPieceAtPosition(bishopCoordinate);
+        bool expectedResult = testData.ExpectedResult;
 
-        bool isMoveValid = bishop.ValidationStrategy.ValidateMoveLogicForPiece(game.BoardPosition, bishopCoordinate, destination);
+        Bishop bishop = (Bishop)game.BoardPosition.GetPieceAtPosition(testData.BishopPosiiton);
+
+        // Act
+        bool actualResult = bishop.ValidationStrategy.ValidateMoveLogicForPiece(game.BoardPosition, testData.BishopPosiiton, testData.Destination);
 
         // Assert
-        isMoveValid.Should().BeFalse();
+        actualResult.Should().Be(expectedResult);
     }
 }
+
+public record BishopObstacleTestData(Coordinate BishopPosiiton, Coordinate Destination, Coordinate ObstaclePosition, bool ExpectedResult);

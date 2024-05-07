@@ -150,4 +150,13 @@ public static partial class FenHelper
     }
 
     private static string GetLengthOfConsecutiveOnes(Match match) => match.Length.ToString();
+
+    public static Side GetSideToMoveFromFen(string fenString)
+    {
+        Regex fenRegex = FenRegex();
+        Match match = fenRegex.Match(fenString);
+        const int sideToMoveIndex = 11;
+
+        return match.Groups[sideToMoveIndex].Value == "w" ? Side.Red : Side.Black;
+    }
 }

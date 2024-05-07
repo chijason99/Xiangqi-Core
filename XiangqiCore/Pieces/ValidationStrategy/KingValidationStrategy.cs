@@ -32,5 +32,5 @@ public class KingValidationStrategy : DefaultValidationStrategy
 
     public override int[] GetPossibleRows(Side color) => Board.GetPalaceRows(color);
 
-    public override int[] GetPossibleColumns() => Board.GetGetPalaceColumns();
+    public override int[] GetPossibleColumns() => Board.GetPalaceColumns();
 }
