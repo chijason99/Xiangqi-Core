@@ -1,6 +1,8 @@
 ﻿using XiangqiCore.Boards;
 using XiangqiCore.Exceptions;
 using XiangqiCore.Extension;
+using XiangqiCore.Move;
+using XiangqiCore.Move.Move;
 using XiangqiCore.Pieces;
 
 namespace XiangqiCore;
@@ -9,10 +11,10 @@ public class XiangqiGame
 {
     internal XiangqiGame() { }
 
-    private XiangqiGame(string initialFenString, 
-                         Side sideToMove, 
-                         Player redPlayer, 
-                         Player blackPlayer, 
+    private XiangqiGame(string initialFenString,
+                         Side sideToMove,
+                         Player redPlayer,
+                         Player blackPlayer,
                          string competition,
                          DateTime gameDate)
     {
@@ -76,7 +78,20 @@ public class XiangqiGame
         if (!pieceToMove.ValidationStrategy.IsProposedMoveValid(BoardPosition, startingPosition, destination))
             return false;
 
-        BoardPosition.MakeMove(startingPosition, destination);
+        Board.MakeMove(startingPosition, destination);
+
+        return true;
+    }
+
+    public bool Move(string moveNotation, MoveNotationType moveNotationType)
+    {
+        ParsedMoveObject parsedMove = moveNotationType switch
+        {
+            MoveNotationType.Chinese => ChineseNotationParser.Parse(moveNotation),
+            _ => throw new ArgumentException("Invalid Move Notation Type")
+        };
+
+        Board.MakeMove(parsedMove, SideToMove);
 
         return true;
     }

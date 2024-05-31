@@ -1,7 +1,10 @@
-﻿using XiangqiCore.Pieces.PieceTypes;
+﻿using XiangqiCore.Attributes;
+using XiangqiCore.Pieces.PieceTypes;
 using XiangqiCore.Pieces.ValidationStrategy;
 
 namespace XiangqiCore.Pieces;
+
+[MoveInOrthogonals]
 public sealed class Cannon : Piece
 {
     public Cannon(Coordinate coordinate, Side side) 

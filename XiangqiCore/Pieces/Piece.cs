@@ -1,4 +1,6 @@
-﻿using XiangqiCore.Pieces.PieceTypes;
+﻿using XiangqiCore.Extension;
+using XiangqiCore.Move;
+using XiangqiCore.Pieces.PieceTypes;
 using XiangqiCore.Pieces.ValidationStrategy;
 
 namespace XiangqiCore.Pieces;
@@ -26,4 +28,13 @@ public abstract class Piece(Coordinate coordinate, Side side)
     public abstract PieceType PieceType { get; }
     public abstract char FenCharacter { get; }
     public char GetFenCharacter => Side == Side.Red ? char.ToUpper(FenCharacter) : Side == Side.Black ? char.ToLower(FenCharacter) : FenCharacter;
+
+    public virtual Coordinate GetDestinationCoordinateFromNotation(MoveDirection moveDirection, int fourthCharacterInNotation)
+    => moveDirection switch
+    {
+        MoveDirection.Forward => new Coordinate(Coordinate.Column, Coordinate.Row + fourthCharacterInNotation.ConvertStepsBaseOnSide(Side)),
+        MoveDirection.Backward => new Coordinate(Coordinate.Column, Coordinate.Row - fourthCharacterInNotation.ConvertStepsBaseOnSide(Side)),
+        MoveDirection.Horizontal => new Coordinate(fourthCharacterInNotation.ConvertToColumnBasedOnSide(Side), Coordinate.Row),
+        _ => throw new ArgumentException("Invalid move direction"),
+    };
 }
