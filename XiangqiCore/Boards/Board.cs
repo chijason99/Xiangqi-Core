@@ -44,7 +44,7 @@ public class Board
     public static int[] GetAllColumns() => [1, 2, 3, 4, 5, 6, 7, 8, 9];
 
     public static int[] GetPalaceRows(Side color)
-        => color == Side.Red ? [1, 2, 3] : color == Side.Black ? [ 8, 9, 10] : throw new ArgumentException("Please provide the correct Side that you are looking for");
+        => color == Side.Red ? [1, 2, 3] : color == Side.Black ? [8, 9, 10] : throw new ArgumentException("Please provide the correct Side that you are looking for");
 
     public static int[] GetPalaceColumns() => [4, 5, 6];
 
@@ -61,51 +61,36 @@ public class Board
 
     private Coordinate FindStartingPosition(ParsedMoveObject moveObject, Side sideToMove)
     {
-        // If the movement does not include starting column, i.e. having more than one of that piece in the same column
-        //if (moveObject.StartingColumn == ParsedMoveObject.UnknownStartingColumn)
-        //{
-            MethodInfo method = typeof(PieceExtension).GetMethod(nameof(PieceExtension.GetPiecesOfType));
-            MethodInfo genericMethod = method.MakeGenericMethod(moveObject.PieceType);
+        MethodInfo method = typeof(PieceExtension).GetMethod(nameof(PieceExtension.GetPiecesOfType));
+        MethodInfo genericMethod = method.MakeGenericMethod(moveObject.PieceType);
 
-            IEnumerable<Piece> allPiecesOfType = ((IEnumerable<Piece>)genericMethod.Invoke(obj: null, parameters: [Position, sideToMove]));
+        IEnumerable<Piece> allPiecesOfType = ((IEnumerable<Piece>)genericMethod.Invoke(obj: null, parameters: [Position, sideToMove]));
 
-            if (!allPiecesOfType.Any()) throw new InvalidOperationException($"Cannot find any columns containing more than one {EnumHelper<Side>.GetDisplayName(sideToMove)} { moveObject.PieceType.Name}");
+        if (!allPiecesOfType.Any()) throw new InvalidOperationException($"Cannot find any columns containing more than one {EnumHelper<Side>.GetDisplayName(sideToMove)} {moveObject.PieceType.Name}");
 
-            List<Piece> piecesToMove = allPiecesOfType
-                                .OrderBy(piece => piece.Coordinate.Row)
-                                .ToList();
+        List<Piece> piecesToMove = allPiecesOfType
+                                    .OrderBy(piece => piece.Coordinate.Row)
+                                    .ToList();
 
-            Piece pieceToMove = piecesToMove.SingleOrDefault(p => p.Coordinate.Column == moveObject.StartingColumn) ??
-                                piecesToMove[moveObject.PieceOrderIndex];
-                                    
+        // If the starting column is provided, then find the piece that has the same column as the starting column;
+        // Otherwise, i.e. there are more than one piece of the same type and side in the column, pick the one following the order
+        Piece pieceToMove = piecesToMove.SingleOrDefault(p => p.Coordinate.Column == moveObject.StartingColumn) ??
+                            piecesToMove[moveObject.PieceOrderIndex];
 
         return pieceToMove.Coordinate;
-        //}
-        //else
-        //{
-        //    Piece targetPiece = Position
-        //                            .GetPiecesOnColumn(moveObject.StartingColumn)
-        //                            .Single(p => p.GetType() == moveObject.PieceType && p.Side == sideToMove);
-
-        //    return targetPiece.Coordinate;
-        //}
     }
 
     private Coordinate FindDestination(ParsedMoveObject moveObject, Coordinate startingCoordinate)
     {
-        // Find the piece at the coordinate
         Piece pieceToMove = Position.GetPieceAtPosition(startingCoordinate);
 
-        // Check if it is moving forward/horizontally/backward
         MoveDirection moveDirection = moveObject.MoveDirection;
 
-        // Find out the corresponding move for piece type, as the fourth character would be depending on piece types
-        if(pieceToMove.GetType().GetCustomAttribute<MoveInDiagonalsAttribute>() is not null && moveDirection == MoveDirection.Horizontal)
+        if (pieceToMove.GetType().GetCustomAttribute<MoveInDiagonalsAttribute>() is not null && moveDirection == MoveDirection.Horizontal)
             throw new ArgumentException($"Piece type {moveObject.PieceType.Name} cannot move horizontally");
 
         Coordinate destination = pieceToMove.GetDestinationCoordinateFromNotation(moveObject.MoveDirection, moveObject.ForuthCharacter);
 
-        // return the destination
         return destination;
     }
 }
