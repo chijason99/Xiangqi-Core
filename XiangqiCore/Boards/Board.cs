@@ -1,10 +1,8 @@
-﻿using System.CodeDom;
-using System.Reflection;
+﻿using System.Reflection;
 using XiangqiCore.Attributes;
 using XiangqiCore.Extension;
 using XiangqiCore.Move;
 using XiangqiCore.Pieces;
-using XiangqiCore.Pieces.PieceTypes;
 
 namespace XiangqiCore.Boards;
 public class Board
@@ -48,7 +46,15 @@ public class Board
 
     public static int[] GetPalaceColumns() => [4, 5, 6];
 
-    public void MakeMove(Coordinate startingPosition, Coordinate destination) => Position.MakeMove(startingPosition, destination);
+    public void MakeMove(Coordinate startingPosition, Coordinate destination)
+    {
+        Piece pieceToMove = GetPieceAtPosition(startingPosition);
+
+        if (!pieceToMove.ValidateMove(Position, startingPosition, destination))
+            return;
+
+        Position.MakeMove(startingPosition, destination);
+    }
 
     public void MakeMove(ParsedMoveObject moveObject, Side sideToMove)
     {
@@ -60,6 +66,9 @@ public class Board
 
     private Coordinate FindStartingPosition(ParsedMoveObject moveObject, Side sideToMove)
     {
+        if (moveObject.IsFromUcciNotation)
+            return moveObject.StartingPosition.Value;
+
         MethodInfo method = typeof(PieceExtension).GetMethod(nameof(PieceExtension.GetPiecesOfType));
         MethodInfo genericMethod = method.MakeGenericMethod(moveObject.PieceType);
 
@@ -81,6 +90,9 @@ public class Board
 
     private Coordinate FindDestination(ParsedMoveObject moveObject, Coordinate startingCoordinate)
     {
+        if (moveObject.IsFromUcciNotation)
+            return moveObject.Destination.Value;
+
         Piece pieceToMove = Position.GetPieceAtPosition(startingCoordinate);
 
         MoveDirection moveDirection = moveObject.MoveDirection;

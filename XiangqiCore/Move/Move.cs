@@ -9,7 +9,7 @@ public record ParsedMoveObject
     // For UCCI notation
     public ParsedMoveObject(Coordinate startingPoint, Coordinate destination) 
     {
-        StartingPoint = startingPoint;
+        StartingPosition = startingPoint;
         Destination = destination;
     }
 
@@ -29,7 +29,7 @@ public record ParsedMoveObject
     public int PieceOrderIndex { get; set; }
     public MoveDirection MoveDirection { get; set; }
 
-    public Coordinate? StartingPoint { get; set; }
+    public Coordinate? StartingPosition { get; set; }
     public Coordinate? Destination { get; set; }
-    public bool HasKnownStartingPointAndDestination => StartingPoint is not null && Destination is not null;
+    public bool IsFromUcciNotation => StartingPosition is not null && Destination is not null;
 }

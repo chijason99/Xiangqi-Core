@@ -37,4 +37,6 @@ public abstract class Piece(Coordinate coordinate, Side side)
         MoveDirection.Horizontal => new Coordinate(fourthCharacterInNotation.ConvertToColumnBasedOnSide(Side), Coordinate.Row),
         _ => throw new ArgumentException("Invalid move direction"),
     };
+
+    public bool ValidateMove(Piece[,] position, Coordinate startingPoint, Coordinate destination) => ValidationStrategy.IsProposedMoveValid(position, startingPoint, destination);
 }
