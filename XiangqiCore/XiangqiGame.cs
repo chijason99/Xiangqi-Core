@@ -85,13 +85,10 @@ public class XiangqiGame
 
     public bool Move(string moveNotation, MoveNotationType moveNotationType)
     {
-        ParsedMoveObject parsedMove = moveNotationType switch
-        {
-            MoveNotationType.Chinese => ChineseNotationParser.Parse(moveNotation),
-            _ => throw new ArgumentException("Invalid Move Notation Type")
-        };
+        IMoveNotationParser parser = MoveNotationParserFactory.GetParser(moveNotationType);
+        ParsedMoveObject parsedMoveObject = parser.Parse(moveNotation);
 
-        Board.MakeMove(parsedMove, SideToMove);
+        Board.MakeMove(parsedMoveObject, SideToMove);
 
         return true;
     }

@@ -52,7 +52,6 @@ public class Board
 
     public void MakeMove(ParsedMoveObject moveObject, Side sideToMove)
     {
-        // Finding the starting position of the piece
         Coordinate startingPosition = FindStartingPosition(moveObject, sideToMove);
         Coordinate destination = FindDestination(moveObject, startingPosition);
 

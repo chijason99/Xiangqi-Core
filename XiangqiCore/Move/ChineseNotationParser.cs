@@ -4,12 +4,14 @@ using XiangqiCore.Pieces.PieceTypes;
 
 namespace XiangqiCore.Move;
 
-public static class ChineseNotationParser
+public class ChineseNotationParser : MoveNotationBase
 {
     private static char[] pieceChineseNames => ['將', '帥', '車', '俥', '馬', '傌', '砲', '炮', '士', '仕', '象', '相', '卒', '兵'];
     private static char[] chineseNumbers => ['一', '二', '三', '四', '五', '六', '七', '八', '九'];
 
-    public static ParsedMoveObject Parse(string notation)
+    public ChineseNotationParser() { }
+
+    public override ParsedMoveObject Parse(string notation)
     {
         Type pieceType = ParsePieceType(notation);
         int startingColumn = ParseStartingColumn(notation);
@@ -24,7 +26,7 @@ public static class ChineseNotationParser
         return result;
     }
 
-    public static Type ParsePieceType(string notation)
+    private Type ParsePieceType(string notation)
     {
         char pieceNameToCheck = pieceChineseNames.Contains(notation[0]) ? notation[0] : notation[1];
 
@@ -41,7 +43,7 @@ public static class ChineseNotationParser
         };
     }
 
-    public static MoveDirection ParseMoveDirection(string notation)
+    private MoveDirection ParseMoveDirection(string notation)
         => notation[2] switch
         {
             '進' => MoveDirection.Forward,
@@ -50,7 +52,7 @@ public static class ChineseNotationParser
             _ => throw new ArgumentException("Invalid Move Direction")
         };
 
-    public static int ParseStartingColumn(string notation)
+    private int ParseStartingColumn(string notation)
     {
         const int defaultColumnIndex = 1;
         char secondCharacter = notation[defaultColumnIndex];
@@ -63,12 +65,10 @@ public static class ChineseNotationParser
             return successfulParse ? startingColumn.ConvertToColumnBasedOnSide(Side.Black) : ParsedMoveObject.UnknownStartingColumn;
         }
         else
-        {
             return chineseNumbers.Contains(secondCharacter) ? ChineseNumberParser.Parse(secondCharacter).ConvertToColumnBasedOnSide(Side.Red) : ParsedMoveObject.UnknownStartingColumn;
-        }
     }
 
-    public static int ParseFourthCharacter(string notation)
+    private int ParseFourthCharacter(string notation)
     {
         const int fourthCharacterIndex = 3;
         bool isBlack = notation.Any(char.IsDigit);
@@ -80,12 +80,10 @@ public static class ChineseNotationParser
             return successfulParse ? fourthCharacter : ParsedMoveObject.UnknownStartingColumn;
         }
         else
-        {
             return chineseNumbers.Contains(notation[fourthCharacterIndex]) ? ChineseNumberParser.Parse(notation[fourthCharacterIndex]) : ParsedMoveObject.UnknownStartingColumn;
-        }
     }
 
-    public static int ParsePieceOrderIndex(string notation)
+    private int ParsePieceOrderIndex(string notation)
     {
         bool isBlack = notation.Any(char.IsDigit);
 
