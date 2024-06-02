@@ -46,12 +46,18 @@ public class Board
 
     public static int[] GetPalaceColumns() => [4, 5, 6];
 
-    public void MakeMove(Coordinate startingPosition, Coordinate destination)
+    public void MakeMove(Coordinate startingPosition, Coordinate destination, Side sideToMove)
     {
+        if (!Position.HasPieceAtPosition(startingPosition))
+            throw new InvalidOperationException("There must be a piece on the starting position");
+
         Piece pieceToMove = GetPieceAtPosition(startingPosition);
 
+        if (pieceToMove.Side != sideToMove)
+            throw new InvalidOperationException($"The side to move now should be {EnumHelper<Side>.GetDisplayName(sideToMove)}");
+
         if (!pieceToMove.ValidateMove(Position, startingPosition, destination))
-            return;
+            throw new InvalidOperationException($"The proposed move violates the game logic"); ;
 
         Position.MakeMove(startingPosition, destination);
     }
@@ -61,7 +67,7 @@ public class Board
         Coordinate startingPosition = FindStartingPosition(moveObject, sideToMove);
         Coordinate destination = FindDestination(moveObject, startingPosition);
 
-        MakeMove(startingPosition, destination);
+        MakeMove(startingPosition, destination, sideToMove);
     }
 
     private Coordinate FindStartingPosition(ParsedMoveObject moveObject, Side sideToMove)

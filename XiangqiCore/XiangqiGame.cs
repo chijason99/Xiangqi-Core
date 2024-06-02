@@ -67,29 +67,33 @@ public class XiangqiGame
 
     public bool Move(Coordinate startingPosition, Coordinate destination)
     {
-        if (!BoardPosition.HasPieceAtPosition(startingPosition))
+        try
+        {
+            Board.MakeMove(startingPosition, destination, SideToMove);
+            return true;
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Invalid move: {ex.Message}");
             return false;
-
-        Piece pieceToMove = BoardPosition.GetPieceAtPosition(startingPosition);
-
-        if (pieceToMove.Side != SideToMove)
-            return false;
-
-        if (!pieceToMove.ValidationStrategy.IsProposedMoveValid(BoardPosition, startingPosition, destination))
-            return false;
-
-        Board.MakeMove(startingPosition, destination);
-
-        return true;
+        }
     }
 
     public bool Move(string moveNotation, MoveNotationType moveNotationType)
     {
-        IMoveNotationParser parser = MoveNotationParserFactory.GetParser(moveNotationType);
-        ParsedMoveObject parsedMoveObject = parser.Parse(moveNotation);
+        try
+        {
+            IMoveNotationParser parser = MoveNotationParserFactory.GetParser(moveNotationType);
+            ParsedMoveObject parsedMoveObject = parser.Parse(moveNotation);
 
-        Board.MakeMove(parsedMoveObject, SideToMove);
+            Board.MakeMove(parsedMoveObject, SideToMove);
 
-        return true;
+            return true;
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Invalid move: {ex.Message}");
+            return false;
+        }
     }
 }
