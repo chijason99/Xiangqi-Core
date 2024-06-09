@@ -1,4 +1,5 @@
-﻿using System.Reflection;
+﻿using System.CodeDom;
+using System.Reflection;
 using XiangqiCore.Attributes;
 using XiangqiCore.Extension;
 using XiangqiCore.Move;
@@ -75,17 +76,7 @@ public class Board
         if (moveObject.IsFromUcciNotation)
             return moveObject.StartingPosition.Value;
 
-        MethodInfo method = typeof(PieceExtension).GetMethod(nameof(PieceExtension.GetPiecesOfType));
-        MethodInfo genericMethod = method.MakeGenericMethod(moveObject.PieceType);
-
-        IEnumerable<Piece> allPiecesOfType = ((IEnumerable<Piece>)genericMethod.Invoke(obj: null, parameters: [Position, sideToMove]));
-
-        if (!allPiecesOfType.Any()) throw new InvalidOperationException($"Cannot find any columns containing more than one {EnumHelper<Side>.GetDisplayName(sideToMove)} {moveObject.PieceType.Name}");
-
-        List<Piece> piecesToMove = allPiecesOfType
-                                    .OrderByRowWithSide(sideToMove)
-                                    .ToList();
-
+        Piece[] piecesToMove = GetPiecesToMove(moveObject.PieceType, sideToMove);
         Piece pieceToMove;
 
         // If the starting column is provided, then find the piece that has the same column as the starting column;
@@ -99,7 +90,23 @@ public class Board
         return pieceToMove.Coordinate;
     }
 
-    private Piece FindPieceToMoveForMultiColumnPawn(MultiColumnPawnParsedMoveObject moveObject, List<Piece> piecesToMove, Side sideToMove)
+    private Piece[] GetPiecesToMove (Type pieceType, Side sideToMove)
+    {
+        MethodInfo method = typeof(PieceExtension).GetMethod(nameof(PieceExtension.GetPiecesOfType));
+        MethodInfo genericMethod = method.MakeGenericMethod(pieceType);
+
+        IEnumerable<Piece> allPiecesOfType = ((IEnumerable<Piece>)genericMethod.Invoke(obj: null, parameters: [Position, sideToMove]));
+
+        if (!allPiecesOfType.Any()) throw new InvalidOperationException($"Cannot find any columns containing more than one {EnumHelper<Side>.GetDisplayName(sideToMove)} {pieceType.Name}");
+
+        Piece[] piecesToMove = allPiecesOfType
+                                    .OrderByRowWithSide(sideToMove)
+                                    .ToArray();
+
+        return piecesToMove;
+    }
+
+    private Piece FindPieceToMoveForMultiColumnPawn(MultiColumnPawnParsedMoveObject moveObject, Piece[] piecesToMove, Side sideToMove)
     {
         Piece[] pawnsOnColumn;
 
