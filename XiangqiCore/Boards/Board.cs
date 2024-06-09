@@ -1,5 +1,4 @@
-﻿using System.CodeDom;
-using System.Reflection;
+﻿using System.Reflection;
 using XiangqiCore.Attributes;
 using XiangqiCore.Extension;
 using XiangqiCore.Move;
@@ -84,7 +83,7 @@ public class Board
         if(moveObject is MultiColumnPawnParsedMoveObject multiColumnPawnObject)
             pieceToMove = FindPieceToMoveForMultiColumnPawn(multiColumnPawnObject, piecesToMove, sideToMove);
         else
-            pieceToMove = piecesToMove.SingleOrDefault(p => p.Coordinate.Column == moveObject.StartingColumn) ??
+            pieceToMove = piecesToMove.SingleOrDefault(p => p.Coordinate.Column == moveObject.StartingColumn.ConvertToColumnBasedOnSide(sideToMove)) ??
                           piecesToMove[moveObject.PieceOrderIndex];
         
         return pieceToMove.Coordinate;
@@ -113,7 +112,7 @@ public class Board
         if (moveObject.StartingColumn != ParsedMoveObject.UnknownStartingColumn)
         {
             pawnsOnColumn = piecesToMove
-                                .Where(p => p.Coordinate.Column == moveObject.StartingColumn)
+                                .Where(p => p.Coordinate.Column == moveObject.StartingColumn.ConvertToColumnBasedOnSide(sideToMove))
                                 .OrderByRowWithSide(sideToMove)
                                 .ToArray();
         }

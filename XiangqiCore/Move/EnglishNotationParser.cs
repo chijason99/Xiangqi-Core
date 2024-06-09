@@ -34,12 +34,10 @@ public class EnglishNotationParser : MoveNotationBase
         char secondCharacter = notation[defaultColumnIndex];
         bool isBlack = notation.Any(char.IsLower);
 
-        bool successfulParse = int.TryParse(secondCharacter.ToString(), out int startingColumn);
-        
-        if (successfulParse)
-            return isBlack ? startingColumn.ConvertToColumnBasedOnSide(Side.Black) : startingColumn.ConvertToColumnBasedOnSide(Side.Red);
-        else
-            return ParsedMoveObject.UnknownStartingColumn;
+        return int.TryParse(secondCharacter.ToString(), out int startingColumn) ? 
+                startingColumn : 
+                ParsedMoveObject.UnknownStartingColumn;
+
     }
 
     public MoveDirection ParseMoveDirection(string notation)
@@ -64,13 +62,12 @@ public class EnglishNotationParser : MoveNotationBase
         const int defaultPieceOrderIndex = 0;
 
         char pieceOrderCharacter = notation[pieceOrderCharacterIndex];
-        bool isBlack = notation.Any(char.IsLower);
 
         // Multi column pawn scenario
         if (char.IsDigit(pieceOrderCharacter))
-            return int.Parse(pieceOrderCharacter.ToString());
+            return int.Parse(pieceOrderCharacter.ToString()) - 1;
         else if (pieceOrderIndexSymbol.Contains(pieceOrderCharacter))
-            return pieceOrderCharacter == '+' ? 0 : 1;
+            return pieceOrderCharacter == '+' ? 0 : (IsMultiColumnPawn(notation) ? MultiColumnPawnParsedMoveObject.LastPawnIndex : 1);
         else
             return defaultPieceOrderIndex;
     }
@@ -89,7 +86,7 @@ public class EnglishNotationParser : MoveNotationBase
                                              parsedMoveObject;
     }
 
-    private bool IsMultiColumnPawn(string notation) => ParsePieceType(notation) is Pawn && notation.IndexOfAny(pawnsInEnglish) == -1;
+    private bool IsMultiColumnPawn(string notation) => ParsePieceType(notation) == typeof(Pawn) && notation.IndexOfAny(pawnsInEnglish) == -1;
 
     private int GetMinNumberOfPawnsOnColumn(string notation)
     {

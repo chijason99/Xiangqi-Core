@@ -24,9 +24,10 @@ public class ChineseNotationParser : MoveNotationBase
         MoveDirection moveDirection = ParseMoveDirection(notation);
         int foruthCharacter = ParseFourthCharacter(notation);
 
-        ParsedMoveObject result = new(pieceType, startingColumn, moveDirection, foruthCharacter);
-
-        result.PieceOrderIndex = isMultiColumnPawn ? ParsePieceOrderIndexForMultiColumnPawn(notation) : ParsePieceOrderIndex(notation);
+        ParsedMoveObject result = new(pieceType, startingColumn, moveDirection, foruthCharacter)
+        {
+            PieceOrderIndex = isMultiColumnPawn ? ParsePieceOrderIndexForMultiColumnPawn(notation) : ParsePieceOrderIndex(notation)
+        };
 
         if (isMultiColumnPawn)
         {
@@ -71,15 +72,13 @@ public class ChineseNotationParser : MoveNotationBase
         char secondCharacter = notation[defaultColumnIndex];
 
         if (notationSide == Side.Black)
-        {
-            if (int.TryParse(secondCharacter.ToString(), out int startingColumn))
-                return startingColumn.ConvertToColumnBasedOnSide(Side.Black);
-        }
-        else
-            if (ChineseNumberParser.TryParse(secondCharacter, out int startingColumn))
-                return startingColumn.ConvertToColumnBasedOnSide(Side.Red);
-
-        return ParsedMoveObject.UnknownStartingColumn;
+            return (int.TryParse(secondCharacter.ToString(), out int startingColumn)) ? 
+                    startingColumn :
+                    ParsedMoveObject.UnknownStartingColumn;
+        else 
+            return ChineseNumberParser.TryParse(secondCharacter, out int startingColumn) ? 
+                    startingColumn : 
+                    ParsedMoveObject.UnknownStartingColumn;
     }
 
 
