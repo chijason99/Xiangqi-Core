@@ -277,4 +277,13 @@ public static class PieceExtension
         boardPosition.SetPieceAtPosition(startingPosition, emptyPiece);
         boardPosition.SetPieceAtPosition(destination, movedPiece);
     }
+
+    /// <summary>
+    /// A method to order the pieces correct according to the side of move, such that the parsed piece order index is actually grabbing the correct pawn
+    /// </summary>
+    /// <param name="pieces"></param>
+    /// <param name="sideToMove"></param>
+    /// <returns></returns>
+    public static IEnumerable<Piece> OrderByRowWithSide(this IEnumerable<Piece> pieces, Side sideToMove)
+        => sideToMove == Side.Black ? pieces.OrderBy(p => p.Coordinate.Row) : pieces.OrderByDescending(p => p.Coordinate.Row);
 }

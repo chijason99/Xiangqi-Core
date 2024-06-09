@@ -8,20 +8,33 @@ public class ChineseNotationParser : MoveNotationBase
 {
     private static char[] pieceChineseNames => ['將', '帥', '車', '俥', '馬', '傌', '砲', '炮', '士', '仕', '象', '相', '卒', '兵'];
     private static char[] chineseNumbers => ['一', '二', '三', '四', '五', '六', '七', '八', '九'];
+    private static char[] pawnsInChinese => ['卒', '兵'];
 
     public ChineseNotationParser() { }
 
+    public Side GetNotationSide(string notation) => notation.Any(char.IsDigit) ? Side.Black : Side.Red;
+
     public override ParsedMoveObject Parse(string notation)
     {
+        Side notationSide = GetNotationSide(notation);
+        bool isMultiColumnPawn = IsMultiColumnPawn(notation);
+
         Type pieceType = ParsePieceType(notation);
-        int startingColumn = ParseStartingColumn(notation);
+        int startingColumn = ParseStartingColumn(notation, notationSide);
         MoveDirection moveDirection = ParseMoveDirection(notation);
         int foruthCharacter = ParseFourthCharacter(notation);
 
         ParsedMoveObject result = new(pieceType, startingColumn, moveDirection, foruthCharacter);
 
-        if (startingColumn == ParsedMoveObject.UnknownStartingColumn)
-            result.PieceOrderIndex = ParsePieceOrderIndex(notation);
+        result.PieceOrderIndex = isMultiColumnPawn ? ParsePieceOrderIndexForMultiColumnPawn(notation) : ParsePieceOrderIndex(notation);
+
+        if (isMultiColumnPawn)
+        {
+            int minNumberOfPawnsOnColumn = GetMinNumberOfPawnsOnColumn(notation);
+            MultiColumnPawnParsedMoveObject multiColumnPawnResult = new(result, minNumberOfPawnsOnColumn);
+
+            return multiColumnPawnResult;
+        }
 
         return result;
     }
@@ -52,21 +65,23 @@ public class ChineseNotationParser : MoveNotationBase
             _ => throw new ArgumentException("Invalid Move Direction")
         };
 
-    private int ParseStartingColumn(string notation)
+    private int ParseStartingColumn(string notation, Side notationSide)
     {
         const int defaultColumnIndex = 1;
         char secondCharacter = notation[defaultColumnIndex];
-        bool isBlack = notation.Any(char.IsDigit);
 
-        if (isBlack)
+        if (notationSide == Side.Black)
         {
-            bool successfulParse = int.TryParse(secondCharacter.ToString(), out int startingColumn);
-
-            return successfulParse ? startingColumn.ConvertToColumnBasedOnSide(Side.Black) : ParsedMoveObject.UnknownStartingColumn;
+            if (int.TryParse(secondCharacter.ToString(), out int startingColumn))
+                return startingColumn.ConvertToColumnBasedOnSide(Side.Black);
         }
         else
-            return chineseNumbers.Contains(secondCharacter) ? ChineseNumberParser.Parse(secondCharacter).ConvertToColumnBasedOnSide(Side.Red) : ParsedMoveObject.UnknownStartingColumn;
+            if (ChineseNumberParser.TryParse(secondCharacter, out int startingColumn))
+                return startingColumn.ConvertToColumnBasedOnSide(Side.Red);
+
+        return ParsedMoveObject.UnknownStartingColumn;
     }
+
 
     private int ParseFourthCharacter(string notation)
     {
@@ -91,5 +106,30 @@ public class ChineseNotationParser : MoveNotationBase
             return notation[0] == '前' ? 0 : 1;
         else
             return notation[0] == '前' ? 1 : 0;
+    }
+
+    // Multi Column Pawn situation
+    // Meaning that there are more than one columns holding two or more pawns of the same color
+    private bool IsMultiColumnPawn(string notation) => ParsePieceType(notation) == typeof(Pawn) && notation.IndexOfAny(pawnsInChinese) != 0;
+
+    private int GetMinNumberOfPawnsOnColumn(string notation)
+        => notation[0] switch
+        {
+            '中' => 3,
+            '前' or '後' => 2,
+            _ => ChineseNumberParser.Parse(notation[0])
+        };
+
+    private int ParsePieceOrderIndexForMultiColumnPawn(string notation)
+    {
+        char firstCharacter = notation[0];
+
+        return firstCharacter switch
+        {
+            '前' => 0,
+            '中' => 1,
+            '後' => MultiColumnPawnParsedMoveObject.FrontPawnIndex,
+            _ => ChineseNumberParser.Parse(firstCharacter) - 1
+        };
     }
 }

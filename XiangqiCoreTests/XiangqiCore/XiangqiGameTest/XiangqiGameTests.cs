@@ -11,6 +11,9 @@ public static class XiangqiGameTests
     private const string _startingFen1 = "1r2kabr1/4a4/2n1b1n1c/p1p1p3p/6p2/2PN1R3/P3P1c1P/2CCB1N2/9/R2AKAB2 b - - 3 11";
     private const string _startingFen2 = "2baka1r1/7r1/2n1b1n2/p1p1p1p1p/9/2P2NP2/P3P2cP/2N1C4/9/R1BAKABR1 b - - 5 9";
     private const string _startingFen3 = "2baka3/9/2c1b3n/C3p3p/2pn2c2/1R3r1N1/P3P3P/2N1BC3/4A4/4KAB2 w - - 1 17";
+    private const string _multiPawnFen1 = "4k4/3P1P3/4P4/3P1P3/9/9/9/9/9/5K3 w - - 0 0";
+    private const string _multiPawnFen2 = "5k3/9/2P6/9/2P6/9/2P6/9/9/4K4 w - - 0 0";
+    private const string _multiPawnFen3 = "5k3/2P6/2P6/2P1P4/2P6/9/9/9/9/4K4 w - - 0 0";
 
     public static IEnumerable<object []> MoveMethodWithCoordinatesTestData
     {
@@ -88,6 +91,41 @@ public static class XiangqiGameTests
         }
     }
 
+    public static IEnumerable<object []> MoveMethodWithChineseNotationForMultiPawnTestData
+    {
+        get
+        {
+            yield return new object[] { new MoveNotationMethodTestData(_multiPawnFen1, "前六平五", MoveNotationType.Chinese, new(4, 9), new(5, 9), PieceType.Pawn, ExpectedResult: true) };
+            yield return new object[] { new MoveNotationMethodTestData(_multiPawnFen1, "後六平五", MoveNotationType.Chinese, new(4, 7), new(5, 7), PieceType.Pawn, ExpectedResult: true) };
+            yield return new object[] { new MoveNotationMethodTestData(_multiPawnFen1, "前四平五", MoveNotationType.Chinese, new(6, 9), new(5, 9), PieceType.Pawn, ExpectedResult: true) };
+            yield return new object[] { new MoveNotationMethodTestData(_multiPawnFen1, "後四平五", MoveNotationType.Chinese, new(6, 7), new(5, 7), PieceType.Pawn, ExpectedResult: true) };
+
+            yield return new object[] { new MoveNotationMethodTestData(_multiPawnFen1, "前六進一", MoveNotationType.Chinese, new(4, 9), new(4, 10), PieceType.Pawn, ExpectedResult: true) };
+            yield return new object[] { new MoveNotationMethodTestData(_multiPawnFen1, "後六進一", MoveNotationType.Chinese, new(4, 7), new(4, 8), PieceType.Pawn, ExpectedResult: true) };
+            yield return new object[] { new MoveNotationMethodTestData(_multiPawnFen1, "前四進一", MoveNotationType.Chinese, new(6, 9), new(6, 10), PieceType.Pawn, ExpectedResult: true) };
+            yield return new object[] { new MoveNotationMethodTestData(_multiPawnFen1, "後四進一", MoveNotationType.Chinese, new(6, 7), new(6, 8), PieceType.Pawn, ExpectedResult: true) };
+
+            yield return new object[] { new MoveNotationMethodTestData(_multiPawnFen1, "前六平七", MoveNotationType.Chinese, new(4, 9), new(3, 9), PieceType.Pawn, ExpectedResult: true) };
+            yield return new object[] { new MoveNotationMethodTestData(_multiPawnFen1, "後六平七", MoveNotationType.Chinese, new(4, 7), new(3, 7), PieceType.Pawn, ExpectedResult: true) };
+            yield return new object[] { new MoveNotationMethodTestData(_multiPawnFen1, "前四平三", MoveNotationType.Chinese, new(6, 9), new(7, 9), PieceType.Pawn, ExpectedResult: true) };
+            yield return new object[] { new MoveNotationMethodTestData(_multiPawnFen1, "後四平三", MoveNotationType.Chinese, new(6, 7), new(7, 7), PieceType.Pawn, ExpectedResult: true) };
+
+            yield return new object[] { new MoveNotationMethodTestData(_multiPawnFen1, "兵五進一", MoveNotationType.Chinese, new(5, 8), new(5, 9), PieceType.Pawn, ExpectedResult: true) };
+            yield return new object[] { new MoveNotationMethodTestData(_multiPawnFen1, "兵五平四", MoveNotationType.Chinese, new(5, 8), new(6, 8), PieceType.Pawn, ExpectedResult: true) };
+            yield return new object[] { new MoveNotationMethodTestData(_multiPawnFen1, "兵五平六", MoveNotationType.Chinese, new(5, 8), new(4, 8), PieceType.Pawn, ExpectedResult: true) };
+
+            yield return new object[] { new MoveNotationMethodTestData(_multiPawnFen2, "前兵進一", MoveNotationType.Chinese, new(3, 8), new(3, 9), PieceType.Pawn, ExpectedResult: true) };
+            yield return new object[] { new MoveNotationMethodTestData(_multiPawnFen2, "中兵平六", MoveNotationType.Chinese, new(3, 6), new(4, 6), PieceType.Pawn, ExpectedResult: true) };
+            yield return new object[] { new MoveNotationMethodTestData(_multiPawnFen2, "後兵進一", MoveNotationType.Chinese, new(3, 4), new(3, 5), PieceType.Pawn, ExpectedResult: true) };
+
+            yield return new object[] { new MoveNotationMethodTestData(_multiPawnFen3, "前兵進一", MoveNotationType.Chinese, new(3, 9), new(3, 10), PieceType.Pawn, ExpectedResult: true) };
+            yield return new object[] { new MoveNotationMethodTestData(_multiPawnFen3, "二兵平六", MoveNotationType.Chinese, new(3, 8), new(4, 8), PieceType.Pawn, ExpectedResult: true) };
+            yield return new object[] { new MoveNotationMethodTestData(_multiPawnFen3, "三兵平八", MoveNotationType.Chinese, new(3, 7), new(2, 7), PieceType.Pawn, ExpectedResult: true) };
+            yield return new object[] { new MoveNotationMethodTestData(_multiPawnFen3, "後兵平六", MoveNotationType.Chinese, new(3, 6), new(4, 6), PieceType.Pawn, ExpectedResult: true) };
+            yield return new object[] { new MoveNotationMethodTestData(_multiPawnFen3, "兵五進一", MoveNotationType.Chinese, new(5, 7), new(5, 8), PieceType.Pawn, ExpectedResult: true) };
+        }
+    }
+
     [Theory]
     [MemberData(nameof(MoveMethodWithCoordinatesTestData))]
     public static void MoveMethod_ShouldAlterTheBoardCorrectly(MoveMethodTestData testData)
@@ -121,6 +159,12 @@ public static class XiangqiGameTests
     [Theory]
     [MemberData(nameof(MoveMethodWithUcciNotationTestData))]
     public static void MoveMethod_ShouldAlterTheBoardCorrectly_WhenUsingUcciMoveNotation(MoveNotationMethodTestData testData)
+       => AssertMoveWithNotationMethod(testData);    
+    
+    
+    [Theory]
+    [MemberData(nameof(MoveMethodWithChineseNotationForMultiPawnTestData))]
+    public static void MoveMethod_ShouldAlterTheBoardCorrectly_WhenMultiPawnTestData(MoveNotationMethodTestData testData)
        => AssertMoveWithNotationMethod(testData);
 
     private static void AssertMoveWithNotationMethod(MoveNotationMethodTestData testData)

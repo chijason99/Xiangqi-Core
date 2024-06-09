@@ -86,12 +86,44 @@ public class Board
                                     .OrderBy(piece => piece.Coordinate.Row)
                                     .ToList();
 
+        Piece pieceToMove;
+
         // If the starting column is provided, then find the piece that has the same column as the starting column;
         // Otherwise, i.e. there are more than one piece of the same type and side in the column, pick the one following the order
-        Piece pieceToMove = piecesToMove.SingleOrDefault(p => p.Coordinate.Column == moveObject.StartingColumn) ??
-                            piecesToMove[moveObject.PieceOrderIndex];
-
+        if(moveObject is MultiColumnPawnParsedMoveObject multiColumnPawnObject)
+            pieceToMove = FindPieceToMoveForMultiColumnPawn(multiColumnPawnObject, piecesToMove, sideToMove);
+        else
+            pieceToMove = piecesToMove.SingleOrDefault(p => p.Coordinate.Column == moveObject.StartingColumn) ??
+                          piecesToMove[moveObject.PieceOrderIndex];
+        
         return pieceToMove.Coordinate;
+    }
+
+    private Piece FindPieceToMoveForMultiColumnPawn(MultiColumnPawnParsedMoveObject moveObject, List<Piece> piecesToMove, Side sideToMove)
+    {
+        Piece[] pawnsOnColumn;
+
+        if (moveObject.StartingColumn != ParsedMoveObject.UnknownStartingColumn)
+        {
+            pawnsOnColumn = piecesToMove
+                                .Where(p => p.Coordinate.Column == moveObject.StartingColumn)
+                                .OrderByRowWithSide(sideToMove)
+                                .ToArray();
+        }
+        else
+        {
+            pawnsOnColumn = piecesToMove
+                                .GroupBy(p => p.Coordinate.Column)
+                                .Where(group => group.Count() >= moveObject.MinNumberOfPawnsOnColumn)
+                                .SelectMany(group => group)
+                                .OrderByRowWithSide(sideToMove)
+                                .ToArray();
+        }
+
+        if (moveObject.PieceOrderIndex == MultiColumnPawnParsedMoveObject.FrontPawnIndex)
+            return sideToMove == Side.Black ? pawnsOnColumn.First() : pawnsOnColumn.Last();
+        else
+            return pawnsOnColumn[moveObject.PieceOrderIndex];
     }
 
     private Coordinate FindDestination(ParsedMoveObject moveObject, Coordinate startingCoordinate)
@@ -106,7 +138,7 @@ public class Board
         if (pieceToMove.GetType().GetCustomAttribute<MoveInDiagonalsAttribute>() is not null && moveDirection == MoveDirection.Horizontal)
             throw new ArgumentException($"Piece type {moveObject.PieceType.Name} cannot move horizontally");
 
-        Coordinate destination = pieceToMove.GetDestinationCoordinateFromNotation(moveObject.MoveDirection, moveObject.ForuthCharacter);
+        Coordinate destination = pieceToMove.GetDestinationCoordinateFromNotation(moveObject.MoveDirection, moveObject.FourthCharacter);
 
         return destination;
     }

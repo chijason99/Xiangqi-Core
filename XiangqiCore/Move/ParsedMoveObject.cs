@@ -19,13 +19,13 @@ public record ParsedMoveObject
         PieceType = pieceType;
         StartingColumn = startingColumn;
         MoveDirection = moveDirection;
-        ForuthCharacter = foruthCharacter;
+        FourthCharacter = foruthCharacter;
         PieceOrderIndex = pieceOrderIndex;
     }
 
     public Type PieceType { get; set; }
     public int StartingColumn { get; set; }
-    public int ForuthCharacter {  get; set; }
+    public int FourthCharacter {  get; set; }
     public int PieceOrderIndex { get; set; }
     public MoveDirection MoveDirection { get; set; }
 
