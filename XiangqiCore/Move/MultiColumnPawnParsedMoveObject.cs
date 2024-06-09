@@ -11,7 +11,7 @@ public record MultiColumnPawnParsedMoveObject : ParsedMoveObject
         MinNumberOfPawnsOnColumn = minNumberOfPawnsOnColumn;
     }
 
-    public static int FrontPawnIndex => -1;
+    public static int LastPawnIndex => -1;
 
     public int MinNumberOfPawnsOnColumn { get; set; }
     public int[] PossiblePawnColumnsToMakeTheMove { get; set; } = [];

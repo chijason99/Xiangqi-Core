@@ -83,7 +83,7 @@ public class Board
         if (!allPiecesOfType.Any()) throw new InvalidOperationException($"Cannot find any columns containing more than one {EnumHelper<Side>.GetDisplayName(sideToMove)} {moveObject.PieceType.Name}");
 
         List<Piece> piecesToMove = allPiecesOfType
-                                    .OrderBy(piece => piece.Coordinate.Row)
+                                    .OrderByRowWithSide(sideToMove)
                                     .ToList();
 
         Piece pieceToMove;
@@ -120,8 +120,8 @@ public class Board
                                 .ToArray();
         }
 
-        if (moveObject.PieceOrderIndex == MultiColumnPawnParsedMoveObject.FrontPawnIndex)
-            return sideToMove == Side.Black ? pawnsOnColumn.First() : pawnsOnColumn.Last();
+        if (moveObject.PieceOrderIndex == MultiColumnPawnParsedMoveObject.LastPawnIndex)
+            return pawnsOnColumn.Last();
         else
             return pawnsOnColumn[moveObject.PieceOrderIndex];
     }

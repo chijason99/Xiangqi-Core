@@ -99,18 +99,12 @@ public class ChineseNotationParser : MoveNotationBase
     }
 
     private int ParsePieceOrderIndex(string notation)
-    {
-        bool isBlack = notation.Any(char.IsDigit);
-
-        if (isBlack)
-            return notation[0] == '前' ? 0 : 1;
-        else
-            return notation[0] == '前' ? 1 : 0;
-    }
+        => notation[0] == '前' ? 0 : 1;
 
     // Multi Column Pawn situation
     // Meaning that there are more than one columns holding two or more pawns of the same color
-    private bool IsMultiColumnPawn(string notation) => ParsePieceType(notation) == typeof(Pawn) && notation.IndexOfAny(pawnsInChinese) != 0;
+    private bool IsMultiColumnPawn(string notation) => ParsePieceType(notation) == typeof(Pawn) && 
+                                                       notation.IndexOfAny(pawnsInChinese) != 0;
 
     private int GetMinNumberOfPawnsOnColumn(string notation)
         => notation[0] switch
@@ -128,7 +122,7 @@ public class ChineseNotationParser : MoveNotationBase
         {
             '前' => 0,
             '中' => 1,
-            '後' => MultiColumnPawnParsedMoveObject.FrontPawnIndex,
+            '後' => MultiColumnPawnParsedMoveObject.LastPawnIndex,
             _ => ChineseNumberParser.Parse(firstCharacter) - 1
         };
     }
