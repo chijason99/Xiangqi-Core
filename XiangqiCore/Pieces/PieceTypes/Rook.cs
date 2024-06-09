@@ -1,10 +1,14 @@
-﻿using XiangqiCore.Pieces.PieceTypes;
+﻿using XiangqiCore.Attributes;
+using XiangqiCore.Move;
+using XiangqiCore.Pieces.PieceTypes;
 using XiangqiCore.Pieces.ValidationStrategy;
 
 namespace XiangqiCore.Pieces;
+
+[MoveInOrthogonals]
 public sealed class Rook : Piece
 {
-    public Rook(Coordinate coordinate, Side side) 
+    public Rook(Coordinate coordinate, Side side)
         : base(coordinate, side)
     {
         ValidationStrategy = new RookValidationStrategy();

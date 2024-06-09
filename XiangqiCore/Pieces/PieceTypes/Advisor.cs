@@ -1,8 +1,12 @@
-﻿using XiangqiCore.Pieces.PieceTypes;
+﻿using XiangqiCore.Attributes;
+using XiangqiCore.Extension;
+using XiangqiCore.Move;
+using XiangqiCore.Pieces.PieceTypes;
 using XiangqiCore.Pieces.ValidationStrategy;
 
 namespace XiangqiCore.Pieces;
 
+[MoveInDiagonals]
 public sealed class Advisor : Piece
 {
     public Advisor(Coordinate coordinate, Side side) 
@@ -15,4 +19,12 @@ public sealed class Advisor : Piece
     public override PieceType PieceType => PieceType.Advisor;
 
     public override char FenCharacter => 'a';
+
+    public override Coordinate GetDestinationCoordinateFromNotation(MoveDirection moveDirection, int fourthCharacterInNotation)
+    => moveDirection switch
+    {
+        MoveDirection.Forward => new Coordinate(fourthCharacterInNotation.ConvertToColumnBasedOnSide(Side), Coordinate.Row + 1.ConvertStepsBaseOnSide(Side)),
+        MoveDirection.Backward => new Coordinate(fourthCharacterInNotation.ConvertToColumnBasedOnSide(Side), Coordinate.Row - 1.ConvertStepsBaseOnSide(Side)),
+        _ => throw new ArgumentException("Invalid Move Direction")
+    };
 }

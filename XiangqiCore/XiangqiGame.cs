@@ -1,5 +1,8 @@
 ﻿using XiangqiCore.Boards;
 using XiangqiCore.Exceptions;
+using XiangqiCore.Extension;
+using XiangqiCore.Move;
+using XiangqiCore.Move.Move;
 using XiangqiCore.Pieces;
 
 namespace XiangqiCore;
@@ -8,10 +11,10 @@ public class XiangqiGame
 {
     internal XiangqiGame() { }
 
-    private XiangqiGame(string initialFenString, 
-                         Side sideToMove, 
-                         Player redPlayer, 
-                         Player blackPlayer, 
+    private XiangqiGame(string initialFenString,
+                         Side sideToMove,
+                         Player redPlayer,
+                         Player blackPlayer,
                          string competition,
                          DateTime gameDate)
     {
@@ -49,7 +52,9 @@ public class XiangqiGame
 
         if (!isFenValid) throw new InvalidFenException(initialFenString);
 
-        XiangqiGame createdGameInstance = new(initialFenString, sideToMove, redPlayer, blackPlayer, competition, gameDate)
+        Side sideToMoveFromFen = FenHelper.GetSideToMoveFromFen(initialFenString);
+
+        XiangqiGame createdGameInstance = new(initialFenString, sideToMoveFromFen, redPlayer, blackPlayer, competition, gameDate)
         {
             Board = useBoardConfig ? new Board(initialFenString, boardConfig!) : new Board(initialFenString),
         };
@@ -58,5 +63,37 @@ public class XiangqiGame
             createdGameInstance.InitialFenString = FenHelper.GetFenFromPosition(createdGameInstance.Board.Position);
 
         return createdGameInstance;
+    }
+
+    public bool Move(Coordinate startingPosition, Coordinate destination)
+    {
+        try
+        {
+            Board.MakeMove(startingPosition, destination, SideToMove);
+            return true;
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Invalid move: {ex.Message}");
+            return false;
+        }
+    }
+
+    public bool Move(string moveNotation, MoveNotationType moveNotationType)
+    {
+        try
+        {
+            IMoveNotationParser parser = MoveNotationParserFactory.GetParser(moveNotationType);
+            ParsedMoveObject parsedMoveObject = parser.Parse(moveNotation);
+
+            Board.MakeMove(parsedMoveObject, SideToMove);
+
+            return true;
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Invalid move: {ex.Message}");
+            return false;
+        }
     }
 }

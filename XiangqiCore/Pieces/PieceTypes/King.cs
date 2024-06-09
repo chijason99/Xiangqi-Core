@@ -1,7 +1,9 @@
-﻿using XiangqiCore.Pieces.ValidationStrategy;
+﻿using XiangqiCore.Attributes;
+using XiangqiCore.Pieces.ValidationStrategy;
 
 namespace XiangqiCore.Pieces.PieceTypes;
 
+[MoveInOrthogonals]
 public sealed class King : Piece
 {
     public King(Coordinate coordinate, Side side)

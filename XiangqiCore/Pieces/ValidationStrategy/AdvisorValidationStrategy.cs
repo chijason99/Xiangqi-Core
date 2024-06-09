@@ -3,7 +3,7 @@
 namespace XiangqiCore.Pieces.ValidationStrategy;
 public class AdvisorValidationStrategy : DefaultValidationStrategy
 {
-    public override int[] GetPossibleColumns() => Board.GetGetPalaceColumns();
+    public override int[] GetPossibleColumns() => Board.GetPalaceColumns();
 
     public override int[] GetPossibleRows(Side color) => Board.GetPalaceRows(color);
 

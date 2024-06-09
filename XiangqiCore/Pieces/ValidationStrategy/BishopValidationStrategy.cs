@@ -26,10 +26,12 @@ public class BishopValidationStrategy : DefaultValidationStrategy
         Coordinate bottomLeftObstacleCoordinate = GetObstacleCoordinateOnMoveDirection(BishopMoveDirection.BottomLeft, startingPosition);
         Coordinate bottomRightObstacleCoordinate = GetObstacleCoordinateOnMoveDirection(BishopMoveDirection.BottomRight, startingPosition);
 
-        return (isMovingTopLeft && !boardPosition.HasPieceAtPosition(topLeftObstacleCoordinate)) ||
-               (isMovingTopRight && !boardPosition.HasPieceAtPosition(topRightObstacleCoordinate)) ||
-               (isMovingBottomLeft && !boardPosition.HasPieceAtPosition(bottomLeftObstacleCoordinate)) ||
-               (isMovingBottomRight && !boardPosition.HasPieceAtPosition(bottomRightObstacleCoordinate));
+        bool isValidMovingTopLeft = isMovingTopLeft && !boardPosition.HasPieceAtPosition(topLeftObstacleCoordinate);
+        bool isValidMovingTopRight = isMovingTopRight && !boardPosition.HasPieceAtPosition(topRightObstacleCoordinate);
+        bool isValidMovingBottomLeft = isMovingBottomLeft && !boardPosition.HasPieceAtPosition(bottomLeftObstacleCoordinate);
+        bool isValidMovingBottomRight = isMovingBottomRight && !boardPosition.HasPieceAtPosition(bottomRightObstacleCoordinate);
+
+        return isValidMovingTopLeft || isValidMovingTopRight || isValidMovingBottomLeft || isValidMovingBottomRight;
     }
 
     private Coordinate GetObstacleCoordinateOnMoveDirection(BishopMoveDirection bishopMoveDirection, Coordinate startingPosition)
@@ -41,10 +43,10 @@ public class BishopValidationStrategy : DefaultValidationStrategy
         {
             return bishopMoveDirection switch
             {
-                BishopMoveDirection.TopLeft => new Coordinate(startingRow + 1, startingColumn - 1),
-                BishopMoveDirection.TopRight => new Coordinate(startingRow + 1, startingColumn + 1),
-                BishopMoveDirection.BottomLeft => new Coordinate(startingRow - 1, startingColumn - 1),
-                BishopMoveDirection.BottomRight => new Coordinate(startingRow - 1, startingColumn + 1),
+                BishopMoveDirection.TopLeft => new Coordinate(startingColumn - 1, startingRow + 1),
+                BishopMoveDirection.TopRight => new Coordinate(startingColumn + 1, startingRow + 1),
+                BishopMoveDirection.BottomLeft => new Coordinate(startingColumn - 1, startingRow - 1),
+                BishopMoveDirection.BottomRight => new Coordinate(startingColumn + 1, startingRow - 1),
                 _ => throw new ArgumentException("Invalid bishop move direction")
             };
         }
