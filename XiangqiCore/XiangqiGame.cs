@@ -115,7 +115,7 @@ public class XiangqiGame
 
     private void IncrementRoundNumberIfNeeded()
     {
-        if (SideToMove == Side.Black || RoundNumber == 0)
+        if (SideToMove == Side.Red || RoundNumber == 0)
             RoundNumber++;
     }
 
@@ -134,9 +134,9 @@ public class XiangqiGame
         else
             IncrementNumberOfMovesWithoutCapture();
 
-        latestMove.UpdateFenWithGameInfo(RoundNumber, NumberOfMovesWithoutCapture);
-
         IncrementRoundNumberIfNeeded();
+
+        latestMove.UpdateFenWithGameInfo(RoundNumber, NumberOfMovesWithoutCapture);
 
         SwitchSideToMove();
         AddMoveToHistory(latestMove);
