@@ -5,6 +5,7 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
     <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
+	<IsTestProject>false</IsTestProject>
     <Title>XiangqiCore</Title>
     <Authors>Jason Chi</Authors>
     <Company />
