@@ -24,9 +24,15 @@ public class PawnValidationStrategy : DefaultValidationStrategy
         const int redRiverRow = 5;
         const int blackRiverRow = 6;
 
-        bool isMovingForward = pawn.Side == Side.Red ? startingPosition.Row + 1 == destination.Row : startingPosition.Row - 1 == destination.Row;
-        bool isMovingLeft = startingPosition.Column - 1 == destination.Column;
-        bool isMovingRight = startingPosition.Column + 1 == destination.Column;
+        bool isOnTheSameColumn = startingPosition.Column == destination.Column;
+        bool isOnTheSameRow = startingPosition.Row == destination.Row;
+
+        bool isMovingForward = pawn.Side == Side.Red ? 
+                               startingPosition.Row + 1 == destination.Row && isOnTheSameColumn : 
+                               startingPosition.Row - 1 == destination.Row && isOnTheSameColumn;
+
+        bool isMovingLeft = startingPosition.Column - 1 == destination.Column && isOnTheSameRow;
+        bool isMovingRight = startingPosition.Column + 1 == destination.Column && isOnTheSameRow;
         bool pawnHasCrossedTheRiver = pawn.Side == Side.Red ? startingPosition.Row >= blackRiverRow : startingPosition.Row <= redRiverRow;
 
         return (isMovingForward && !(isMovingLeft || isMovingRight)) || (pawnHasCrossedTheRiver && ((isMovingLeft || isMovingRight) && !isMovingForward));

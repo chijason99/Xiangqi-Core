@@ -243,4 +243,70 @@ public static class FenHelperTests
         // Assert
         resultFen.Should().BeEquivalentTo(positionFen);
     }
+
+    [Theory]
+    [InlineData("1rbak1b2/1C2a4/2R1c1n2/4p3p/p4np2/9/P1P1P1P1P/N2CB1r2/4A4/1RB1KA3 b - - 1 16", 16)]
+    [InlineData("r1baknb2/4a4/7C1/4p3p/p5p2/8r/PCP6/N8/4A1n2/1RBK1ABRc w - - 12 26", 26)]
+    [InlineData("1rbak1b2/4a4/1CR3n2/4p3p/p2C1np2/9/P1P1c1r1P/N3B4/4A4/1RB1KA3 b - - 1 18", 18)]
+    [InlineData("2baknbC1/4a4/9/4p3p/p3c4/4r4/P1P3C2/N2nB2R1/3K5/5A3 b - - 7 42", 42)]
+    public static void ShouldReturnCorrectRoundNumber_WhenGivenFen(string sampleFen, int expectedRoundNumber)
+    {
+        // Arrange
+
+        // Act
+        int actualRoundNumber = FenHelper.GetRoundNumber(sampleFen);
+
+        // Assert
+        actualRoundNumber.Should().Be(expectedRoundNumber);
+    }
+
+    [Theory]
+    [InlineData("1rbak1b2/1C2a4/2R1c1n2/4p3p/p4np2/9/P1P1P1P1P/N2CB1r2/4A4/1RB1KA3 b")]
+    [InlineData("r1baknb2/4a4/7C1/4p3p/p5p2/8r/PCP6/N8/4A1n2/1RBK1ABRc w")]
+    [InlineData("1rbak1b2/4a4/1CR3n2/4p3p/p2C1np2/9/P1P1c1r1P/N3B4/4A4/1RB1KA3 b")]
+    [InlineData("2baknbC1/4a4/9/4p3p/p3c4/4r4/P1P3C2/N2nB2R1/3K5/5A3 b")]
+    public static void ShouldReturnZeroAsRoundNumber_WhenRoundNumberNotProvided(string sampleFen)
+    {
+        // Arrange
+        const int expectedRoundNumber = 0;
+
+        // Act
+        int actualRoundNumber = FenHelper.GetRoundNumber(sampleFen);
+
+        // Assert
+        actualRoundNumber.Should().Be(expectedRoundNumber);
+    }
+
+    [Theory]
+    [InlineData("1rbak1b2/1C2a4/2R1c1n2/4p3p/p4np2/9/P1P1P1P1P/N2CB1r2/4A4/1RB1KA3 b - - 1 16", 1)]
+    [InlineData("r1baknb2/4a4/7C1/4p3p/p5p2/8r/PCP6/N8/4A1n2/1RBK1ABRc w - - 12 26", 12)]
+    [InlineData("1rbak1b2/4a4/1CR3n2/4p3p/p2C1np2/9/P1P1c1r1P/N3B4/4A4/1RB1KA3 b - - 1 18", 1)]
+    [InlineData("2baknbC1/4a4/9/4p3p/p3c4/4r4/P1P3C2/N2nB2R1/3K5/5A3 b - - 7 42", 7)]
+    public static void ShouldReturnCorrectNumberOfMovesWithoutCapture_WhenGivenFen(string sampleFen, int expectedNumberOfMovesWithoutCapture)
+    {
+        // Arrange
+
+        // Act
+        int actualNumberOfMovesWithoutCapture = FenHelper.GetNumberOfMovesWithoutCapture(sampleFen);
+
+        // Assert
+        actualNumberOfMovesWithoutCapture.Should().Be(expectedNumberOfMovesWithoutCapture);
+    }
+
+    [Theory]
+    [InlineData("1rbak1b2/1C2a4/2R1c1n2/4p3p/p4np2/9/P1P1P1P1P/N2CB1r2/4A4/1RB1KA3 b")]
+    [InlineData("r1baknb2/4a4/7C1/4p3p/p5p2/8r/PCP6/N8/4A1n2/1RBK1ABRc w")]
+    [InlineData("1rbak1b2/4a4/1CR3n2/4p3p/p2C1np2/9/P1P1c1r1P/N3B4/4A4/1RB1KA3 b")]
+    [InlineData("2baknbC1/4a4/9/4p3p/p3c4/4r4/P1P3C2/N2nB2R1/3K5/5A3 b")]
+    public static void ShouldReturnZeroAsNumberOfMovesWithoutCapture_WhenNumberOfMovesWithoutCaptureNotProvided(string sampleFen)
+    {
+        // Arrange
+        const int expectedNumberOfMovesWithoutCapture = 0;
+
+        // Act
+        int actualRoundNumber = FenHelper.GetNumberOfMovesWithoutCapture(sampleFen);
+
+        // Assert
+        actualRoundNumber.Should().Be(expectedNumberOfMovesWithoutCapture);
+    }
 }

@@ -46,7 +46,7 @@ public class Board
 
     public static int[] GetPalaceColumns() => [4, 5, 6];
 
-    public void MakeMove(Coordinate startingPosition, Coordinate destination, Side sideToMove)
+    public MoveHistoryObject MakeMove(Coordinate startingPosition, Coordinate destination, Side sideToMove)
     {
         if (!Position.HasPieceAtPosition(startingPosition))
             throw new InvalidOperationException("There must be a piece on the starting position");
@@ -59,15 +59,18 @@ public class Board
         if (!pieceToMove.ValidateMove(Position, startingPosition, destination))
             throw new InvalidOperationException($"The proposed move violates the game logic"); ;
 
+        MoveHistoryObject moveHistory = CreateMoveHistory(sideToMove, startingPosition, destination);
         Position.MakeMove(startingPosition, destination);
+
+        return moveHistory;
     }
 
-    public void MakeMove(ParsedMoveObject moveObject, Side sideToMove)
+    public MoveHistoryObject MakeMove(ParsedMoveObject moveObject, Side sideToMove)
     {
         Coordinate startingPosition = FindStartingPosition(moveObject, sideToMove);
         Coordinate destination = FindDestination(moveObject, startingPosition);
 
-        MakeMove(startingPosition, destination, sideToMove);
+        return MakeMove(startingPosition, destination, sideToMove);
     }
 
     private Coordinate FindStartingPosition(ParsedMoveObject moveObject, Side sideToMove)
@@ -148,4 +151,27 @@ public class Board
 
         return destination;
     }
+
+    private MoveHistoryObject CreateMoveHistory(Side sideToMove, Coordinate startingPosition, Coordinate destination)
+    {
+        Piece[,] positionAfterTheProposedMove = Position.SimulateMove(startingPosition, destination);
+        bool isCapture = Position.HasPieceAtPosition(destination);
+        bool isCheck = positionAfterTheProposedMove.IsKingInCheck(sideToMove.GetOppositeSide());
+        bool isCheckmate = positionAfterTheProposedMove.IsSideInCheckmate(sideToMove);
+        Piece pieceMoved = GetPieceAtPosition(startingPosition);
+
+        MoveHistoryObject moveHistory = new (
+            fenOfPosition: FenHelper.GetFenFromPosition(positionAfterTheProposedMove),
+            isCapture,
+            isCheck,
+            isCheckmate,
+            pieceMoved.PieceType,
+            sideToMove,
+            startingPosition,
+            destination
+        );
+
+        return moveHistory;
+    }
+
 }

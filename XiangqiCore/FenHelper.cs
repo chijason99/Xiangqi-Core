@@ -6,10 +6,11 @@ namespace XiangqiCore;
 
 public static partial class FenHelper
 {
+    private static readonly Regex _fenRegex = FenRegex();
+
     public static bool Validate(string fenInput)
     {
-        Regex fenRegex = FenRegex();
-        Match match = fenRegex.Match(fenInput);
+        Match match = _fenRegex.Match(fenInput);
 
         // 1 overall group, 10 groups for 10 rows on the board, 1 group for turnorder, 1 group for round number, 1 group for turns without capturing
         const int expectedNumberOfGroups = 14;
@@ -57,8 +58,7 @@ public static partial class FenHelper
 
     public static Piece[,] CreatePositionFromFen(string fenInput)
     {
-        Regex fenRegex = FenRegex();
-        Match match = fenRegex.Match(fenInput);
+        Match match = _fenRegex.Match(fenInput);
 
         Piece[,] result = new Piece[10, 9];
 
@@ -153,10 +153,47 @@ public static partial class FenHelper
 
     public static Side GetSideToMoveFromFen(string fenString)
     {
-        Regex fenRegex = FenRegex();
-        Match match = fenRegex.Match(fenString);
+        Match match = _fenRegex.Match(fenString);
         const int sideToMoveIndex = 11;
+        const Side defaultSideToMove = Side.Red;
 
-        return match.Groups[sideToMoveIndex].Value == "w" ? Side.Red : Side.Black;
+        if (match.Success && IsNumberOfRegexMatchAboveTargetIndex(match, sideToMoveIndex))
+            return match.Groups[sideToMoveIndex].Value is "w" or "r" ? Side.Red : Side.Black;
+
+        return defaultSideToMove;
+    }
+
+    public static int GetRoundNumber(string fenString)
+    {
+        Match match = _fenRegex.Match(fenString);
+        const int roundNumberIndex = 13;
+        const int defaultRoundNumber = 0;
+
+        if (match.Success && IsNumberOfRegexMatchAboveTargetIndex(match, roundNumberIndex))
+            return int.Parse(match.Groups[roundNumberIndex].Value);
+
+        return defaultRoundNumber;
+    }
+
+    public static int GetNumberOfMovesWithoutCapture(string fenString)
+    {
+        Match match = _fenRegex.Match(fenString);
+        const int numberOfMovesWithoutCaptureIndex = 12;
+        const int defaultNumberOfMovesWithoutCapture = 0;
+
+        if (match.Success && IsNumberOfRegexMatchAboveTargetIndex(match, numberOfMovesWithoutCaptureIndex))
+            return int.Parse(match.Groups[numberOfMovesWithoutCaptureIndex].Value);
+
+        return defaultNumberOfMovesWithoutCapture;
+    }
+
+    private static bool IsNumberOfRegexMatchAboveTargetIndex(Match match, int targetIndex)
+        => match.Groups.Count > targetIndex;
+
+    public static string AppendGameInfoToFen(this string boardFen, Side sideToMove, int roundNumber, int numberOfMovesWithoutCapture)
+    {
+        string sideToMoveFen = sideToMove == Side.Red ? "w" : "b";
+
+        return $"{boardFen} {sideToMoveFen} - - {numberOfMovesWithoutCapture} {roundNumber}";
     }
 }

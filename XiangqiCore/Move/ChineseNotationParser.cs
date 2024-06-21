@@ -72,15 +72,14 @@ public class ChineseNotationParser : MoveNotationBase
         char secondCharacter = notation[defaultColumnIndex];
 
         if (notationSide == Side.Black)
-            return (int.TryParse(secondCharacter.ToString(), out int startingColumn)) ? 
-                    startingColumn :
+            return char.IsDigit(secondCharacter) ? 
+                    (int) char.GetNumericValue(secondCharacter) : 
                     ParsedMoveObject.UnknownStartingColumn;
         else 
             return ChineseNumberParser.TryParse(secondCharacter, out int startingColumn) ? 
                     startingColumn : 
                     ParsedMoveObject.UnknownStartingColumn;
     }
-
 
     private int ParseFourthCharacter(string notation)
     {
@@ -89,9 +88,10 @@ public class ChineseNotationParser : MoveNotationBase
 
         if (isBlack)
         {
-            bool successfulParse = int.TryParse(notation[fourthCharacterIndex].ToString(), out int fourthCharacter);
+            // Use this method instead of int.TryParse as the int.TryParse cannot handle numbers in full-width form
+            double fourthCharacterInDouble = Char.GetNumericValue(notation[fourthCharacterIndex]);
 
-            return successfulParse ? fourthCharacter : ParsedMoveObject.UnknownStartingColumn;
+            return (int)fourthCharacterInDouble;
         }
         else
             return chineseNumbers.Contains(notation[fourthCharacterIndex]) ? ChineseNumberParser.Parse(notation[fourthCharacterIndex]) : ParsedMoveObject.UnknownStartingColumn;

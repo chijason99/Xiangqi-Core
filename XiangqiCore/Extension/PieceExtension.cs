@@ -163,27 +163,8 @@ public static class PieceExtension
         Piece[,] positionAfterSimulation = boardPosition.SimulateMove(startingPosition, destination);
         King targetKing = positionAfterSimulation.GetPiecesOfType<King>(targetKingSide).Single();
 
-        // Check Against Rook
-        if (positionAfterSimulation.IsKingAttackedBy<Rook>(targetKing.Coordinate))
-            return true;
-
-        // Check Against King
-        if (positionAfterSimulation.IsKingExposedDirectlyToEnemyKing(targetKing.Coordinate))
-            return true;
-
-        // Check Against Cannon
-        if (positionAfterSimulation.IsKingAttackedBy<Cannon>(targetKing.Coordinate))
-            return true;
-
-        // Check Against Pawn
-        if (positionAfterSimulation.IsKingAttackedBy<Pawn>(targetKing.Coordinate))
-            return true;
-
-        // Check Against Knight
-        if (positionAfterSimulation.IsKingAttackedBy<Knight>(targetKing.Coordinate))
-            return true;
-
-        return false;
+        return positionAfterSimulation.IsKingInCheck(targetKingSide) || 
+               positionAfterSimulation.IsKingExposedDirectlyToEnemyKing(targetKing.Coordinate);
     }
 
     /// <summary>
@@ -286,4 +267,32 @@ public static class PieceExtension
     /// <returns></returns>
     public static IEnumerable<Piece> OrderByRowWithSide(this IEnumerable<Piece> pieces, Side sideToMove)
         => sideToMove == Side.Black ? pieces.OrderBy(p => p.Coordinate.Row) : pieces.OrderByDescending(p => p.Coordinate.Row);
+
+    public static bool IsKingInCheck(this Piece[,] position, Side sideToCheck)
+    {
+        King targetKing = position.GetPiecesOfType<King>(sideToCheck).Single();
+
+        return position.IsKingAttackedBy<Rook>(targetKing.Coordinate) ||
+               position.IsKingAttackedBy<Cannon>(targetKing.Coordinate) ||
+               position.IsKingAttackedBy<Pawn>(targetKing.Coordinate) ||
+               position.IsKingAttackedBy<Knight>(targetKing.Coordinate);
+    }
+
+    public static bool IsSideInCheckmate(this Piece[,] position, Side sideToCheck)
+    {
+        Piece[] piecesToCheck = position
+                                    .Cast<Piece>()
+                                    .Where(p => p.Side == sideToCheck)
+                                    .ToArray();
+
+        foreach (Piece piece in piecesToCheck)
+        {
+            List<Coordinate> availableCoordinatesForPiece = piece.GeneratePotentialMoves(position);
+
+            if (availableCoordinatesForPiece.Any())
+                return false;
+        }
+
+        return true;
+    }
 }
