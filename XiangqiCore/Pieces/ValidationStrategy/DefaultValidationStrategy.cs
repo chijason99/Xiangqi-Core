@@ -4,12 +4,12 @@ using XiangqiCore.Extension;
 namespace XiangqiCore.Pieces.ValidationStrategy;
 public class DefaultValidationStrategy : IValidationStrategy
 {
-    public bool AreCoordinatesValid(Side color, Coordinate destination)
+    public virtual bool AreCoordinatesValid(Side color, Coordinate destination)
     {
-        int[] palaceRows = GetPossibleRows(color);
-        int[] palaceColumns = GetPossibleColumns();
+        int[] rows = GetPossibleRows(color);
+        int[] columns = GetPossibleColumns();
 
-        return palaceColumns.Contains(destination.Column) && palaceRows.Contains(destination.Row);
+        return columns.Contains(destination.Column) && rows.Contains(destination.Row);
     }
 
     public virtual int[] GetPossibleColumns() => Board.GetAllColumns();
@@ -22,10 +22,15 @@ public class DefaultValidationStrategy : IValidationStrategy
         Side side = pieceToMove.Side;
         IValidationStrategy validationStrategy = pieceToMove.ValidationStrategy;
 
-        return validationStrategy.AreCoordinatesValid(side, destination) &&
-               validationStrategy.ValidateMoveLogicForPiece(boardPosition, startingPoint, destination) &&
-               !boardPosition.WillExposeKingToDanger(startingPoint, destination) &&
-               !boardPosition.IsDestinationContainingFriendlyPiece(startingPoint, destination);
+        bool areCoordinatesValid = validationStrategy.AreCoordinatesValid(side, destination);
+        bool isDestinationContainingFriendlyPiece = boardPosition.IsDestinationContainingFriendlyPiece(startingPoint, destination);
+        bool isMoveLogicValid = validationStrategy.ValidateMoveLogicForPiece(boardPosition, startingPoint, destination);
+        bool willExposeKingToDanger = boardPosition.WillExposeKingToDanger(startingPoint, destination);
+
+        return areCoordinatesValid &&
+               !isDestinationContainingFriendlyPiece &&
+               isMoveLogicValid &&
+               !willExposeKingToDanger;
     }
     public virtual bool ValidateMoveLogicForPiece(Piece[,] boardPosition, Coordinate startingPoint, Coordinate destination) => true;
 }

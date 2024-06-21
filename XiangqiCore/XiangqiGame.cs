@@ -45,6 +45,14 @@ public class XiangqiGame
 
     public Piece[,] BoardPosition => Board.Position;
 
+    public string CurrentFen => _moveHistory.LastOrDefault()?.FenOfPosition ?? "";
+
+    public int NumberOfMovesWithoutCapture { get; private set; } = 0;
+    public int RoundNumber { get; private set; } = 0;
+
+    private List<MoveHistoryObject> _moveHistory { get; set; } = [];
+    public IReadOnlyList<MoveHistoryObject> MoveHistory => _moveHistory.AsReadOnly();
+
     public static XiangqiGame Create(string initialFenString, Side sideToMove, Player redPlayer, Player blackPlayer,
                                      string competition, DateTime gameDate, bool useBoardConfig = false, BoardConfig? boardConfig = null)
     {
@@ -57,6 +65,8 @@ public class XiangqiGame
         XiangqiGame createdGameInstance = new(initialFenString, sideToMoveFromFen, redPlayer, blackPlayer, competition, gameDate)
         {
             Board = useBoardConfig ? new Board(initialFenString, boardConfig!) : new Board(initialFenString),
+            RoundNumber = FenHelper.GetRoundNumber(initialFenString),
+            NumberOfMovesWithoutCapture = FenHelper.GetNumberOfMovesWithoutCapture(initialFenString),
         };
 
         if (useBoardConfig)
@@ -69,7 +79,10 @@ public class XiangqiGame
     {
         try
         {
-            Board.MakeMove(startingPosition, destination, SideToMove);
+            MoveHistoryObject moveHistoryObject = Board.MakeMove(startingPosition, destination, SideToMove);
+
+            UpdateGameInfo(moveHistoryObject);
+
             return true;
         }
         catch (Exception ex)
@@ -86,8 +99,11 @@ public class XiangqiGame
             IMoveNotationParser parser = MoveNotationParserFactory.GetParser(moveNotationType);
             ParsedMoveObject parsedMoveObject = parser.Parse(moveNotation);
 
-            Board.MakeMove(parsedMoveObject, SideToMove);
+            MoveHistoryObject moveHistoryObject = Board.MakeMove(parsedMoveObject, SideToMove);
+            moveHistoryObject.UpdateMoveNotation(moveNotation, moveNotationType);
 
+            UpdateGameInfo(moveHistoryObject);
+            
             return true;
         }
         catch (Exception ex)
@@ -95,5 +111,34 @@ public class XiangqiGame
             Console.WriteLine($"Invalid move: {ex.Message}");
             return false;
         }
+    }
+
+    private void IncrementRoundNumberIfNeeded()
+    {
+        if (SideToMove == Side.Black || RoundNumber == 0)
+            RoundNumber++;
+    }
+
+    private void IncrementNumberOfMovesWithoutCapture() => NumberOfMovesWithoutCapture++;
+
+    private void ResetNumberOfMovesWithoutCapture() => NumberOfMovesWithoutCapture = 0;
+
+    private void SwitchSideToMove() => SideToMove = SideToMove.GetOppositeSide();
+
+    private void AddMoveToHistory(MoveHistoryObject moveHistoryObj) => _moveHistory.Add(moveHistoryObj);
+
+    private void UpdateGameInfo(MoveHistoryObject latestMove)
+    {
+        if (latestMove.IsCapture)
+            ResetNumberOfMovesWithoutCapture();
+        else
+            IncrementNumberOfMovesWithoutCapture();
+
+        latestMove.UpdateFenWithGameInfo(RoundNumber, NumberOfMovesWithoutCapture);
+
+        IncrementRoundNumberIfNeeded();
+
+        SwitchSideToMove();
+        AddMoveToHistory(latestMove);
     }
 }

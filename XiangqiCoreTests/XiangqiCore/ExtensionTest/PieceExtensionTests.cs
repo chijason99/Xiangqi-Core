@@ -346,6 +346,29 @@ public static class PieceExtensionTests
         // Assert
         actualResult.Should().Be(expectedResult);
     }
+
+    [Theory]
+    [InlineData("3k5/3NP4/3Cb4/3n5/9/5c3/1pc1p4/4B4/3C5/2BAK4 b - - 1 52", Side.Black, true)]
+    [InlineData("2Rrkab2/4n4/3Nna3/p3C2rp/2p6/5p3/P3P3P/4B4/9/3AKAB2 b - - 2 6", Side.Black, true)]
+    [InlineData("3k5/4P4/9/9/9/9/9/9/4K4/6B2 b - - 0 10", Side.Black, true)]
+    [InlineData("2N6/4a4/3k5/9/9/9/9/9/9/4K4 b - - 19 10", Side.Black, false)]
+    [InlineData("2N6/4a4/3k5/9/9/9/9/9/9/4K4 b - - 19 10", Side.Red, false)]
+    [InlineData("2b2k3/C1N6/4c4/5P3/2n6/2B3B2/9/3A1A3/5K3/9 b - - 8 73", Side.Black, false)]
+    public static void IsSideInCheckamte_ShouldReturnTrue_WhenGivenCheckmateFen(string sampleFen, Side sideToCheck, bool expectedResult)
+    {
+        // Arrange
+        XiangqiBuilder builder = new();
+
+        XiangqiGame game = builder
+                            .UseCustomFen(sampleFen)
+                            .Build();
+
+        // Act
+        bool actualResult = game.BoardPosition.IsSideInCheckmate(sideToCheck);
+
+        // Assert
+        actualResult.Should().Be(expectedResult);
+    }
 }
 
 public record CountPiecesBetweenTwoCoordinatesTestData(string StartingFen, Coordinate StartingPosition, Coordinate Destination, int ExpectedResult);
