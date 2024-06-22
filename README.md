@@ -32,7 +32,7 @@ Here's a simple example of setting up a game board and making a move:
 	XiangqiGame game = builder.UseDefaultConfiguration().Build();
 	
 	// Make a move
-	game.MakeMove("ÅÚ¶þÆ½Îå", MoveNotationType.Chinese);
+	game.MakeMove("ç‚®äºŒå¹³äº”", MoveNotationType.Chinese);
 ```
 Refer to the documentation for more detailed examples and usage instructions.
 
