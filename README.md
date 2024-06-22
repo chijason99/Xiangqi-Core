@@ -27,12 +27,12 @@ To get started with XiangqiCore, first import the package into your project:
 Here's a simple example of setting up a game board and making a move:
 
 ```
-    // Create a new game instance with the help of the XiangqiBuilder using fluent API
-	XiangqiBuilder builder = new (); 
-	XiangqiGame game = builder.UseDefaultConfiguration().Build();
+// Create a new game instance with the help of the XiangqiBuilder
+XiangqiBuilder builder = new (); 
+XiangqiGame game = builder.UseDefaultConfiguration().Build();
 	
-	// Make a move
-	game.MakeMove("炮二平五", MoveNotationType.Chinese);
+// Make a move
+game.MakeMove("炮二平五", MoveNotationType.Chinese);
 ```
 Refer to the documentation for more detailed examples and usage instructions.
 
