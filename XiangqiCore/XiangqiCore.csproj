@@ -6,11 +6,28 @@
     <Nullable>enable</Nullable>
     <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
 	<IsTestProject>false</IsTestProject>
-    <Title>XiangqiCore</Title>
+    <Title>Xiangqi-Core</Title>
     <Authors>Jason Chi</Authors>
     <Company />
-    <Description>A lightweight xiangqi library for users to create xiangqi related applications</Description>
+    <Description>XiangqiCore is a versatile .NET library designed to empower developers with comprehensive tools for building Xiangqi (Chinese Chess) applications. It offers a rich set of features including fluent API, advanced game state management, support for parsing move notations in UCCI, Chinese, and English, and robust move validation. Whether you're developing a full-fledged Xiangqi game, integrating Xiangqi functionality into existing software, or creating tools for game analysis, XiangqiCore provides the foundational elements you need to get started with ease and efficiency. Built with performance and flexibility in mind, it's the perfect starting point for your next Xiangqi project.</Description>
+    <PackageId>Xiangqi-Core</PackageId>
+    <Product>Xiangqi-Core</Product>
+    <PackageIcon>xiangqicore-logo-2.jpg</PackageIcon>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
+    <RepositoryUrl>https://github.com/chijason99/Xiangqi-Core</RepositoryUrl>
+    <PackageTags>xiangqi;chinese chess</PackageTags>
   </PropertyGroup>
+
+  <ItemGroup>
+    <None Include="..\..\..\..\..\..\..\Downloads\xiangqicore-logo-2.jpg">
+      <Pack>True</Pack>
+      <PackagePath>\</PackagePath>
+    </None>
+    <None Include="..\README.md">
+      <Pack>True</Pack>
+      <PackagePath>\</PackagePath>
+    </None>
+  </ItemGroup>
 
   <ItemGroup>
     <PackageReference Include="LinqKit" Version="1.2.5" />
