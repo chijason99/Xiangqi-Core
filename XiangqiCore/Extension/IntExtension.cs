@@ -1,4 +1,6 @@
-﻿namespace XiangqiCore.Extension;
+﻿using XiangqiCore.Misc;
+
+namespace XiangqiCore.Extension;
 public static class IntExtension
 {
     public static int ConvertStepsBaseOnSide(this int originalValue, Side side)

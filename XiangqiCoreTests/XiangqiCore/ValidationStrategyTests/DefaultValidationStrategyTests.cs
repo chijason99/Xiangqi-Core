@@ -5,6 +5,8 @@ using System.Text;
 using System.Threading.Tasks;
 using xiangqi_core_test.XiangqiCore.ExtensionTest;
 using XiangqiCore.Extension;
+using XiangqiCore.Game;
+using XiangqiCore.Misc;
 
 namespace xiangqi_core_test.XiangqiCore.ValidationStrategyTests;
 public static class DefaultValidationStrategyTests

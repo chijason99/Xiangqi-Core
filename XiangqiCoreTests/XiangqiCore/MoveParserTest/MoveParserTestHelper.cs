@@ -1,4 +1,6 @@
-﻿using XiangqiCore.Move.Move;
+﻿using XiangqiCore.Game;
+using XiangqiCore.Misc;
+using XiangqiCore.Move;
 using XiangqiCore.Pieces.PieceTypes;
 
 namespace xiangqi_core_test.XiangqiCore.MoveParserTest;

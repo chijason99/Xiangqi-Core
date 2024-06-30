@@ -1,6 +1,7 @@
 ﻿using System.ComponentModel;
 using System.Reflection;
 using XiangqiCore.Attributes;
+using XiangqiCore.Misc;
 
 namespace XiangqiCore.Extension;
 public class EnumHelper<T> where T : Enum 

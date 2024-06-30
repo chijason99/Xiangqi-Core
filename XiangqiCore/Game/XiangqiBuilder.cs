@@ -1,6 +1,7 @@
 ﻿using XiangqiCore.Boards;
+using XiangqiCore.Misc;
 
-namespace XiangqiCore;
+namespace XiangqiCore.Game;
 
 public class XiangqiBuilder : IXiangqiBuilder
 {
@@ -15,8 +16,9 @@ public class XiangqiBuilder : IXiangqiBuilder
 
     private Player _redPlayer { get; set; }
     private Player _blackPlayer { get; set; }
-    private string _competition { get; set; }
-    private DateTime _gameDate { get; set; }
+    
+    private Competition _competition { get; set; }
+    private GameResult _gameResult { get; set; } = GameResult.Unknown;
 
     private bool _useBoardConfig { get; set; } = false;
     private BoardConfig? _boardConfig { get; set; } = null;
@@ -29,8 +31,11 @@ public class XiangqiBuilder : IXiangqiBuilder
         _redPlayer = new();
         _blackPlayer = new();
 
-        _competition = "Unknown";
-        _gameDate = DateTime.Today;
+        CompetitionBuilder competitionBuilder = new();
+
+        // Create a default competition
+        _competition = competitionBuilder.Build();
+        _gameResult = GameResult.Unknown;
 
         return this;
     }
@@ -50,8 +55,7 @@ public class XiangqiBuilder : IXiangqiBuilder
     }
 
     public XiangqiGame Build()
-         => XiangqiGame.Create(initialFenString: _initialFen, sideToMove: _sideToMove, redPlayer: _redPlayer,
-                               blackPlayer: _blackPlayer, competition: _competition, gameDate: _gameDate, useBoardConfig: _useBoardConfig, boardConfig: _boardConfig);
+         => XiangqiGame.Create(_initialFen, _redPlayer, _blackPlayer, _competition, _useBoardConfig, _boardConfig, _gameResult);
 
     public XiangqiBuilder HasRedPlayer(Action<Player> action)
     {
@@ -75,16 +79,20 @@ public class XiangqiBuilder : IXiangqiBuilder
         return this;
     }
 
-    public XiangqiBuilder PlayedInCompetition(string competitionName)
+    public XiangqiBuilder WithGameResult(GameResult gameResult)
     {
-        _competition = competitionName;
+        _gameResult = gameResult;
 
         return this;
     }
 
-    public XiangqiBuilder PlayedOnDate(DateTime gameDate)
+    public XiangqiBuilder PlayedInCompetition(Action<CompetitionBuilder> action)
     {
-        _gameDate = gameDate;
+        CompetitionBuilder competitionBuilder = new();
+
+        action.Invoke(competitionBuilder);
+
+        _competition = competitionBuilder.Build();
 
         return this;
     }

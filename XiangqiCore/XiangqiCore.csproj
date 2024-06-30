@@ -19,14 +19,14 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <None Include="..\..\..\..\..\..\..\Downloads\xiangqicore-logo-2.jpg">
-      <Pack>True</Pack>
-      <PackagePath>\</PackagePath>
-    </None>
     <None Include="..\README.md">
       <Pack>True</Pack>
       <PackagePath>\</PackagePath>
     </None>
+	<None Include="..\xiangqicore-logo-2.jpg">
+		<Pack>True</Pack>
+		<PackagePath>\</PackagePath>
+	</None>
   </ItemGroup>
 
   <ItemGroup>

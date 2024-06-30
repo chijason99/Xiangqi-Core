@@ -16,17 +16,21 @@ Xiangqi-Core is a comprehensive library designed to facilitate the development o
 
 Xiangqi-Core is available as a NuGet package. You can install it using the NuGet Package Manager or the dotnet CLI.
 
-`dotnet add package Xiangqi-Core`
+```bash
+dotnet add package Xiangqi-Core
+```
 
 ## Usage
 
 To get started with Xiangqi-Core, first import the package into your project:
 
-```using XiangqiCore;```
+```C#
+using XiangqiCore;
+```
 
 Here's a simple example of setting up a game board and making a move:
 
-```
+```c#
 // Create a new game instance with the help of the XiangqiBuilder
 XiangqiBuilder builder = new (); 
 XiangqiGame game = builder.UseDefaultConfiguration().Build();

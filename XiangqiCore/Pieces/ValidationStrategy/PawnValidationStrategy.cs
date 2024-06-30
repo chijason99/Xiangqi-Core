@@ -1,6 +1,7 @@
 ﻿using XiangqiCore.Boards;
 using XiangqiCore.Exceptions;
 using XiangqiCore.Extension;
+using XiangqiCore.Misc;
 
 namespace XiangqiCore.Pieces.ValidationStrategy;
 public class PawnValidationStrategy : DefaultValidationStrategy

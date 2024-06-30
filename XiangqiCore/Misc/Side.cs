@@ -1,6 +1,6 @@
 ﻿using XiangqiCore.Attributes;
 
-namespace XiangqiCore;
+namespace XiangqiCore.Misc;
 
 public enum Side
 {

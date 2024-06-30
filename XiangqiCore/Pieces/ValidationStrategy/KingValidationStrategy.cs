@@ -1,4 +1,5 @@
 ﻿using XiangqiCore.Boards;
+using XiangqiCore.Misc;
 
 namespace XiangqiCore.Pieces.ValidationStrategy;
 public class KingValidationStrategy : DefaultValidationStrategy

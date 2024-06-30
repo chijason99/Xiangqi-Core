@@ -2,7 +2,7 @@
 using XiangqiCore.Pieces;
 using XiangqiCore.Pieces.PieceTypes;
 
-namespace XiangqiCore;
+namespace XiangqiCore.Misc;
 
 public static partial class FenHelper
 {

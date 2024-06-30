@@ -1,5 +1,6 @@
 ﻿using XiangqiCore.Boards;
-using XiangqiCore.Pieces;
+using XiangqiCore.Game;
+using XiangqiCore.Misc;
 using XiangqiCore.Pieces.PieceTypes;
 
 namespace XiangqiCoreTests.XiangqiCore.XiangqiBuilderTest;
@@ -100,28 +101,39 @@ public static class XiangqiBuilderTests
 
         // Act
         XiangqiGame xiangqiGame = builder.UseDefaultConfiguration()
-                            .PlayedInCompetition("2017全港個人賽")
+                            .PlayedInCompetition(option =>
+                            {
+                                option
+                                    .WithGameDate(new DateTime(2017, 12, 1))
+                                    .WithLocation("香港")
+                                    .WithName("2017全港個人賽");
+                            })
                             .Build();
 
         // Assert
-        xiangqiGame.Competition.Should().Be("2017全港個人賽");
+        xiangqiGame.Competition.Name.Should().Be("2017全港個人賽");
+        xiangqiGame.Competition.Location.Should().Be("香港");
+        xiangqiGame.Competition.GameDate.Should().Be(new DateTime(2017, 12, 1));
     }
 
-    [Fact]
-    public static void ShouldCreateAGameWithDate_WhenCallingPlayedOnDate()
+    [Theory]
+    [InlineData(GameResult.RedWin, "1-0")]
+    [InlineData(GameResult.BlackWin, "0-1")]
+    [InlineData(GameResult.Draw, "1/2-1/2")]
+    public static void ShouldCreateAGameWithCorrectResult_WhenCallingWithResult(GameResult result, string expectedResultText)
     {
         // Arrange
         XiangqiBuilder builder = new();
 
         // Act
-        XiangqiGame xiangqiGame = builder.UseDefaultConfiguration()
-                            .PlayedOnDate(new DateTime(2019,9,13))
-                            .Build();
+        XiangqiGame xiangqiGame = builder
+                                    .UseDefaultConfiguration()
+                                    .WithGameResult(result)
+                                    .Build();
 
         // Assert
-        xiangqiGame.GameDate.Year.Should().Be(2019);
-        xiangqiGame.GameDate.Month.Should().Be(9);
-        xiangqiGame.GameDate.Day.Should().Be(13);
+        xiangqiGame.GameResultString.Should().Be(expectedResultText);
+        xiangqiGame.GameResult.Should().Be(result);
     }
 
     [Fact]

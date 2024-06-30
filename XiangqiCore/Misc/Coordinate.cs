@@ -1,4 +1,4 @@
-﻿namespace XiangqiCore;
+﻿namespace XiangqiCore.Misc;
 public readonly struct Coordinate()
 {
     private const int _minRow = 1;

@@ -1,4 +1,5 @@
 ﻿using XiangqiCore.Attributes;
+using XiangqiCore.Misc;
 using XiangqiCore.Pieces.ValidationStrategy;
 
 namespace XiangqiCore.Pieces.PieceTypes;

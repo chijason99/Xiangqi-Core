@@ -1,5 +1,6 @@
 ﻿using XiangqiCore.Exceptions;
 using XiangqiCore.Extension;
+using XiangqiCore.Misc;
 using XiangqiCore.Pieces.PieceTypes;
 
 namespace XiangqiCore.Pieces;

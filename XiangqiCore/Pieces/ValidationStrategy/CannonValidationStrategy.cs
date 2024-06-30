@@ -1,4 +1,5 @@
 ﻿using XiangqiCore.Extension;
+using XiangqiCore.Misc;
 
 namespace XiangqiCore.Pieces.ValidationStrategy;
 public class CannonValidationStrategy : DefaultValidationStrategy

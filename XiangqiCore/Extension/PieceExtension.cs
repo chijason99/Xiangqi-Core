@@ -1,4 +1,5 @@
 ﻿using LinqKit;
+using XiangqiCore.Misc;
 using XiangqiCore.Pieces;
 using XiangqiCore.Pieces.PieceTypes;
 

@@ -1,5 +1,6 @@
 ﻿using XiangqiCore.Exceptions;
 using XiangqiCore.Extension;
+using XiangqiCore.Misc;
 
 namespace XiangqiCore.Pieces.ValidationStrategy;
 public class BishopValidationStrategy : DefaultValidationStrategy

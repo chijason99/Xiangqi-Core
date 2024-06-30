@@ -1,6 +1,4 @@
-﻿using XiangqiCore.Move.Move;
-
-namespace XiangqiCore.Move;
+﻿namespace XiangqiCore.Move;
 public static class MoveNotationParserFactory
 {
     public static IMoveNotationParser GetParser(MoveNotationType notationType)

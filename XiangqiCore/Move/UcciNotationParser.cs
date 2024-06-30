@@ -1,4 +1,6 @@
-﻿namespace XiangqiCore.Move;
+﻿using XiangqiCore.Misc;
+
+namespace XiangqiCore.Move;
 public class UcciNotationParser : MoveNotationBase
 {
 
