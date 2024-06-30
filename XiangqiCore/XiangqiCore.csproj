@@ -22,11 +22,11 @@
   <ItemGroup>
     <None Include="..\README.md">
       <Pack>True</Pack>
-      <PackagePath>\</PackagePath>
+      <PackagePath>.</PackagePath>
     </None>
 	<None Include="..\xiangqicore-logo-2.jpg">
 		<Pack>True</Pack>
-		<PackagePath>\</PackagePath>
+		<PackagePath>.</PackagePath>
 	</None>
   </ItemGroup>
 

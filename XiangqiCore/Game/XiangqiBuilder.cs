@@ -16,12 +16,14 @@ public class XiangqiBuilder : IXiangqiBuilder
 
     private Player _redPlayer { get; set; }
     private Player _blackPlayer { get; set; }
-    
+
     private Competition _competition { get; set; }
     private GameResult _gameResult { get; set; } = GameResult.Unknown;
 
     private bool _useBoardConfig { get; set; } = false;
     private BoardConfig? _boardConfig { get; set; } = null;
+
+    private string _moveRecord { get; set; } = "";
 
     public XiangqiBuilder UseDefaultConfiguration()
     {
@@ -55,9 +57,9 @@ public class XiangqiBuilder : IXiangqiBuilder
     }
 
     public XiangqiGame Build()
-         => XiangqiGame.Create(_initialFen, _redPlayer, _blackPlayer, _competition, _useBoardConfig, _boardConfig, _gameResult);
+         => XiangqiGame.Create(_initialFen, _redPlayer, _blackPlayer, _competition, _useBoardConfig, _boardConfig, _gameResult, _moveRecord);
 
-    public XiangqiBuilder HasRedPlayer(Action<Player> action)
+    public XiangqiBuilder WithRedPlayer(Action<Player> action)
     {
         Player redPlayer = new();
 
@@ -68,7 +70,7 @@ public class XiangqiBuilder : IXiangqiBuilder
         return this;
     }
 
-    public XiangqiBuilder HasBlackPlayer(Action<Player> action)
+    public XiangqiBuilder WithBlackPlayer(Action<Player> action)
     {
         Player blackPlayer = new();
 
@@ -86,7 +88,7 @@ public class XiangqiBuilder : IXiangqiBuilder
         return this;
     }
 
-    public XiangqiBuilder PlayedInCompetition(Action<CompetitionBuilder> action)
+    public XiangqiBuilder WithCompetition(Action<CompetitionBuilder> action)
     {
         CompetitionBuilder competitionBuilder = new();
 
@@ -101,6 +103,18 @@ public class XiangqiBuilder : IXiangqiBuilder
     {
         _boardConfig = config;
         _useBoardConfig = true;
+
+        return this;
+    }
+
+    /// <summary>
+    /// This method is used to set the move record for the game. Currently, it only supports Chinese move records
+    /// </summary>
+    /// <param name="moveRecord"></param>
+    /// <returns></returns>
+    public XiangqiBuilder WithMoveRecord(string moveRecord)
+    {
+        _moveRecord = moveRecord;
 
         return this;
     }

@@ -55,7 +55,7 @@ public static class XiangqiBuilderTests
 
         // Act
         XiangqiGame xiangqiGame = builder.UseDefaultConfiguration()
-                                        .HasRedPlayer(player =>
+                                        .WithRedPlayer(player =>
                                         {
                                             player.Name = playerName;
                                             player.Team = teamName;
@@ -79,7 +79,7 @@ public static class XiangqiBuilderTests
 
         // Act
         XiangqiGame xiangqiGame = builder.UseDefaultConfiguration()
-                                        .HasBlackPlayer(player =>
+                                        .WithBlackPlayer(player =>
                                         {
                                             player.Name = playerName;
                                             player.Team = teamName;
@@ -101,7 +101,7 @@ public static class XiangqiBuilderTests
 
         // Act
         XiangqiGame xiangqiGame = builder.UseDefaultConfiguration()
-                            .PlayedInCompetition(option =>
+                            .WithCompetition(option =>
                             {
                                 option
                                     .WithGameDate(new DateTime(2017, 12, 1))
@@ -170,5 +170,30 @@ public static class XiangqiBuilderTests
         xiangqiGame.Board.GetPieceAtPosition(redRookCoordinate).Should().Be(redRook);
         xiangqiGame.Board.GetPieceAtPosition(redKingCoordinate).Should().Be(redKing);
         xiangqiGame.Board.GetPieceAtPosition(blackKingCoordinate).Should().Be(blackKing);
+    }
+
+    [Theory]
+    [InlineData("r2akab1r/9/nCc1b1n1c/p1p1p1p1p/9/2P3P2/P3P3P/2N1BC3/9/R1BAKA1NR b - - 11 6", "6. ...  車９平８\r\n  7. 馬二進三  車８進４    8. 車九平八  車１平２\r\n  9. 車一平二  車８平６   10. 仕四進五  卒３進１\r\n 11. 兵七進一  炮３進５   12. 炮四平七  車６平３\r\n 13. 炮七進二  卒７進１   14. 車二進七  馬７進６\r\n 15. 炮七平九  卒７進１   16. 相五進三  馬６退４", 11)]
+    [InlineData("rnbakabnr/9/1c5c1/p1p1p1p1p/9/9/P1P1P1P1P/1C5C1/9/RNBAKABNR w - - 0 0", "1. 相三進五  炮２平４    2. 兵七進一  馬２進１\r\n  3. 馬八進七  車１平２    4. 車九平八  車２進４\r\n  5. 炮八平九  車２平４    6. 馬二進三  卒７進１\r\n  7. 炮二平一  馬８進７    8. 車一平二  車９平８\r\n  9. 車二進四  炮８平９   10. 車二進五  馬７退８\r\n 11. 車八進一  馬８進７   12. 車八平二  卒１進１\r\n 13. 車二進三  象７進５   14. 兵三進一  馬１進２\r\n 15. 馬三進四  車４平６   16. 兵三進一  車６平７\r\n 17. 兵一進一  炮９退１   18. 炮一平三  車７平６\r\n 19. 炮九退一  炮４進６   20. 炮九平七  炮９平３\r\n 21. 炮三平四  車６平７   22. 車二退三  炮４退６\r\n 23. 炮七平三  車７平５   24. 炮四平三  車５平６\r\n 25. 車二進三  炮４平１   26. 兵七進一  車６平３\r\n 27. 炮三進六  炮１平７   28. 馬四進五  車３平６\r\n 29. 馬五進三  車６進３   30. 馬七退五  馬２進３\r\n 31. 炮三進四  車６退４   32. 炮三退二  車６退１\r\n 33. 馬三退二  馬３進４   34. 馬五進三  車６進５\r\n 35. 車二退三  車６平５   36. 仕六進五  車５平７\r\n 37. 馬二進四  士４進５   38. 車二平四  車７退１\r\n 39. 車四進一  馬４退５   40. 炮三平五  馬５退３\r\n 41. 馬四進六  炮３平４   42. 車四平七  馬３退４\r\n 43. 炮五退二  馬４進５   44. 馬六進八  炮４進３\r\n 45. 馬八退七  炮４平７   46. 帥五平六  車７平１\r\n 47. 炮五平三  卒１進１   48. 車七進二  馬５退３\r\n 49. 馬七退五  車１平５   50. 馬五進三  炮７平８\r\n 51. 炮三平二  士５進６   52. 車七平六  士６進５\r\n 53. 馬三進一  車５平７   54. 兵一進一  炮８進２\r\n 55. 帥六進一  將５平６   56. 炮二平四  將６平５\r\n 57. 炮四平五  將５平６   58. 兵一進一  象５退７\r\n 59. 馬一進二  象３進５   60. 兵一進一  車７平５\r\n 61. 車六退二  馬３進２   62. 馬二退三  將６平５\r\n 63. 馬三退四  車５退２   64. 車六平八  卒１進１\r\n 65. 馬四進二  車５平４   66. 仕五進六  將５平４", 66)]
+    [InlineData("rnbakabnr/9/1c5c1/p1p1p1p1p/9/9/P1P1P1P1P/1C5C1/9/RNBAKABNR w - - 0 0", " 1. 相三進五  馬２進３    2. 兵三進一  卒３進１\r\n  3. 馬二進三  馬３進４    4. 仕四進五  炮８平５\r\n  5. 馬八進七  馬８進７    6. 馬三進二  炮２進３\r\n  7. 馬二進三  車９平８    8. 炮二平三  炮５進４\r\n  9. 車九進一  炮５退１   10. 車九平六  馬４進３\r\n 11. 車六進三  炮２平３   12. 車六退一  車１平２\r\n 13. 炮八平九  車２進６   14. 炮九退一  車８進３\r\n 15. 兵三進一  象７進５   16. 炮九進五  象５進７\r\n 17. 馬三進五  車８退２   18. 車六進六  將５進１\r\n 19. 馬五進七  炮３退４   20. 炮九進二  車２退５\r\n 21. 炮九平七  車２平３   22. 炮三進五  車３進１\r\n 23. 炮三進二  車３平８   24. 車一平四  象３進５\r\n 25. 車六平五  將５平４   26. 炮三平二  象５退７\r\n 27. 車五平四  車８退１   28. 車四進八  將４進１\r\n 29. 前車平六  將４平５   30. 馬七進五  後車進１\r\n 31. 車四退三  車８進７   32. 仕五退四  車８退３\r\n 33. 車四平七  前車平５   34. 仕六進五  車８平２\r\n 35. 車七平三  車５平６   36. 車三進二  將５退１\r\n 37. 車三進一  車６退５   38. 車三進一  車６平８\r\n 39. 車三退三  卒５進１   40. 車三退一  車２進８\r\n 41. 帥五平六  馬３進２   42. 帥六進一  馬２退３\r\n 43. 帥六退一  車２退８   44. 車三平五  將５平６\r\n 45. 車六退六  馬３進２   46. 帥六平五  車８進４\r\n 47. 車五平三  車８平６   48. 車三進三  將６進１\r\n 49. 車六進四  炮５退３   50. 車三退一  將６退１\r\n 51. 車三平五\r\n", 51)]
+    public static void ShouldCreateGameWithMoveRecord_WhenCallingWithMoveRecord(string startingFen, string moveRecord, int expectedRoundCount)
+    {
+        // Arrange
+        XiangqiBuilder builder = new();
+
+        // Act
+        XiangqiGame xiangqiGame = builder
+                                    .UseCustomFen(startingFen)
+                                    .WithMoveRecord(moveRecord)
+                                    .Build();
+
+        // Assert
+        int expectedNumberOfRounds = xiangqiGame
+                                        .MoveHistory
+                                        .GroupBy(x => x.RoundNumber)
+                                        .Select(x => x.Key)
+                                        .Count();
+
+        expectedRoundCount.Should().Be(expectedRoundCount);
     }
 }

@@ -59,7 +59,8 @@ public class XiangqiGame
     public string GameResultString => EnumHelper<GameResult>.GetDisplayName(GameResult);
 
     public static XiangqiGame Create(string initialFenString, Player redPlayer, Player blackPlayer,
-                                     Competition competition, bool useBoardConfig = false, BoardConfig? boardConfig = null, GameResult gameResult = GameResult.Unknown)
+                                     Competition competition, bool useBoardConfig = false, BoardConfig? boardConfig = null, 
+                                     GameResult gameResult = GameResult.Unknown, string moveRecord = "")
     {
         bool isFenValid = FenHelper.Validate(initialFenString);
 
@@ -76,6 +77,9 @@ public class XiangqiGame
 
         if (useBoardConfig)
             createdGameInstance.InitialFenString = FenHelper.GetFenFromPosition(createdGameInstance.Board.Position);
+
+        if (!string.IsNullOrEmpty(moveRecord))
+            createdGameInstance.SaveMoveRecordToHistory(moveRecord);
 
         return createdGameInstance;
     }
@@ -200,5 +204,13 @@ public class XiangqiGame
             UpdateGameResult(latestMove.MovingSide == Side.Red ? GameResult.RedWin : GameResult.BlackWin);
         else
             SwitchSideToMove();
+    }
+
+    private void SaveMoveRecordToHistory(string moveRecord)
+    {
+        List<string> moves = GameRecordParser.Parse(moveRecord);
+
+        foreach (string move in moves)
+            Move(move, MoveNotationType.Chinese);
     }
 }
