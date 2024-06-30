@@ -1,5 +1,6 @@
 ﻿using XiangqiCore.Boards;
 using XiangqiCore.Extension;
+using XiangqiCore.Misc;
 
 namespace XiangqiCore.Pieces.ValidationStrategy;
 public class DefaultValidationStrategy : IValidationStrategy

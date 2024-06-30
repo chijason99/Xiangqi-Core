@@ -1,4 +1,4 @@
-﻿namespace XiangqiCore;
+﻿namespace XiangqiCore.Game;
 
 public class Player()
 {

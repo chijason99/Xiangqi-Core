@@ -1,4 +1,5 @@
-﻿using XiangqiCore.Pieces.PieceTypes;
+﻿using XiangqiCore.Misc;
+using XiangqiCore.Pieces.PieceTypes;
 
 namespace XiangqiCore.Pieces;
 public interface IPieceFactory

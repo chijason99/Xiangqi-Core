@@ -1,4 +1,6 @@
-﻿namespace XiangqiCore.Move;
+﻿using XiangqiCore.Misc;
+
+namespace XiangqiCore.Move;
 public record ParsedMoveObject
 {
     // The starting column would be unknown if there are more than one piece on the same column,

@@ -1,4 +1,5 @@
-﻿using XiangqiCore.Pieces.ValidationStrategy;
+﻿using XiangqiCore.Misc;
+using XiangqiCore.Pieces.ValidationStrategy;
 
 namespace XiangqiCore.Pieces.PieceTypes;
 public sealed class EmptyPiece : Piece

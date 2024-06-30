@@ -1,4 +1,6 @@
-﻿namespace XiangqiCore.Exceptions;
+﻿using XiangqiCore.Misc;
+
+namespace XiangqiCore.Exceptions;
 public class InvalidSideException : Exception
 {
     public InvalidSideException() : base() { }

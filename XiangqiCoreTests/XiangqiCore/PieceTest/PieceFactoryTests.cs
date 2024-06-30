@@ -1,4 +1,5 @@
-﻿using XiangqiCore.Pieces.PieceTypes;
+﻿using XiangqiCore.Misc;
+using XiangqiCore.Pieces.PieceTypes;
 using XiangqiCore.Pieces.ValidationStrategy;
 
 namespace xiangqi_core_test.XiangqiCore.PieceTest;

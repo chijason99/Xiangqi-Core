@@ -1,4 +1,4 @@
-﻿namespace XiangqiCore.Move.Move;
+﻿namespace XiangqiCore.Move;
 public enum MoveNotationType
 {
     English,

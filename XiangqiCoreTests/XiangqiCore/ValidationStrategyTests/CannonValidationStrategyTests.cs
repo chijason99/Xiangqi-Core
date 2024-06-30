@@ -1,4 +1,6 @@
 ﻿using XiangqiCore.Extension;
+using XiangqiCore.Game;
+using XiangqiCore.Misc;
 using XiangqiCore.Pieces.PieceTypes;
 
 namespace xiangqi_core_test.XiangqiCore.ValidationStrategyTests;

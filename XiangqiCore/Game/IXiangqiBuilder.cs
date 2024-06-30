@@ -1,6 +1,6 @@
 ﻿using XiangqiCore.Boards;
 
-namespace XiangqiCore;
+namespace XiangqiCore.Game;
 
 public interface IXiangqiBuilder
 {
@@ -8,8 +8,8 @@ public interface IXiangqiBuilder
     XiangqiBuilder UseCustomFen(string customFen);
     XiangqiBuilder HasRedPlayer(Action<Player> acction);
     XiangqiBuilder HasBlackPlayer(Action<Player> acction);
-    XiangqiBuilder PlayedInCompetition(string competitionName);
-    XiangqiBuilder PlayedOnDate(DateTime gameDate);
+    XiangqiBuilder PlayedInCompetition(Action<CompetitionBuilder> action);
+    XiangqiBuilder WithGameResult(GameResult gameResult);
     XiangqiBuilder UseBoardConfig(BoardConfig config);
     XiangqiBuilder UseBoardConfig(Action<BoardConfig> action);
     XiangqiGame Build();

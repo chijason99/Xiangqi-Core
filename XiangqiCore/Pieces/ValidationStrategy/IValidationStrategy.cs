@@ -1,4 +1,6 @@
-﻿namespace XiangqiCore.Pieces.ValidationStrategy;
+﻿using XiangqiCore.Misc;
+
+namespace XiangqiCore.Pieces.ValidationStrategy;
 public interface IValidationStrategy
 {
     /// <summary>

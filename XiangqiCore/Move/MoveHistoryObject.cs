@@ -1,5 +1,5 @@
 ﻿using XiangqiCore.Extension;
-using XiangqiCore.Move.Move;
+using XiangqiCore.Misc;
 using XiangqiCore.Pieces.PieceTypes;
 
 namespace XiangqiCore.Move;
@@ -12,9 +12,9 @@ public record MoveHistoryObject
         FenOfPosition = fenOfPosition;
         IsCapture = isCapture;
         IsCheck = isCheck;
-        IsCheckMate = isCheckMate;
+        IsCheckmate = isCheckMate;
         PieceMoved = pieceMoved;
-        Side = side;
+        MovingSide = side;
         StartingPosition = startingPosition;
         Destination = destination;
     }
@@ -22,18 +22,19 @@ public record MoveHistoryObject
     public string FenOfPosition { get; private set; }
     public bool IsCapture { get; init; }
     public bool IsCheck { get; init; }
-    public bool IsCheckMate { get; init; }
+    public bool IsCheckmate { get; init; }
     public PieceType PieceMoved { get; init; }
+    public int RoundNumber => FenHelper.GetRoundNumber(FenOfPosition);
 
     // The Side that made the move
-    public Side Side { get; init; }
+    public Side MovingSide { get; init; }
     public Coordinate StartingPosition { get; init; }
     public Coordinate Destination { get; init; }
 
     public string MoveNotation { get; private set; }
     public MoveNotationType MoveNotationType { get; private set; }
 
-    public void UpdateFenWithGameInfo(int roundNumber, int numberOfMovesWithoutCapture) => FenOfPosition = FenOfPosition.AppendGameInfoToFen(Side.GetOppositeSide(), roundNumber, numberOfMovesWithoutCapture);
+    public void UpdateFenWithGameInfo(int roundNumber, int numberOfMovesWithoutCapture) => FenOfPosition = FenOfPosition.AppendGameInfoToFen(MovingSide.GetOppositeSide(), roundNumber, numberOfMovesWithoutCapture);
 
     public void UpdateMoveNotation(string moveNotation, MoveNotationType moveNotationType)
     {

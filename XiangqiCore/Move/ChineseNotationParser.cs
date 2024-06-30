@@ -1,4 +1,5 @@
 ﻿using XiangqiCore.Extension;
+using XiangqiCore.Misc;
 using XiangqiCore.Pieces;
 using XiangqiCore.Pieces.PieceTypes;
 
