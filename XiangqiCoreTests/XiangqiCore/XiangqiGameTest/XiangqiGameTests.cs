@@ -125,17 +125,17 @@ public static class XiangqiGameTests
 
         XiangqiGame game = builder
                             .UseCustomFen(startingFen)       
-                            .HasRedPlayer(player =>
+                            .WithRedPlayer(player =>
                             {
                                 player.Name = redPlayer;
                                 player.Team = redTeam;
                             })
-                            .HasBlackPlayer(player =>
+                            .WithBlackPlayer(player =>
                             {
                                 player.Name = blackPlayer;
                                 player.Team = blackTeam;
                             })
-                            .PlayedInCompetition(option =>
+                            .WithCompetition(option =>
                             {
                                 option
                                     .WithGameDate(competitionDate)
