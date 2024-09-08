@@ -2,6 +2,10 @@
 using System.Reflection;
 using XiangqiCore.Attributes;
 using XiangqiCore.Misc;
+using XiangqiCore.Move;
+using XiangqiCore.Move.MoveNotationTranslators;
+using XiangqiCore.Move.MoveObject;
+using XiangqiCore.Pieces.PieceTypes;
 
 namespace XiangqiCore.Extension;
 public class EnumHelper<T> where T : Enum 
@@ -67,4 +71,34 @@ public static class EnumExtension
 
         return side == Side.Black ? Side.Red : Side.Black;
     }
+
+    public static string TranslateTo(this MoveNotationType originalNotationType, MoveHistoryObject moveObject, MoveNotationType targetNotationType)
+    {
+        if (originalNotationType == targetNotationType)
+            return moveObject.MoveNotation;
+
+        if (originalNotationType == MoveNotationType.Chinese)
+            return ChineseNotationTranslator.Tanslate(moveObject, targetNotationType);
+
+        //if (originalNotationType == MoveNotationType.English)
+        //	return EnglishNotationTranslator.Tanslate(moveObject, targetNotationType);
+
+        //if (originalNotationType == MoveNotationType.UCCI)
+        //	return UcciNotationTranslator.Tanslate(moveObject, targetNotationType);
+
+        return string.Empty;
+    }
+
+	public static char GetEnglishMoveNotationCharacter(this PieceType pieceType)
+        => pieceType switch
+		{
+			PieceType.Rook => 'R',
+			PieceType.Cannon => 'C',
+			PieceType.Bishop => 'E',
+			PieceType.King => 'K',
+			PieceType.Knight => 'H',
+			PieceType.Pawn => 'P',
+			PieceType.Advisor => 'A',
+			_ => throw new ArgumentException("Invalid piece type"),
+		};
 }

@@ -1,6 +1,6 @@
 ﻿using XiangqiCore.Misc;
 
-namespace XiangqiCore.Move;
+namespace XiangqiCore.Move.MoveObject;
 public record ParsedMoveObject
 {
     // The starting column would be unknown if there are more than one piece on the same column,
@@ -9,7 +9,7 @@ public record ParsedMoveObject
     public ParsedMoveObject() { }
 
     // For UCCI notation
-    public ParsedMoveObject(Coordinate startingPoint, Coordinate destination) 
+    public ParsedMoveObject(Coordinate startingPoint, Coordinate destination)
     {
         StartingPosition = startingPoint;
         Destination = destination;
@@ -27,7 +27,7 @@ public record ParsedMoveObject
 
     public Type PieceType { get; set; }
     public int StartingColumn { get; set; }
-    public int FourthCharacter {  get; set; }
+    public int FourthCharacter { get; set; }
     public int PieceOrderIndex { get; set; }
     public MoveDirection MoveDirection { get; set; }
 

@@ -1,8 +1,8 @@
-﻿using XiangqiCore.Extension;
+﻿using XiangqiCore.Move.MoveObject;
 using XiangqiCore.Pieces;
 using XiangqiCore.Pieces.PieceTypes;
 
-namespace XiangqiCore.Move;
+namespace XiangqiCore.Move.NotationParser;
 public class EnglishNotationParser : MoveNotationBase
 {
     private static char[] pieceEnglishNames => ['k', 'r', 'h', 'c', 'a', 'e', 'p'];
@@ -34,8 +34,8 @@ public class EnglishNotationParser : MoveNotationBase
         char secondCharacter = notation[defaultColumnIndex];
         bool isBlack = notation.Any(char.IsLower);
 
-        return int.TryParse(secondCharacter.ToString(), out int startingColumn) ? 
-                startingColumn : 
+        return int.TryParse(secondCharacter.ToString(), out int startingColumn) ?
+                startingColumn :
                 ParsedMoveObject.UnknownStartingColumn;
 
     }
@@ -67,7 +67,7 @@ public class EnglishNotationParser : MoveNotationBase
         if (char.IsDigit(pieceOrderCharacter))
             return int.Parse(pieceOrderCharacter.ToString()) - 1;
         else if (pieceOrderIndexSymbol.Contains(pieceOrderCharacter))
-            return pieceOrderCharacter == '+' ? 0 : (IsMultiColumnPawn(notation) ? MultiColumnPawnParsedMoveObject.LastPawnIndex : 1);
+            return pieceOrderCharacter == '+' ? 0 : IsMultiColumnPawn(notation) ? MultiColumnPawnParsedMoveObject.LastPawnIndex : 1;
         else
             return defaultPieceOrderIndex;
     }
@@ -80,9 +80,9 @@ public class EnglishNotationParser : MoveNotationBase
         int fourthCharacter = GetFourthCharacter(notation);
         int pieceOrderIndex = GetPieceOrderIndex(notation);
 
-        ParsedMoveObject parsedMoveObject = new (pieceType, startingColumn, moveDirection, fourthCharacter, pieceOrderIndex);
+        ParsedMoveObject parsedMoveObject = new(pieceType, startingColumn, moveDirection, fourthCharacter, pieceOrderIndex);
 
-        return IsMultiColumnPawn(notation) ? new MultiColumnPawnParsedMoveObject(parsedMoveObject, GetMinNumberOfPawnsOnColumn(notation)) : 
+        return IsMultiColumnPawn(notation) ? new MultiColumnPawnParsedMoveObject(parsedMoveObject, GetMinNumberOfPawnsOnColumn(notation)) :
                                              parsedMoveObject;
     }
 

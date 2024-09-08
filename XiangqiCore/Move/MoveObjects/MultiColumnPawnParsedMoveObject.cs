@@ -1,11 +1,11 @@
-﻿namespace XiangqiCore.Move;
+﻿namespace XiangqiCore.Move.MoveObject;
 public record MultiColumnPawnParsedMoveObject : ParsedMoveObject
 {
-    public MultiColumnPawnParsedMoveObject(ParsedMoveObject parsedMoveObject, int minNumberOfPawnsOnColumn) 
-        : base(parsedMoveObject.PieceType, 
-               parsedMoveObject.StartingColumn, 
-               parsedMoveObject.MoveDirection, 
-               parsedMoveObject.FourthCharacter, 
+    public MultiColumnPawnParsedMoveObject(ParsedMoveObject parsedMoveObject, int minNumberOfPawnsOnColumn)
+        : base(parsedMoveObject.PieceType,
+               parsedMoveObject.StartingColumn,
+               parsedMoveObject.MoveDirection,
+               parsedMoveObject.FourthCharacter,
                parsedMoveObject.PieceOrderIndex)
     {
         MinNumberOfPawnsOnColumn = minNumberOfPawnsOnColumn;

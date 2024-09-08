@@ -5,6 +5,8 @@ using XiangqiCore.Exceptions;
 using XiangqiCore.Extension;
 using XiangqiCore.Misc;
 using XiangqiCore.Move;
+using XiangqiCore.Move.MoveObject;
+using XiangqiCore.Move.NotationParsers;
 using XiangqiCore.Pieces;
 
 namespace XiangqiCore.Game;
@@ -47,7 +49,7 @@ public class XiangqiGame
 
     public Piece[,] BoardPosition => Board.Position;
 
-    public string CurrentFen => _moveHistory.LastOrDefault()?.FenOfPosition ?? "";
+    public string CurrentFen => _moveHistory.LastOrDefault()?.FenAfterMove ?? "";
 
     public int NumberOfMovesWithoutCapture { get; private set; } = 0;
     public int RoundNumber { get; private set; } = 0;
