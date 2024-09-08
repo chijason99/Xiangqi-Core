@@ -1,5 +1,6 @@
 ﻿using XiangqiCore.Misc;
 using XiangqiCore.Move.MoveObject;
+using XiangqiCore.Move.MoveObjects;
 
 namespace XiangqiCore.Move.NotationParsers;
 
@@ -8,6 +9,7 @@ public class UcciNotationParser : MoveNotationBase
 
 	private Dictionary<char, int> UcciColumnMap;
 	private Dictionary<int, int> UcciRowMap;
+
 	public UcciNotationParser()
 	{
 		UcciColumnMap = CreateUcciColumnMap();
@@ -70,7 +72,7 @@ public class UcciNotationParser : MoveNotationBase
 	public override string TranslateToUcci(MoveHistoryObject moveHistoryObject)
 	{
 		string UcciStartingCoordinate = Coordinate.TranslateToUcciCoordinate(moveHistoryObject.StartingPosition);
-		string UcciDestinationCoordinate = Coordinate.TranslateToUcciCoordinate(moveHistoryObject.StartingPosition);
+		string UcciDestinationCoordinate = Coordinate.TranslateToUcciCoordinate(moveHistoryObject.Destination);
 
 		return $"{UcciStartingCoordinate}{UcciDestinationCoordinate}";
 	}

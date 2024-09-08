@@ -1,4 +1,7 @@
-﻿using XiangqiCore.Move;
+﻿using XiangqiCore.Game;
+using XiangqiCore.Move;
+using XiangqiCore.Move.MoveObjects;
+using XiangqiCore.Move.NotationParsers;
 using XiangqiCore.Pieces.PieceTypes;
 
 namespace xiangqi_core_test.XiangqiCore.MoveParserTest;
@@ -30,4 +33,35 @@ public static class UcciNotationParserTests
     [MemberData(nameof(MoveMethodWithUcciNotationTestData))]
     public static void MoveMethod_ShouldAlterTheBoardCorrectly_WhenUsingUcciMoveNotation(MoveNotationMethodTestData testData)
    => MoveParserTestHelper.AssertMoveWithNotationMethod(testData);
+
+    [Theory]
+    [InlineData("3akab2/9/1cn1b1nrc/pC2p1R1p/2p6/6P2/P1P1P3P/N3C1N2/9/2BAKAB2 b - - 2 11", "炮9退1", "I7I8")]
+    [InlineData("3akab2/9/2n1b4/p3p2Cp/2p2P3/5N3/PcP1P3P/N4c3/9/2BAKAB2 w - - 1 17", "炮二進一", "H6H7")]
+    [InlineData("3k1abC1/4a1N2/9/4N3p/2p2P3/P8/5c2P/1c2Bn3/5K3/3A1AB2 w - - 3 32", "帥四平五", "F1E1")]
+    [InlineData("3k1abC1/4a1N2/9/4N3p/2p2P3/P8/4c3P/1c3n3/4K4/2BA1AB2 b - - 6 34", "馬6退5", "F2E4")]
+    public static void TranslateToUcciNotation_ShouldReturnCorrectUcciNotation_WhenGivenMoveObject(string startingFen, string moveNotation, string expectedResult)
+	{
+		// Arrange
+		IMoveNotationParser moveNotationParser = MoveNotationParserFactory.GetParser(MoveNotationType.UCCI);
+        MoveHistoryObject moveHistoryObject;
+
+        XiangqiBuilder builder = new();
+        
+        XiangqiGame game = builder
+                            .UseCustomFen(startingFen)
+                            .Build();
+
+        bool moveResult = game.Move(moveNotation, MoveNotationType.Chinese);
+
+        moveResult.Should().BeTrue();
+        game.MoveHistory.Count.Should().Be(1);
+
+        MoveHistoryObject latestMoveHistoryObject = game.MoveHistory.Last();
+
+		// Act
+		string result = moveNotationParser.TranslateToUcci(latestMoveHistoryObject);
+
+		// Assert
+		result.Should().Be(expectedResult);
+	}
 }

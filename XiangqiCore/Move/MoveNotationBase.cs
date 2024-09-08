@@ -1,4 +1,5 @@
 ﻿using XiangqiCore.Move.MoveObject;
+using XiangqiCore.Move.MoveObjects;
 using XiangqiCore.Move.NotationParsers;
 
 namespace XiangqiCore.Move;

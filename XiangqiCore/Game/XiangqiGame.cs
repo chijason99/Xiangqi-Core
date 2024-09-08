@@ -6,6 +6,7 @@ using XiangqiCore.Extension;
 using XiangqiCore.Misc;
 using XiangqiCore.Move;
 using XiangqiCore.Move.MoveObject;
+using XiangqiCore.Move.MoveObjects;
 using XiangqiCore.Move.NotationParsers;
 using XiangqiCore.Pieces;
 

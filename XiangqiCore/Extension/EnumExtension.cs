@@ -3,8 +3,8 @@ using System.Reflection;
 using XiangqiCore.Attributes;
 using XiangqiCore.Misc;
 using XiangqiCore.Move;
-using XiangqiCore.Move.MoveNotationTranslators;
-using XiangqiCore.Move.MoveObject;
+using XiangqiCore.Move.MoveObjects;
+using XiangqiCore.Move.NotationParsers;
 using XiangqiCore.Pieces.PieceTypes;
 
 namespace XiangqiCore.Extension;
@@ -77,14 +77,17 @@ public static class EnumExtension
         if (originalNotationType == targetNotationType)
             return moveObject.MoveNotation;
 
-        if (originalNotationType == MoveNotationType.Chinese)
-            return ChineseNotationTranslator.Tanslate(moveObject, targetNotationType);
+		//if (originalNotationType == MoveNotationType.Chinese)
+  //          return ChineseNotationTranslator.Tanslate(moveObject, targetNotationType);
 
         //if (originalNotationType == MoveNotationType.English)
         //	return EnglishNotationTranslator.Tanslate(moveObject, targetNotationType);
 
-        //if (originalNotationType == MoveNotationType.UCCI)
-        //	return UcciNotationTranslator.Tanslate(moveObject, targetNotationType);
+        if (originalNotationType == MoveNotationType.UCCI)
+        {
+			IMoveNotationParser moveNotationParser = MoveNotationBase.GetMoveNotationParserInstance<UcciNotationParser>();
+		    return moveNotationParser.TranslateToUcci(moveObject);
+		}
 
         return string.Empty;
     }
