@@ -22,16 +22,16 @@
   <ItemGroup>
     <None Include="..\README.md">
       <Pack>True</Pack>
-      <PackagePath>\</PackagePath>
+      <PackagePath>.</PackagePath>
     </None>
 	<None Include="..\xiangqicore-logo-2.jpg">
 		<Pack>True</Pack>
-		<PackagePath>\</PackagePath>
+		<PackagePath>.</PackagePath>
 	</None>
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="LinqKit" Version="1.2.5" />
+    <PackageReference Include="LinqKit" Version="1.3.0" />
   </ItemGroup>
 
 </Project>

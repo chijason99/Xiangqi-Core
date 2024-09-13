@@ -3,6 +3,8 @@ using XiangqiCore.Attributes;
 using XiangqiCore.Extension;
 using XiangqiCore.Misc;
 using XiangqiCore.Move;
+using XiangqiCore.Move.MoveObject;
+using XiangqiCore.Move.MoveObjects;
 using XiangqiCore.Pieces;
 
 namespace XiangqiCore.Boards;
@@ -162,7 +164,8 @@ public class Board
         Piece pieceMoved = GetPieceAtPosition(startingPosition);
 
         MoveHistoryObject moveHistory = new (
-            fenOfPosition: FenHelper.GetFenFromPosition(positionAfterTheProposedMove),
+            fenAfterMove: FenHelper.GetFenFromPosition(positionAfterTheProposedMove),
+            fenBeforeMove: GetFenFromPosition,
             isCapture,
             isCheck,
             isCheckmate,
@@ -174,5 +177,4 @@ public class Board
 
         return moveHistory;
     }
-
 }

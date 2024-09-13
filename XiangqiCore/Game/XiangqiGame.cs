@@ -5,6 +5,9 @@ using XiangqiCore.Exceptions;
 using XiangqiCore.Extension;
 using XiangqiCore.Misc;
 using XiangqiCore.Move;
+using XiangqiCore.Move.MoveObject;
+using XiangqiCore.Move.MoveObjects;
+using XiangqiCore.Move.NotationParsers;
 using XiangqiCore.Pieces;
 
 namespace XiangqiCore.Game;
@@ -47,7 +50,7 @@ public class XiangqiGame
 
     public Piece[,] BoardPosition => Board.Position;
 
-    public string CurrentFen => _moveHistory.LastOrDefault()?.FenOfPosition ?? "";
+    public string CurrentFen => _moveHistory.LastOrDefault()?.FenAfterMove ?? "";
 
     public int NumberOfMovesWithoutCapture { get; private set; } = 0;
     public int RoundNumber { get; private set; } = 0;
@@ -59,7 +62,8 @@ public class XiangqiGame
     public string GameResultString => EnumHelper<GameResult>.GetDisplayName(GameResult);
 
     public static XiangqiGame Create(string initialFenString, Player redPlayer, Player blackPlayer,
-                                     Competition competition, bool useBoardConfig = false, BoardConfig? boardConfig = null, GameResult gameResult = GameResult.Unknown)
+                                     Competition competition, bool useBoardConfig = false, BoardConfig? boardConfig = null, 
+                                     GameResult gameResult = GameResult.Unknown, string moveRecord = "")
     {
         bool isFenValid = FenHelper.Validate(initialFenString);
 
@@ -76,6 +80,9 @@ public class XiangqiGame
 
         if (useBoardConfig)
             createdGameInstance.InitialFenString = FenHelper.GetFenFromPosition(createdGameInstance.Board.Position);
+
+        if (!string.IsNullOrEmpty(moveRecord))
+            createdGameInstance.SaveMoveRecordToHistory(moveRecord);
 
         return createdGameInstance;
     }
@@ -118,12 +125,18 @@ public class XiangqiGame
         }
     }
 
-    public string ExportMoveHistory()
+    public string ExportMoveHistory(MoveNotationType targetNotationType = MoveNotationType.Chinese)
     {
         List<string> movesOfEachRound = [];
 
         _moveHistory
-            .Select(moveHistoryItem => new { moveHistoryItem.RoundNumber, moveHistoryItem.MovingSide, moveHistoryItem.MoveNotation })
+            .Select(moveHistoryItem =>
+                new
+                {
+                    moveHistoryItem.RoundNumber,
+                    moveHistoryItem.MovingSide,
+                    MoveNotation = moveHistoryItem.TransalateNotation(targetNotationType)
+                })
             .GroupBy(moveHistoryItem => moveHistoryItem.RoundNumber)
             .OrderBy(roundGroup => roundGroup.Key)
             .ForEach(roundGroup =>
@@ -200,5 +213,13 @@ public class XiangqiGame
             UpdateGameResult(latestMove.MovingSide == Side.Red ? GameResult.RedWin : GameResult.BlackWin);
         else
             SwitchSideToMove();
+    }
+
+    private void SaveMoveRecordToHistory(string moveRecord)
+    {
+        List<string> moves = GameRecordParser.Parse(moveRecord);
+
+        foreach (string move in moves)
+            Move(move, MoveNotationType.Chinese);
     }
 }

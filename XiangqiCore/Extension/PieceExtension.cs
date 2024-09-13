@@ -296,4 +296,7 @@ public static class PieceExtension
 
         return true;
     }
+
+    public static bool HasDuplicatePieceOnColumn(this Piece[,] position, int column, PieceType pieceType, Side side)
+		=> position.GetPiecesOnColumn(column).Count(x => x.PieceType == pieceType && x.Side == side) > 1;
 }

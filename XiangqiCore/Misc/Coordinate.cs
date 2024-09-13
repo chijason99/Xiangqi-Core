@@ -7,7 +7,10 @@ public readonly struct Coordinate()
     private const int _maxColumn = 9;
     private const int _emptyCoordinateValue = -1;
 
-    public Coordinate(int column, int row) : this()
+    private const int _uniCodeOfA = 65;
+    private const int _uniCodeOfI = 73;
+
+	public Coordinate(int column, int row) : this()
     {
         bool isEmptyCoordinate = column == _emptyCoordinateValue && row == _emptyCoordinateValue;
         bool isInvalidRow = row < _minRow || row > _maxRow;
@@ -27,4 +30,23 @@ public readonly struct Coordinate()
     public int Row { get; init; }
 
     public static Coordinate Empty => new(-1, -1);
+
+    public static string TranslateToUcciCoordinate(Coordinate coordinate)
+	{
+		if (coordinate.Equals(Empty))
+			return "00";
+
+		char column = TranslateToUcciColumn(coordinate.Column);
+		int row = TranslateToUcciRow(coordinate.Row);
+
+		return $"{column}{row}";
+	}
+
+	private static int TranslateToUcciRow(int row) => row - 1;
+
+	private static char TranslateToUcciColumn(int column)
+	{
+		int columnUnicode = column + _uniCodeOfA - 1;
+		return Convert.ToChar(columnUnicode);
+	}
 }

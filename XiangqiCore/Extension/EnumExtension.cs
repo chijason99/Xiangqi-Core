@@ -2,6 +2,11 @@
 using System.Reflection;
 using XiangqiCore.Attributes;
 using XiangqiCore.Misc;
+using XiangqiCore.Move;
+using XiangqiCore.Move.MoveObjects;
+using XiangqiCore.Move.NotationParser;
+using XiangqiCore.Move.NotationParsers;
+using XiangqiCore.Pieces.PieceTypes;
 
 namespace XiangqiCore.Extension;
 public class EnumHelper<T> where T : Enum 
@@ -52,6 +57,15 @@ public class EnumHelper<T> where T : Enum
         return descriptionAttribute is not null ? descriptionAttribute.Description : targetMember.Name;
     }
 
+	public static string GetChineseDisplayName(T targetElement, Side side = Side.Red)
+	{
+		MemberInfo memberInfo = typeof(T).GetMember(targetElement.ToString()).First();
+
+		ChineseNameAttribute chineseNameAttribute = memberInfo.GetCustomAttribute<ChineseNameAttribute>() ??
+			throw new InvalidOperationException("Please use the Chinese Name attribute to set the corresponding Chinese name");
+
+		return side == Side.Red ? chineseNameAttribute.NameForRed : chineseNameAttribute.NameForBlack;
+	}
 }
 
 public static class EnumExtension
@@ -66,5 +80,30 @@ public static class EnumExtension
         if (side == Side.None) throw new ArgumentException("Please use either Side.Red or Side.Black as the parameter");
 
         return side == Side.Black ? Side.Red : Side.Black;
+    }
+
+    public static string TranslateTo(this MoveNotationType originalNotationType, MoveHistoryObject moveObject, MoveNotationType targetNotationType)
+    {
+        if (originalNotationType == targetNotationType)
+            return moveObject.MoveNotation;
+
+		IMoveNotationParser moveNotationParser = targetNotationType switch
+		{
+			MoveNotationType.Chinese => MoveNotationBase.GetMoveNotationParserInstance<ChineseNotationParser>(),
+			MoveNotationType.English => MoveNotationBase.GetMoveNotationParserInstance<EnglishNotationParser>(),
+			MoveNotationType.UCCI => MoveNotationBase.GetMoveNotationParserInstance<UcciNotationParser>(),
+			_ => null
+		};
+
+		if (targetNotationType == MoveNotationType.Chinese)
+			return moveNotationParser.TranslateToChinese(moveObject);
+
+		if (targetNotationType == MoveNotationType.English)
+			return moveNotationParser.TranslateToEnglish(moveObject);
+
+		if (targetNotationType == MoveNotationType.UCCI)
+		    return moveNotationParser.TranslateToUcci(moveObject);
+
+        return string.Empty;
     }
 }
