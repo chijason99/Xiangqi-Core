@@ -42,9 +42,6 @@ public static class UcciNotationParserTests
     public static void TranslateToUcciNotation_ShouldReturnCorrectUcciNotation_WhenGivenMoveObject(string startingFen, string moveNotation, string expectedResult)
 	{
 		// Arrange
-		IMoveNotationParser moveNotationParser = MoveNotationParserFactory.GetParser(MoveNotationType.UCCI);
-        MoveHistoryObject moveHistoryObject;
-
         XiangqiBuilder builder = new();
         
         XiangqiGame game = builder
@@ -58,8 +55,8 @@ public static class UcciNotationParserTests
 
         MoveHistoryObject latestMoveHistoryObject = game.MoveHistory.Last();
 
-		// Act
-		string result = moveNotationParser.TranslateToUcci(latestMoveHistoryObject);
+        // Act
+        string result = latestMoveHistoryObject.TransalateNotation(MoveNotationType.UCCI);
 
 		// Assert
 		result.Should().Be(expectedResult);

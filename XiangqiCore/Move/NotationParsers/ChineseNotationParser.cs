@@ -1,5 +1,7 @@
-﻿using XiangqiCore.Misc;
+﻿using XiangqiCore.Extension;
+using XiangqiCore.Misc;
 using XiangqiCore.Move.MoveObject;
+using XiangqiCore.Move.MoveObjects;
 using XiangqiCore.Pieces;
 using XiangqiCore.Pieces.PieceTypes;
 

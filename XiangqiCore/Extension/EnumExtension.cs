@@ -4,6 +4,7 @@ using XiangqiCore.Attributes;
 using XiangqiCore.Misc;
 using XiangqiCore.Move;
 using XiangqiCore.Move.MoveObjects;
+using XiangqiCore.Move.NotationParser;
 using XiangqiCore.Move.NotationParsers;
 using XiangqiCore.Pieces.PieceTypes;
 
@@ -56,6 +57,15 @@ public class EnumHelper<T> where T : Enum
         return descriptionAttribute is not null ? descriptionAttribute.Description : targetMember.Name;
     }
 
+	public static string GetChineseDisplayName(T targetElement, Side side = Side.Red)
+	{
+		MemberInfo memberInfo = typeof(T).GetMember(targetElement.ToString()).First();
+
+		ChineseNameAttribute chineseNameAttribute = memberInfo.GetCustomAttribute<ChineseNameAttribute>() ??
+			throw new InvalidOperationException("Please use the Chinese Name attribute to set the corresponding Chinese name");
+
+		return side == Side.Red ? chineseNameAttribute.NameForRed : chineseNameAttribute.NameForBlack;
+	}
 }
 
 public static class EnumExtension
@@ -77,31 +87,23 @@ public static class EnumExtension
         if (originalNotationType == targetNotationType)
             return moveObject.MoveNotation;
 
-		//if (originalNotationType == MoveNotationType.Chinese)
-  //          return ChineseNotationTranslator.Tanslate(moveObject, targetNotationType);
+		IMoveNotationParser moveNotationParser = targetNotationType switch
+		{
+			MoveNotationType.Chinese => MoveNotationBase.GetMoveNotationParserInstance<ChineseNotationParser>(),
+			MoveNotationType.English => MoveNotationBase.GetMoveNotationParserInstance<EnglishNotationParser>(),
+			MoveNotationType.UCCI => MoveNotationBase.GetMoveNotationParserInstance<UcciNotationParser>(),
+			_ => null
+		};
 
-        //if (originalNotationType == MoveNotationType.English)
-        //	return EnglishNotationTranslator.Tanslate(moveObject, targetNotationType);
+		if (targetNotationType == MoveNotationType.Chinese)
+			return moveNotationParser.TranslateToChinese(moveObject);
 
-        if (originalNotationType == MoveNotationType.UCCI)
-        {
-			IMoveNotationParser moveNotationParser = MoveNotationBase.GetMoveNotationParserInstance<UcciNotationParser>();
+		if (targetNotationType == MoveNotationType.English)
+			return moveNotationParser.TranslateToEnglish(moveObject);
+
+		if (targetNotationType == MoveNotationType.UCCI)
 		    return moveNotationParser.TranslateToUcci(moveObject);
-		}
 
         return string.Empty;
     }
-
-	public static char GetEnglishMoveNotationCharacter(this PieceType pieceType)
-        => pieceType switch
-		{
-			PieceType.Rook => 'R',
-			PieceType.Cannon => 'C',
-			PieceType.Bishop => 'E',
-			PieceType.King => 'K',
-			PieceType.Knight => 'H',
-			PieceType.Pawn => 'P',
-			PieceType.Advisor => 'A',
-			_ => throw new ArgumentException("Invalid piece type"),
-		};
 }

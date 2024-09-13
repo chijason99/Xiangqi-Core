@@ -125,12 +125,18 @@ public class XiangqiGame
         }
     }
 
-    public string ExportMoveHistory()
+    public string ExportMoveHistory(MoveNotationType targetNotationType = MoveNotationType.Chinese)
     {
         List<string> movesOfEachRound = [];
 
         _moveHistory
-            .Select(moveHistoryItem => new { moveHistoryItem.RoundNumber, moveHistoryItem.MovingSide, moveHistoryItem.MoveNotation })
+            .Select(moveHistoryItem =>
+                new
+                {
+                    moveHistoryItem.RoundNumber,
+                    moveHistoryItem.MovingSide,
+                    MoveNotation = moveHistoryItem.TransalateNotation(targetNotationType)
+                })
             .GroupBy(moveHistoryItem => moveHistoryItem.RoundNumber)
             .OrderBy(roundGroup => roundGroup.Key)
             .ForEach(roundGroup =>
