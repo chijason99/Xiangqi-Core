@@ -1,5 +1,4 @@
-﻿using LinqKit;
-using System.Text;
+﻿using System.Text;
 using XiangqiCore.Boards;
 using XiangqiCore.Exceptions;
 using XiangqiCore.Extension;
@@ -129,7 +128,7 @@ public class XiangqiGame
     {
         List<string> movesOfEachRound = [];
 
-        _moveHistory
+        var groupedMoveHitories = _moveHistory
             .Select(moveHistoryItem =>
                 new
                 {
@@ -138,18 +137,19 @@ public class XiangqiGame
                     MoveNotation = moveHistoryItem.TransalateNotation(targetNotationType)
                 })
             .GroupBy(moveHistoryItem => moveHistoryItem.RoundNumber)
-            .OrderBy(roundGroup => roundGroup.Key)
-            .ForEach(roundGroup =>
-            {
-                StringBuilder roundMoves = new();
+            .OrderBy(roundGroup => roundGroup.Key);
+            
+        foreach (var roundGroup in groupedMoveHitories)
+        {
+            StringBuilder roundMoves = new();
 
-                string? moveNotationFromRed = roundGroup.SingleOrDefault(move => move.MovingSide == Side.Red)?.MoveNotation ?? "...";
-                string? moveNotationFromBlack = roundGroup.SingleOrDefault(move => move.MovingSide == Side.Black)?.MoveNotation;
+            string? moveNotationFromRed = roundGroup.SingleOrDefault(move => move.MovingSide == Side.Red)?.MoveNotation ?? "...";
+            string? moveNotationFromBlack = roundGroup.SingleOrDefault(move => move.MovingSide == Side.Black)?.MoveNotation;
 
-                roundMoves.Append($"{roundGroup.Key}. {moveNotationFromRed}  {moveNotationFromBlack}");
+            roundMoves.Append($"{roundGroup.Key}. {moveNotationFromRed}  {moveNotationFromBlack}");
 
-                movesOfEachRound.Add(roundMoves.ToString());
-            });
+            movesOfEachRound.Add(roundMoves.ToString());
+        };
 
         return string.Join("\n", movesOfEachRound);
     }

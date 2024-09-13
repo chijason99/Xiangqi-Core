@@ -1,5 +1,4 @@
-﻿using LinqKit;
-using XiangqiCore.Misc;
+﻿using XiangqiCore.Misc;
 using XiangqiCore.Pieces;
 using XiangqiCore.Pieces.PieceTypes;
 
@@ -9,12 +8,6 @@ namespace XiangqiCore.Extension;
 /// </summary>
 public static class PieceExtension
 {
-    /// <summary>
-    /// Builds the where clause for filtering pieces.
-    /// </summary>
-    /// <returns>The expression starter for the where clause.</returns>
-    public static ExpressionStarter<Piece> BuildPieceWhereClause() => PredicateBuilder.New<Piece>();
-
     /// <summary>
     /// Gets the piece at the specified position.
     /// </summary>
@@ -80,14 +73,9 @@ public static class PieceExtension
 
         IEnumerable<Piece> piecesOnRow = position.GetPiecesOnRow(startingPosition.Row);
 
-        ExpressionStarter<Piece> predicate = BuildPieceWhereClause();
-
-        if (startingPosition.Column < destination.Column)
-            predicate = predicate.And(piece => piece.Coordinate.Column > startingPosition.Column && piece.Coordinate.Column < destination.Column);
-        else
-            predicate = predicate.And(piece => piece.Coordinate.Column < startingPosition.Column && piece.Coordinate.Column > destination.Column);
-
-        return piecesOnRow.Count(predicate);
+        return startingPosition.Column < destination.Column ?
+            piecesOnRow.Count(piece => piece.Coordinate.Column > startingPosition.Column && piece.Coordinate.Column < destination.Column) :
+            piecesOnRow.Count(piece => piece.Coordinate.Column < startingPosition.Column && piece.Coordinate.Column > destination.Column);
     }
 
     /// <summary>
@@ -108,15 +96,10 @@ public static class PieceExtension
 
         IEnumerable<Piece> piecesOnColumn = position.GetPiecesOnColumn(startingPosition.Column);
 
-        ExpressionStarter<Piece> predicate = BuildPieceWhereClause();
-
-        if (startingPosition.Row < destination.Row)
-            predicate = predicate.And(piece => piece.Coordinate.Row > startingPosition.Row && piece.Coordinate.Row < destination.Row);
-        else
-            predicate = predicate.And(piece => piece.Coordinate.Row < startingPosition.Row && piece.Coordinate.Row > destination.Row);
-
-        return piecesOnColumn.Count(predicate);
-    }
+        return startingPosition.Row < destination.Row ?
+            piecesOnColumn.Count(piece => piece.Coordinate.Row > startingPosition.Row && piece.Coordinate.Row < destination.Row) :
+			piecesOnColumn.Count(piece => piece.Coordinate.Row < startingPosition.Row && piece.Coordinate.Row > destination.Row);
+	}
 
     /// <summary>
     /// Checks if the destination position contains a friendly piece.
