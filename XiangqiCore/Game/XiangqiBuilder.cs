@@ -14,16 +14,18 @@ public class XiangqiBuilder : IXiangqiBuilder
 	private string _initialFen { get; set; } = _defaultStartingPositionFen;
 	private Side _sideToMove { get; set; }
 
-	private Player _redPlayer { get; set; }
-	private Player _blackPlayer { get; set; }
+	private Player _redPlayer { get; set; } = new();
+	private Player _blackPlayer { get; set; } = new();
 
-	private Competition _competition { get; set; }
+	private Competition _competition { get; set; } = new CompetitionBuilder().Build();
 	private GameResult _gameResult { get; set; } = GameResult.Unknown;
 
 	private bool _useBoardConfig { get; set; } = false;
 	private BoardConfig? _boardConfig { get; set; } = null;
 
 	private string _moveRecord { get; set; } = "";
+
+	private string _gameName { get; set; } = "";
 
 	/// <summary>
 	/// Initializes a new instance of the <see cref="XiangqiBuilder"/> class.
@@ -81,7 +83,16 @@ public class XiangqiBuilder : IXiangqiBuilder
 	/// </summary>
 	/// <returns>An instance of the <see cref="XiangqiGame"/> class.</returns>
 	public async Task<XiangqiGame> BuildAsync()
-		=> await XiangqiGame.Create(_initialFen, _redPlayer, _blackPlayer, _competition, _useBoardConfig, _boardConfig, _gameResult, _moveRecord);
+		=> await XiangqiGame.Create(
+			_initialFen, 
+			_redPlayer, 
+			_blackPlayer, 
+			_competition, 
+			_useBoardConfig, 
+			_boardConfig, 
+			_gameResult, 
+			_moveRecord,
+			_gameName);
 
 	/// <summary>
 	/// Sets the configuration for the red player.
@@ -181,6 +192,13 @@ public class XiangqiBuilder : IXiangqiBuilder
 
 		_boardConfig = config;
 		_useBoardConfig = true;
+
+		return this;
+	}
+
+	public XiangqiBuilder WithGameName(string gameName)
+	{
+		_gameName = gameName;
 
 		return this;
 	}

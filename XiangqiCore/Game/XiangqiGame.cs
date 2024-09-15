@@ -33,7 +33,8 @@ public class XiangqiGame
 		Player redPlayer,
 		Player blackPlayer,
 		Competition competition,
-		GameResult result)
+		GameResult result,
+		string gameName)
 	{
 		InitialFenString = initialFenString;
 		SideToMove = sideToMove;
@@ -41,6 +42,23 @@ public class XiangqiGame
 		BlackPlayer = blackPlayer;
 		Competition = competition;
 		GameResult = result;
+
+		if (string.IsNullOrWhiteSpace(gameName))
+		{
+			string gameResultChinese = GameResult switch
+			{
+				GameResult.RedWin => "先勝",
+				GameResult.BlackWin => "先負",
+				GameResult.Draw => "先和",
+				_ => "對"
+			};
+
+			GameName = $"{RedPlayer.Name}{gameResultChinese}{BlackPlayer.Name}";
+		}
+		else
+		{
+			GameName = gameName;
+		}
 
 		CreatedDate = DateTime.Today;
 		UpdatedDate = DateTime.Today;
@@ -71,20 +89,10 @@ public class XiangqiGame
 	/// </summary>
 	public Competition Competition { get; private set; }
 
-	public string GameName {
-		get
-		{ 
-			string gameResultChinese = GameResult switch
-			{
-				GameResult.RedWin => "先勝",
-				GameResult.BlackWin => "先負",
-				GameResult.Draw => "先和",
-				_ => "對"
-			};
-
-			return $"{RedPlayer.Name} {gameResultChinese} {BlackPlayer.Name}";
-		}
-	}
+	/// <summary>
+	/// Gets the name of the game.
+	/// </summary>
+	public string GameName { get; private set; }
 
 	/// <summary>
 	/// Gets the game date.
@@ -163,7 +171,8 @@ public class XiangqiGame
 		bool useBoardConfig = false, 
 		BoardConfig? boardConfig = null,
 		GameResult gameResult = GameResult.Unknown, 
-		string moveRecord = "")
+		string moveRecord = "",
+		string gameName = "")
 	{
 		bool isFenValid = FenHelper.Validate(initialFenString);
 
@@ -177,7 +186,8 @@ public class XiangqiGame
 			redPlayer, 
 			blackPlayer, 
 			competition, 
-			gameResult)
+			gameResult, 
+			gameName)
 		{
 			Board = useBoardConfig ? new Board(initialFenString, boardConfig!) : new Board(initialFenString),
 			RoundNumber = FenHelper.GetRoundNumber(initialFenString),
@@ -331,7 +341,7 @@ public class XiangqiGame
 
 	private void IncrementRoundNumberIfNeeded()
 	{
-		if (SideToMove == Side.Red && MoveHistory.Count != 0)
+		if (SideToMove == Side.Red && (MoveHistory.Count != 0 || RoundNumber != 1))
 			RoundNumber++;
 	}
 
