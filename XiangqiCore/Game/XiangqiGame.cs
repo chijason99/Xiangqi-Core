@@ -287,6 +287,27 @@ public class XiangqiGame
 		return pgnBuilder.ToString();
 	}
 
+	public async Task ExportGameAsPgnFileAsync(string filePath)
+	{
+		if (!Path.IsPathFullyQualified(filePath) || !Path.Exists(filePath))
+			throw new ArgumentException("The specified file path does not exist.");
+
+		char[] invalidFileCharacters = Path.GetInvalidFileNameChars();
+
+		string pgnString = ExportGameAsPgnString();
+		string sanitizedFileName = string.Concat($"{GameName}.pgn".Select(character =>
+		{
+			return invalidFileCharacters.Contains(character) ? '_' : character;
+		}));
+
+		string sanitizedFilePath = Path.Combine(filePath, sanitizedFileName);
+
+		using FileStream fileStream = new(sanitizedFilePath, FileMode.Create, FileAccess.Write);
+		using StreamWriter streamWriter = new(fileStream);
+		
+		await fileStream.WriteAsync(Encoding.UTF8.GetBytes(pgnString));
+	}
+
 	private void AddPgnTag(StringBuilder pgnBuilder, PgnTagType pgnTagKey, string pgnTagValue)
 	{
 		string pgnTagDisplayName = EnumHelper<PgnTagType>.GetDisplayName(pgnTagKey);
