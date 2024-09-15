@@ -316,7 +316,7 @@ public class XiangqiGame
 
 	private void IncrementRoundNumberIfNeeded()
 	{
-		if (SideToMove == Side.Red || RoundNumber == 0)
+		if (SideToMove == Side.Red && MoveHistory.Count != 0)
 			RoundNumber++;
 	}
 
