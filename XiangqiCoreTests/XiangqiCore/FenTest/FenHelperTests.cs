@@ -236,7 +236,7 @@ public static class FenHelperTests
 
         XiangqiGame gameInstance = await builder
                             .WithDefaultConfiguration()
-                            .WithCustomFen(sampleFen)
+                            .WithStartingFen(sampleFen)
                             .BuildAsync();
 
         // Act

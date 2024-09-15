@@ -28,7 +28,7 @@ public static class MoveParserTestHelper
         XiangqiBuilder builder = new();
 
         XiangqiGame game = await builder
-                            .WithCustomFen(testData.StartingFen)
+                            .WithStartingFen(testData.StartingFen)
                             .BuildAsync();
 
         Piece pieceToMove = game.Board.GetPieceAtPosition(testData.StartingPosition);

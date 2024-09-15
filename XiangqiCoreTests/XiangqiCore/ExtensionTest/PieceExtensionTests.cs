@@ -144,7 +144,7 @@ public static class PieceExtensionTests
     {
         // Arrange
         XiangqiBuilder builder = new ();
-        XiangqiGame game = await builder.WithCustomFen(fen).BuildAsync();
+        XiangqiGame game = await builder.WithStartingFen(fen).BuildAsync();
 
         Piece[,] position = game.BoardPosition;
 
@@ -175,7 +175,7 @@ public static class PieceExtensionTests
         XiangqiBuilder builder = new ();
 
         XiangqiGame game = await builder
-                            .WithCustomFen(startingFen)
+                            .WithStartingFen(startingFen)
                             .BuildAsync();
 
         Piece[,] position = game.BoardPosition;
@@ -199,7 +199,7 @@ public static class PieceExtensionTests
         XiangqiBuilder builder = new ();
 
         XiangqiGame game = await builder
-                            .WithCustomFen(startingFen)
+                            .WithStartingFen(startingFen)
                             .BuildAsync();
 
         Piece[,] position = game.BoardPosition;
@@ -223,7 +223,7 @@ public static class PieceExtensionTests
         Coordinate destination = willExposeKingToDangerTestData.Destination;
         bool expectedResult = willExposeKingToDangerTestData.ExpectedResult;
         XiangqiGame game = await builder
-                            .WithCustomFen(startingFen)
+                            .WithStartingFen(startingFen)
                             .BuildAsync();
 
         Piece[,] boardPosition = game.BoardPosition;
@@ -245,7 +245,7 @@ public static class PieceExtensionTests
         Coordinate kingCoordinate = testData.KingCoordinate;
 
         XiangqiGame game = await builder
-                            .WithCustomFen(startingFen)
+                            .WithStartingFen(startingFen)
                             .BuildAsync();
 
         Piece[,] boardPosition = game.BoardPosition;
@@ -268,7 +268,7 @@ public static class PieceExtensionTests
         Coordinate kingCoordinate = testData.KingCoordinate;
 
         XiangqiGame game = await builder
-                            .WithCustomFen(startingFen)
+                            .WithStartingFen(startingFen)
                             .BuildAsync();
 
         Piece[,] boardPosition = game.BoardPosition;
@@ -291,7 +291,7 @@ public static class PieceExtensionTests
         Coordinate kingCoordinate = testData.KingCoordinate;
 
         XiangqiGame game = await builder
-                            .WithCustomFen(startingFen)
+                            .WithStartingFen(startingFen)
                             .BuildAsync();
 
         Piece[,] boardPosition = game.BoardPosition;
@@ -314,7 +314,7 @@ public static class PieceExtensionTests
         Coordinate kingCoordinate = testData.KingCoordinate;
 
         XiangqiGame game = await builder
-                            .WithCustomFen(startingFen)
+                            .WithStartingFen(startingFen)
                             .BuildAsync();
 
         Piece[,] boardPosition = game.BoardPosition;
@@ -337,7 +337,7 @@ public static class PieceExtensionTests
         Coordinate kingCoordinate = testData.KingCoordinate;
 
         XiangqiGame game = await builder
-                            .WithCustomFen(startingFen)
+                            .WithStartingFen(startingFen)
                             .BuildAsync();
 
         Piece[,] boardPosition = game.BoardPosition;
@@ -362,7 +362,7 @@ public static class PieceExtensionTests
         XiangqiBuilder builder = new();
 
         XiangqiGame game = await builder
-                            .WithCustomFen(sampleFen)
+                            .WithStartingFen(sampleFen)
                             .BuildAsync();
 
         // Act
