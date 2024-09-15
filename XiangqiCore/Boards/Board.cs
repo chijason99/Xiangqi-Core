@@ -32,13 +32,15 @@ public class Board
             SetPieceAtPosition(keyValuePair.Key, keyValuePair.Value);
     }
 
-    public Piece[,] Position { get; private set; }
+    private Piece[,] _position { get; set; }
 
-    public void SetPieceAtPosition(Coordinate targetCoordinates, Piece targetPiece) => Position.SetPieceAtPosition(targetCoordinates, targetPiece);
+    public Piece[,] Position => _position.DeepClone();
 
-    public Piece GetPieceAtPosition(Coordinate targetCoordinates) => Position.GetPieceAtPosition(targetCoordinates);
+	public void SetPieceAtPosition(Coordinate targetCoordinates, Piece targetPiece) => _position.SetPieceAtPosition(targetCoordinates, targetPiece);
 
-    public string GetFenFromPosition => FenHelper.GetFenFromPosition(Position);
+    public Piece GetPieceAtPosition(Coordinate targetCoordinates) => _position.GetPieceAtPosition(targetCoordinates);
+
+    public string GetFenFromPosition => FenHelper.GetFenFromPosition(_position);
 
     public static int[] GetAllRows() => [1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
 
@@ -51,19 +53,19 @@ public class Board
 
     public MoveHistoryObject MakeMove(Coordinate startingPosition, Coordinate destination, Side sideToMove)
     {
-        if (!Position.HasPieceAtPosition(startingPosition))
-            throw new InvalidOperationException("There must be a piece on the starting position");
+        if (!_position.HasPieceAtPosition(startingPosition))
+            throw new InvalidOperationException($"There must be a piece on the starting position {startingPosition}");
 
         Piece pieceToMove = GetPieceAtPosition(startingPosition);
 
         if (pieceToMove.Side != sideToMove)
             throw new InvalidOperationException($"The side to move now should be {EnumHelper<Side>.GetDisplayName(sideToMove)}");
 
-        if (!pieceToMove.ValidateMove(Position, startingPosition, destination))
-            throw new InvalidOperationException($"The proposed move violates the game logic"); ;
+        if (!pieceToMove.ValidateMove(_position, startingPosition, destination))
+            throw new InvalidOperationException($"The proposed move from {startingPosition} to {destination} violates the game logic"); ;
 
         MoveHistoryObject moveHistory = CreateMoveHistory(sideToMove, startingPosition, destination);
-        Position.MakeMove(startingPosition, destination);
+        _position.MakeMove(startingPosition, destination);
 
         return moveHistory;
     }
