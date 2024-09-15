@@ -5,6 +5,7 @@ using XiangqiCore.Pieces.PieceTypes;
 using XiangqiCore.Pieces.ValidationStrategy;
 
 namespace XiangqiCore.Pieces;
+
 public abstract class Piece(Coordinate coordinate, Side side)
 {
     public override bool Equals(object? obj)
@@ -50,18 +51,18 @@ public abstract class Piece(Coordinate coordinate, Side side)
         {
             foreach (int column in GetAvailableColumns())
             {
-                Coordinate destination = new(column, row);
+				Coordinate destination = new(column, row);
 
-                if (destination.Equals(Coordinate)) continue;
+				if (destination.Equals(Coordinate)) continue;
 
-                // Skip if the destination is a King as it is not a valid move to capture a king
-                if (position.GetPieceAtPosition(destination) is King) continue;
+				// Skip if the destination is a King as it is not a valid move to capture a king
+				if (position.GetPieceAtPosition(destination) is King) continue;
 
-                tasks.Add(Task.Run(() =>
-                {
-                    if (ValidateMove(position, Coordinate, destination))
-                        potentialMoves.Add(destination);
-                }));
+				tasks.Add(Task.Run(() =>
+				{
+					if (ValidateMove(position, Coordinate, destination))
+						potentialMoves.Add(destination);
+				}));
 
 				await Task.WhenAll(tasks);
 			}
