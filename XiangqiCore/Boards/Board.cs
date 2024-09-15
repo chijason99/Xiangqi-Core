@@ -91,8 +91,22 @@ public class Board
         if(moveObject is MultiColumnPawnParsedMoveObject multiColumnPawnObject)
             pieceToMove = FindPieceToMoveForMultiColumnPawn(multiColumnPawnObject, piecesToMove, sideToMove);
         else
-            pieceToMove = piecesToMove.SingleOrDefault(p => p.Coordinate.Column == moveObject.StartingColumn.ConvertToColumnBasedOnSide(sideToMove)) ??
-                          piecesToMove[moveObject.PieceOrderIndex];
+        {
+            int actualStartingColumn = moveObject.StartingColumn.ConvertToColumnBasedOnSide(sideToMove);
+
+			if (piecesToMove.Count(p => p.Coordinate.Column == actualStartingColumn) == 1)
+                pieceToMove = piecesToMove.Single(p => p.Coordinate.Column == actualStartingColumn);
+			// Edge case for Advisor and Bishop, as they will not be using 前 or 後 to indicate the starting column
+            // when there are two of them in the same column
+			else if (moveObject.PieceType == typeof(Advisor) || moveObject.PieceType == typeof(Bishop))
+            {
+                int pieceOrderIndex = moveObject.MoveDirection == MoveDirection.Forward ? 1 : 0;
+        
+				pieceToMove = piecesToMove[pieceOrderIndex];
+			}
+            else
+				pieceToMove = piecesToMove[moveObject.PieceOrderIndex];
+		}
         
         return pieceToMove.Coordinate;
     }
