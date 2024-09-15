@@ -17,7 +17,7 @@ public static class XiangqiBuilderTests
         XiangqiGame xiangqiGame = await builder.UseDefaultConfiguration().BuildAsync();
 
         // Assert
-        xiangqiGame.InitialFenString.Should().Be("rnbakabnr/9/1c5c1/p1p1p1p1p/9/9/P1P1P1P1P/1C5C1/9/RNBAKABNR w - - 0 0");
+        xiangqiGame.InitialFenString.Should().Be("rnbakabnr/9/1c5c1/p1p1p1p1p/9/9/P1P1P1P1P/1C5C1/9/RNBAKABNR w - - 0 1");
 
         xiangqiGame.SideToMove.Should().Be(Side.Red);
 

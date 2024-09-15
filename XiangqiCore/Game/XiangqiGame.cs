@@ -266,8 +266,8 @@ public class XiangqiGame
 	/// <summary>
 	/// Exports the game as PGN (Portable Game Notation) format.
 	/// </summary>
-	/// <returns>The game in PGN format.</returns>
-	public string ExportGameAsPgn()
+	/// <returns>The PGN string of the game</returns>
+	public string ExportGameAsPgnString()
 	{
 		StringBuilder pgnBuilder = new();
 
