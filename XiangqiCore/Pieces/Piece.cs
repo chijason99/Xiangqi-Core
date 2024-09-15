@@ -41,8 +41,9 @@ public abstract class Piece(Coordinate coordinate, Side side)
 
     public bool ValidateMove(Piece[,] position, Coordinate startingPoint, Coordinate destination) => ValidationStrategy.IsProposedMoveValid(position, startingPoint, destination);
 
-    public virtual List<Coordinate> GeneratePotentialMoves(Piece[,] position)
+    public virtual async Task<List<Coordinate>> GeneratePotentialMoves(Piece[,] position)
     {
+        List<Task> tasks = [];
         List<Coordinate> potentialMoves = [];
 
         foreach (int row in GetAvailableRows())
@@ -56,9 +57,14 @@ public abstract class Piece(Coordinate coordinate, Side side)
                 // Skip if the destination is a King as it is not a valid move to capture a king
                 if (position.GetPieceAtPosition(destination) is King) continue;
 
-                if (ValidateMove(position, Coordinate, destination))
-                    potentialMoves.Add(destination);
-            }
+                tasks.Add(Task.Run(() =>
+                {
+                    if (ValidateMove(position, Coordinate, destination))
+                        potentialMoves.Add(destination);
+                }));
+
+				await Task.WhenAll(tasks);
+			}
         }
 
         return potentialMoves;
