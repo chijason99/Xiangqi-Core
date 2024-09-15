@@ -46,7 +46,7 @@ public static class DefaultValidationStrategyTests
     {
         // Arrange
         XiangqiBuilder builder = new();
-        XiangqiGame game = await builder.WithCustomFen(testData.StartingFen).BuildAsync();
+        XiangqiGame game = await builder.WithStartingFen(testData.StartingFen).BuildAsync();
 
         Coordinate staringPosition = testData.StartingPosition;
         Coordinate destination = testData.Destination;

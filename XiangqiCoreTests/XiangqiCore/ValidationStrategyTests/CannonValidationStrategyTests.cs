@@ -88,7 +88,7 @@ public static class CannonValidationStrategyTests
 
         XiangqiBuilder builder = new();
         XiangqiGame game = await builder
-                            .WithCustomFen(startingFen)
+                            .WithStartingFen(startingFen)
                             .BuildAsync();
 
         Piece[,] boardPosition = game.BoardPosition;

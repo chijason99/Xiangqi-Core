@@ -42,6 +42,7 @@ public class XiangqiGame
 		BlackPlayer = blackPlayer;
 		Competition = competition;
 		GameResult = result;
+		GameDate = competition.GameDate;
 
 		if (string.IsNullOrWhiteSpace(gameName))
 		{
@@ -379,6 +380,11 @@ public class XiangqiGame
 		List<string> moves = GameRecordParser.Parse(moveRecord);
 
 		foreach (string move in moves)
-			await Move(move, MoveNotationType.Chinese);
+		{
+			bool isSuccessful = await Move(move, MoveNotationType.Chinese);
+
+			if (!isSuccessful)
+				throw new InvalidOperationException($"Unable to add {move} to the game.");
+		}
 	}
 }

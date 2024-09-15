@@ -84,7 +84,7 @@ public static class RookValidationStrategyTests
         string startingFen = rookValidationTestData.StartingFen;
 
         XiangqiGame game = await builder
-                            .WithCustomFen(startingFen)
+                            .WithStartingFen(startingFen)
                             .WithBoardConfig(config => config.AddPiece(PieceType.Rook, Side.Red, startingPosition))
                             .BuildAsync();
         // Act

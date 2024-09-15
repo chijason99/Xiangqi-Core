@@ -39,7 +39,7 @@ public static class XiangqiBuilderTests
         XiangqiBuilder builder = new();
 
         // Act
-        XiangqiGame xiangqiGame = await builder.WithDefaultConfiguration().WithCustomFen(customFen).BuildAsync();
+        XiangqiGame xiangqiGame = await builder.WithDefaultConfiguration().WithStartingFen(customFen).BuildAsync();
 
         // Assert
         xiangqiGame.InitialFenString.Should().Be(customFen);
@@ -239,7 +239,7 @@ public static class XiangqiBuilderTests
 
         // Act
         XiangqiGame xiangqiGame = await builder
-                                    .WithCustomFen(startingFen)
+                                    .WithStartingFen(startingFen)
                                     .WithMoveRecord(moveRecord)
                                     .BuildAsync();
 
@@ -252,4 +252,106 @@ public static class XiangqiBuilderTests
 
         expectedRoundCount.Should().Be(expectedRoundCount);
     }
+
+    [Fact]
+	public static async Task ShouldCreateGameWithCorrectInfo_WhenCallingWithDpxqRecordAsync()
+	{
+		// Arrange
+		string sample = @"标题: 杭州环境集团队 王天一 和 四川成都懿锦金弈队 武俊强
+分类: 全国象棋甲级联赛
+赛事: 2023年腾讯棋牌天天象棋全国象棋甲级联赛
+轮次: 决赛
+布局: E42 对兵互进右马局
+红方: 杭州环境集团队 王天一
+黑方: 四川成都懿锦金弈队 武俊强
+结果: 和棋
+日期: 2023.12.10
+地点: 重庆丰都
+组别: 杭州-四川
+台次: 第04台
+评论: 中国象棋协会
+作者: 张磊
+备注: 第3局
+记时规则: 5分＋3秒
+红方用时: 6分
+黑方用时: 6分钟
+棋局类型: 全局
+棋局性质: 超快棋
+红方团体: 杭州环境集团队
+红方姓名: 王天一
+黑方团体: 四川成都懿锦金弈队
+黑方姓名: 武俊强
+棋谱主人: 东萍公司
+棋谱价值: 0
+浏览次数: 3086
+来源网站: 1791148
+ 
+　　第3局
+ 
+【主变: 和棋】
+　　1.　兵七进一　　卒７进１　
+　　2.　马八进七　　马８进７　
+　　3.　马二进一　　象３进５　
+　　4.　炮八平九　　马２进３　
+　　5.　车九平八　　车１平２　
+　　6.　炮二平四　　马７进８　
+　　7.　炮九进四　　车９进１　
+　　8.　车八进六　　车９平６　
+　　9.　仕四进五　　炮２退１　
+　　10. 炮九平七　　卒９进１　
+　　11. 相三进五　　车６进３　
+　　12. 车一平三　　马８进９　
+　　13. 车八退二　　炮２平８　
+　　14. 车八进五　　马３退２　
+　　15. 兵三进一　　卒７进１　
+　　16. 相五进三　　马２进１　
+　　17. 炮七平九　　车６平１　
+　　18. 相三退五　　后炮平３　
+　　19. 炮九平八　　车１平２　
+　　20. 炮八平九　　车２平１　
+　　21. 炮九平八　　车１平２　
+　　22. 炮八平九　　象５进７　
+　　23. 车三进三　　马９退８　
+　　24. 车三进一　　炮８平３　
+　　25. 马七退九　　车２平１　
+　　26. 炮九平八　　车１平２　
+　　27. 炮八平九　　车２平１　
+　　28. 炮九平八　　象７退５　
+　　29. 炮八退四　　车１进２　
+　　30. 炮八平七　　马１进２　
+　　31. 炮七进五　　车１进２　
+　　32. 炮七平八　　车１平４　
+　　33. 相七进九　　马２进３　
+　　34. 车三平二　　车４退４　
+　　35. 马一进三　　马８退６　
+　　36. 车二平四　　马６进８　
+　　37. 车四进一　　车４平６　
+　　38. 马三进四　　卒５进１　
+　　39. 炮八平七　　马８进６　
+　　40. 炮七退四　　炮３进５　
+　　41. 马四进二　　士４进５　
+　　42. 相九退七
+ 
+棋谱由 http://www.dpxq.com/ 生成";
+
+		XiangqiBuilder builder = new();
+
+		// Act
+		XiangqiGame xiangqiGame = await builder
+									.WithDpxqGameRecord(sample)
+									.BuildAsync();
+
+        // Assert
+		xiangqiGame.Competition.Location.Should().Be("重庆丰都");
+		xiangqiGame.Competition.Name.Should().Be("2023年腾讯棋牌天天象棋全国象棋甲级联赛");
+		xiangqiGame.Competition.GameDate.Should().Be(new DateTime(2023, 12, 10));
+
+		xiangqiGame.RedPlayer.Name.Should().Be("王天一");
+		xiangqiGame.RedPlayer.Team.Should().Be("杭州环境集团队");
+		xiangqiGame.BlackPlayer.Name.Should().Be("武俊强");
+		xiangqiGame.BlackPlayer.Team.Should().Be("四川成都懿锦金弈队");
+
+		xiangqiGame.GameResult.Should().Be(GameResult.Draw);
+        xiangqiGame.MoveHistory.Should().HaveCount(41*2 + 1);
+	}
 }

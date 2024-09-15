@@ -1,5 +1,10 @@
-﻿using XiangqiCore.Boards;
+﻿using System;
+using System.Reflection.Metadata.Ecma335;
+using System.Text.RegularExpressions;
+using XiangqiCore.Boards;
 using XiangqiCore.Misc;
+using static System.Net.Mime.MediaTypeNames;
+using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace XiangqiCore.Game;
 
@@ -56,11 +61,11 @@ public class XiangqiBuilder : IXiangqiBuilder
 	}
 
 	/// <summary>
-	/// Sets the Xiangqi game configuration to a custom FEN (Forsyth-Edwards Notation).
+	/// Sets the starting position according to the provided FEN (Forsyth-Edwards Notation).
 	/// </summary>
 	/// <param name="customFen">The custom FEN string representing the desired game configuration.</param>
 	/// <returns>The current instance of the <see cref="XiangqiBuilder"/> class.</returns>
-	public XiangqiBuilder WithCustomFen(string customFen)
+	public XiangqiBuilder WithStartingFen(string customFen)
 	{
 		_initialFen = customFen;
 
@@ -201,5 +206,101 @@ public class XiangqiBuilder : IXiangqiBuilder
 		_gameName = gameName;
 
 		return this;
+	}
+
+	/// <summary>
+	/// Sets the Xiangqi game configuration using a Dpxq game record.
+	/// </summary>
+	/// <param name="dpxqGameRecord"></param>
+	/// <returns></returns>
+	public XiangqiBuilder WithDpxqGameRecord(string dpxqGameRecord)
+	{
+		ExtractGameInfoFromDpxqRecord(dpxqGameRecord);
+		ExtractMoveRecordFromDpxqRecord(dpxqGameRecord);
+
+		return this;
+	}
+
+	private void ExtractGameInfoFromDpxqRecord(string dpxqGameRecord)
+	{
+		const string competitionNameKey = "赛事";
+		const string redTeamKey = "红方团体";
+		const string redPlayerNameKey = "红方姓名";
+		const string blackTeamKey = "黑方团体";
+		const string blackPlayerNameKey = "黑方姓名";
+		const string gameDateKey = "日期";
+		const string locationKey = "地点";
+		const string resultKey = "结果";
+
+		// (?<key>[^:]+): Named capturing group key that matches one or more characters that are not a colon (:)
+		// (?<value>.+): Named capturing group value that matches one or more characters
+		// ^ and $: Match the start and end of a line, respectively
+		Regex gameInfoPattern = new (@"^(?<key>[^:]+): (?<value>.+)$", RegexOptions.Multiline);
+		MatchCollection gameInfoMatched = gameInfoPattern.Matches(dpxqGameRecord);
+
+		CompetitionBuilder competitionBuilder = new();
+
+		foreach (Match match in gameInfoMatched)
+		{
+			string key = match.Groups["key"].Value;
+			string value = match.Groups["value"].Value.Trim();
+
+			switch (key)
+			{
+				case competitionNameKey:
+					competitionBuilder.WithName(value);
+					break;
+				case redTeamKey:
+					_redPlayer.Team = value;
+					break;
+				case redPlayerNameKey:
+					_redPlayer.Name = value;
+					break;
+				case blackTeamKey:
+					_blackPlayer.Team = value;
+					break;
+				case blackPlayerNameKey:
+					_blackPlayer.Name = value;
+					break;
+				case gameDateKey:
+					competitionBuilder.WithGameDate(DateTime.Parse(value));
+					break;
+				case locationKey:
+					competitionBuilder.WithLocation(value);
+					break;
+				case resultKey:
+					_gameResult = value switch
+					{
+						"红胜" => GameResult.RedWin,
+						"黑胜" => GameResult.BlackWin,
+						"和棋" => GameResult.Draw,
+						_ => GameResult.Unknown
+					};
+					break;
+				default:
+					continue;
+			}
+		}
+
+		_competition = competitionBuilder.Build();
+	}
+
+	private void ExtractMoveRecordFromDpxqRecord(string dpxqGameRecord)
+	{
+		// Replace the full width space character with a regular space character
+		// Otherwise, the move record will not be parsed correctly
+		string sanitizedDpxqGameRecord = Regex.Replace(dpxqGameRecord, @"\u3000", " ");
+
+		// \d+: Matches one or more digits.
+		// \.: Matches a literal dot.
+		// \s +: Matches one or more whitespace characters.
+		// .*?: Lazily matches any character(except for line terminators) as few times as possible.
+		// (?=\d +\.\s +|$): Positive lookahead to ensure the match is followed by another round number or the end of the string.
+		Regex moveRecordPattern = new(@"(\d+\.\s+.*?(?=\d+\.\s+|$))", RegexOptions.Multiline);
+		MatchCollection moveRecordMatches = moveRecordPattern.Matches(sanitizedDpxqGameRecord);
+
+		string combinedMoves = string.Join("\n\r", moveRecordMatches);
+
+		_moveRecord = combinedMoves;
 	}
 }

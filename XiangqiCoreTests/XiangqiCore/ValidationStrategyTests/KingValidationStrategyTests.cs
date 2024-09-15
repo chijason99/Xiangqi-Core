@@ -66,7 +66,7 @@ public static class ValidateMoveTests
     {
         // Arrange
         XiangqiBuilder builder = new();
-        XiangqiGame game = await builder.WithCustomFen(fen).BuildAsync();
+        XiangqiGame game = await builder.WithStartingFen(fen).BuildAsync();
 
         Coordinate startingPoint = new(startingPointCol, startingPointRow);
         Coordinate destination = new (destinationCol, destinationRow);
