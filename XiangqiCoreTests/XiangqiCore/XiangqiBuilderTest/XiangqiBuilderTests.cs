@@ -144,6 +144,34 @@ public static class XiangqiBuilderTests
 	}
 
 	[Theory]
+	[InlineData("許銀川", "呂欽", GameResult.RedWin, "2003許銀川先勝呂欽")]
+	[InlineData("傅光明", "胡榮華", GameResult.BlackWin, "全國個人賽精采對局: 傅光明先負胡榮華")]
+	[InlineData("王天一", "鄭惟恫", GameResult.Draw, "財神杯十番: 王天一先和鄭惟恫")]
+	[InlineData("趙國榮", "柳大華", GameResult.Unknown, "test")]
+	public static async Task ShouldCreateCorrectGameName_WhenCallingWithGameNameAsync(string redPlayerName, string blackPlayerName, GameResult gameResult, string expectedGameName)
+	{
+		// Arrange
+		XiangqiBuilder builder = new();
+
+		// Act
+		XiangqiGame xiangqiGame = await builder.WithDefaultConfiguration()
+							.WithRedPlayer(player =>
+							{
+								player.Name = redPlayerName;
+							})
+							.WithBlackPlayer(player =>
+							{
+								player.Name = blackPlayerName;
+							})
+                            .WithGameName(expectedGameName)
+							.WithGameResult(gameResult)
+							.BuildAsync();
+
+		// Assert
+		xiangqiGame.GameName.Should().Be(expectedGameName);
+	}
+
+	[Theory]
     [InlineData(GameResult.RedWin, "1-0")]
     [InlineData(GameResult.BlackWin, "0-1")]
     [InlineData(GameResult.Draw, "1/2-1/2")]
