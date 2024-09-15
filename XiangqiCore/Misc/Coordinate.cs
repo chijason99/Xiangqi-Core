@@ -49,4 +49,6 @@ public readonly struct Coordinate()
 		int columnUnicode = column + _uniCodeOfA - 1;
 		return Convert.ToChar(columnUnicode);
 	}
+
+    public override string ToString() => $"({Column}, {Row})";
 }
