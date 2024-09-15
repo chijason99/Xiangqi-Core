@@ -264,21 +264,27 @@ public static class PieceExtension
 
     public static async Task<bool> IsSideInCheckmate(this Piece[,] position, Side sideToCheck)
     {
-        Piece[] piecesToCheck = position
-                                    .Cast<Piece>()
-                                    .Where(p => p.Side == sideToCheck)
-                                    .ToArray();
-
-        foreach (Piece piece in piecesToCheck)
+        foreach (Piece piece in GetPiecesToCheck(position, sideToCheck))
         {
             List<Coordinate> availableCoordinatesForPiece = await piece.GeneratePotentialMoves(position);
 
-            if (availableCoordinatesForPiece.Any())
+            if (availableCoordinatesForPiece.Count > 0)
                 return false;
         }
 
         return true;
     }
+
+    private static IEnumerable<Piece> GetPiecesToCheck(Piece[,] position, Side sideToCheck)
+    {
+        var piecesToCheck = position
+                            .Cast<Piece>()
+                            .Where(p => p.Side == sideToCheck);
+
+        foreach (Piece pieceToCheck in piecesToCheck)
+            yield return pieceToCheck;
+	}
+
     public static bool HasDuplicatePieceOnColumn(this Piece[,] position, int column, PieceType pieceType, Side side)
 		=> position.GetPiecesOnColumn(column).Count(x => x.PieceType == pieceType && x.Side == side) > 1;
 
