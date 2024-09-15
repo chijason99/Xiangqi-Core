@@ -101,7 +101,7 @@ public class ChineseNotationParser : MoveNotationBase
 	}
 
 	private int ParsePieceOrderIndex(string notation)
-		=> notation[0] == '前' ? 0 : 1;
+		=> notation[0] == '後' ? 1 : 0;
 
 	// Multi Column Pawn situation
 	// Meaning that there are more than one columns holding two or more pawns of the same color
