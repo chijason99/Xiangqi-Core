@@ -140,11 +140,11 @@ public static class PieceExtensionTests
     [Theory]
     [InlineData("rnbakab1r/9/1c4nc1/p1p1p1p1p/9/9/P1P1P1P1P/1C2C4/9/RNBAKABNR w - - 2 1", 1, 9)]
     [InlineData("4kab2/cR2a2r1/2n1b2c1/p1p1p2Rp/5np2/3r5/P1P1P3P/N2C2N2/4AC3/2BAK1B2 w - - 12 14", 8, 3)]
-    public static void ShouldReturnCorrectPiecesInOrder_WhenCallingGetPiecesOnRow(string fen, int rowNumber, int piecesCountOnRow)
+    public async static Task ShouldReturnCorrectPiecesInOrder_WhenCallingGetPiecesOnRow(string fen, int rowNumber, int piecesCountOnRow)
     {
         // Arrange
         XiangqiBuilder builder = new ();
-        XiangqiGame game = builder.UseCustomFen(fen).Build();
+        XiangqiGame game = await builder.UseCustomFen(fen).BuildAsync();
 
         Piece[,] position = game.BoardPosition;
 
@@ -166,7 +166,7 @@ public static class PieceExtensionTests
 
     [Theory]
     [MemberData(nameof(CountPiecesBetweenTwoCoordinatesOnRowTestData))]
-    public static void ShouldReturnCorrectNumberOfPiecesBetweenTwoCoordinates_WhenProviingTwoCoordinatesOnTheSameRow(CountPiecesBetweenTwoCoordinatesTestData testData)
+    public async static Task ShouldReturnCorrectNumberOfPiecesBetweenTwoCoordinates_WhenProviingTwoCoordinatesOnTheSameRow(CountPiecesBetweenTwoCoordinatesTestData testData)
     {
         // Arrange
         string startingFen = testData.StartingFen;
@@ -174,9 +174,9 @@ public static class PieceExtensionTests
         Coordinate destination = testData.Destination;
         XiangqiBuilder builder = new ();
 
-        XiangqiGame game = builder
+        XiangqiGame game = await builder
                             .UseCustomFen(startingFen)
-                            .Build();
+                            .BuildAsync();
 
         Piece[,] position = game.BoardPosition;
         // Act
@@ -190,7 +190,7 @@ public static class PieceExtensionTests
 
     [Theory]
     [MemberData(nameof(CountPiecesBetweenTwoCoordinatesOnColumnTestData))]
-    public static void ShouldReturnCorrectNumberOfPiecesBetweenTwoCoordinates_WhenProviingTwoCoordinatesOnTheSameColumn (CountPiecesBetweenTwoCoordinatesTestData testData)
+    public static async Task ShouldReturnCorrectNumberOfPiecesBetweenTwoCoordinates_WhenProviingTwoCoordinatesOnTheSameColumnAsync (CountPiecesBetweenTwoCoordinatesTestData testData)
     {
         // Arrange
         string startingFen = testData.StartingFen;
@@ -198,9 +198,9 @@ public static class PieceExtensionTests
         Coordinate destination = testData.Destination;
         XiangqiBuilder builder = new ();
 
-        XiangqiGame game = builder
+        XiangqiGame game = await builder
                             .UseCustomFen(startingFen)
-                            .Build();
+                            .BuildAsync();
 
         Piece[,] position = game.BoardPosition;
         // Act
@@ -214,7 +214,7 @@ public static class PieceExtensionTests
 
     [Theory]
     [MemberData(nameof(WillExposeKingToDangerTestData))]
-    public static void WillExposeKingToDanger_ShouldReturnCorrectResult(WillExposeKingToDangerTestData willExposeKingToDangerTestData)
+    public static async Task WillExposeKingToDanger_ShouldReturnCorrectResultAsync(WillExposeKingToDangerTestData willExposeKingToDangerTestData)
     {
         // Arrange
         XiangqiBuilder builder = new();
@@ -222,9 +222,9 @@ public static class PieceExtensionTests
         Coordinate startingPosition = willExposeKingToDangerTestData.StartingPosition;
         Coordinate destination = willExposeKingToDangerTestData.Destination;
         bool expectedResult = willExposeKingToDangerTestData.ExpectedResult;
-        XiangqiGame game = builder
+        XiangqiGame game = await builder
                             .UseCustomFen(startingFen)
-                            .Build();
+                            .BuildAsync();
 
         Piece[,] boardPosition = game.BoardPosition;
         // Act
@@ -236,7 +236,7 @@ public static class PieceExtensionTests
 
     [Theory]
     [MemberData(nameof(IsKingAttackedByRookTestData))]
-    public static void IsKingAttackedByRook_ShouldReturnExpectedResult(IsKingAttackedTestData testData)
+    public static async Task IsKingAttackedByRook_ShouldReturnExpectedResultAsync(IsKingAttackedTestData testData)
     {
         // Arrange
         XiangqiBuilder builder = new();
@@ -244,9 +244,9 @@ public static class PieceExtensionTests
         bool expectedResult = testData.ExpectedResult;
         Coordinate kingCoordinate = testData.KingCoordinate;
 
-        XiangqiGame game = builder
+        XiangqiGame game = await builder
                             .UseCustomFen(startingFen)
-                            .Build();
+                            .BuildAsync();
 
         Piece[,] boardPosition = game.BoardPosition;
 
@@ -259,7 +259,7 @@ public static class PieceExtensionTests
 
     [Theory]
     [MemberData(nameof(IsKingExposedToOpponentKingTestData))]
-    public static void IsKingExposedToOpponentKing_ShouldReturnExpectedResult(IsKingAttackedTestData testData)
+    public static async Task IsKingExposedToOpponentKing_ShouldReturnExpectedResultAsync(IsKingAttackedTestData testData)
     {
         // Arrange
         XiangqiBuilder builder = new();
@@ -267,9 +267,9 @@ public static class PieceExtensionTests
         bool expectedResult = testData.ExpectedResult;
         Coordinate kingCoordinate = testData.KingCoordinate;
 
-        XiangqiGame game = builder
+        XiangqiGame game = await builder
                             .UseCustomFen(startingFen)
-                            .Build();
+                            .BuildAsync();
 
         Piece[,] boardPosition = game.BoardPosition;
 
@@ -282,7 +282,7 @@ public static class PieceExtensionTests
 
     [Theory]
     [MemberData(nameof(IsKingAttackedByCannonTestData))]
-    public static void IsKingAttackedByCannon_ShouldReturnExpectedResult(IsKingAttackedTestData testData)
+    public static async Task IsKingAttackedByCannon_ShouldReturnExpectedResultAsync(IsKingAttackedTestData testData)
     {
         // Arrange
         XiangqiBuilder builder = new();
@@ -290,9 +290,9 @@ public static class PieceExtensionTests
         bool expectedResult = testData.ExpectedResult;
         Coordinate kingCoordinate = testData.KingCoordinate;
 
-        XiangqiGame game = builder
+        XiangqiGame game = await builder
                             .UseCustomFen(startingFen)
-                            .Build();
+                            .BuildAsync();
 
         Piece[,] boardPosition = game.BoardPosition;
 
@@ -305,7 +305,7 @@ public static class PieceExtensionTests
 
     [Theory]
     [MemberData(nameof(IsKingAttackedByKnightTestData))]
-    public static void IsKingAttackedByKnight_ShouldReturnExpectedResult(IsKingAttackedTestData testData)
+    public static async Task IsKingAttackedByKnight_ShouldReturnExpectedResultAsync(IsKingAttackedTestData testData)
     {
         // Arrange
         XiangqiBuilder builder = new();
@@ -313,9 +313,9 @@ public static class PieceExtensionTests
         bool expectedResult = testData.ExpectedResult;
         Coordinate kingCoordinate = testData.KingCoordinate;
 
-        XiangqiGame game = builder
+        XiangqiGame game = await builder
                             .UseCustomFen(startingFen)
-                            .Build();
+                            .BuildAsync();
 
         Piece[,] boardPosition = game.BoardPosition;
 
@@ -328,7 +328,7 @@ public static class PieceExtensionTests
 
     [Theory]
     [MemberData(nameof(IsKingAttackedByPawnTestData))]
-    public static void IsKingAttackedByPawn_ShouldReturnExpectedResult(IsKingAttackedTestData testData)
+    public static async Task IsKingAttackedByPawn_ShouldReturnExpectedResultAsync(IsKingAttackedTestData testData)
     {
         // Arrange
         XiangqiBuilder builder = new();
@@ -336,9 +336,9 @@ public static class PieceExtensionTests
         bool expectedResult = testData.ExpectedResult;
         Coordinate kingCoordinate = testData.KingCoordinate;
 
-        XiangqiGame game = builder
+        XiangqiGame game = await builder
                             .UseCustomFen(startingFen)
-                            .Build();
+                            .BuildAsync();
 
         Piece[,] boardPosition = game.BoardPosition;
 
@@ -361,9 +361,9 @@ public static class PieceExtensionTests
         // Arrange
         XiangqiBuilder builder = new();
 
-        XiangqiGame game = builder
+        XiangqiGame game = await builder
                             .UseCustomFen(sampleFen)
-                            .Build();
+                            .BuildAsync();
 
         // Act
         bool actualResult = await game.BoardPosition.IsSideInCheckmate(sideToCheck);

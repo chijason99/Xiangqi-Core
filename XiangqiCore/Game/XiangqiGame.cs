@@ -140,7 +140,7 @@ public class XiangqiGame
 	/// <param name="gameResult">The game result.</param>
 	/// <param name="moveRecord">The move record.</param>
 	/// <returns>A new instance of the <see cref="XiangqiGame"/> class.</returns>
-	public static XiangqiGame Create(
+	public async static Task<XiangqiGame> Create(
 		string initialFenString, 
 		Player redPlayer, 
 		Player blackPlayer,
@@ -173,7 +173,7 @@ public class XiangqiGame
 			createdGameInstance.InitialFenString = FenHelper.GetFenFromPosition(createdGameInstance.Board.Position);
 
 		if (!string.IsNullOrEmpty(moveRecord))
-			createdGameInstance.SaveMoveRecordToHistory(moveRecord);
+			await createdGameInstance.SaveMoveRecordToHistory(moveRecord);
 
 		return createdGameInstance;
 	}

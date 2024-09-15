@@ -52,7 +52,7 @@ public static class KnightValidationStrategyTests
 
     [Theory]
     [MemberData(nameof(KnightValidMoveTestData))]
-    public static void ValidateMoveLogicForPieceShouldReturnTrue_WhenGivenValidMoves_ForKnight(KnightValidationTestData knightValidationTestData)
+    public static async Task ValidateMoveLogicForPieceShouldReturnTrue_WhenGivenValidMoves_ForKnightAsync(KnightValidationTestData knightValidationTestData)
     {
         // Arrange
         XiangqiBuilder builder = new();
@@ -60,10 +60,10 @@ public static class KnightValidationStrategyTests
         Coordinate knightCoordinate = knightValidationTestData.StartingPosition;
         Coordinate destination = knightValidationTestData.Destination;
 
-        XiangqiGame game = builder
+        XiangqiGame game = await builder
                             .UseEmptyBoard()
                             .UseBoardConfig(config => config.AddPiece(PieceType.Knight, Side.Red, knightCoordinate))
-                            .Build();
+                            .BuildAsync();
         // Act
         Knight knight = (Knight)game.BoardPosition.GetPieceAtPosition(knightCoordinate);
 
@@ -76,7 +76,7 @@ public static class KnightValidationStrategyTests
 
     [Theory]
     [MemberData(nameof(KnightObstacleMoveTestData))]
-    public static void ValidateMoveLogicForPieceShouldReturnCorrectResult_WhenGivenInvalidMoves_ForKnight_WithObstacles(KnightObstacleValidationTestData knightObstacleValidationTestData)
+    public static async Task ValidateMoveLogicForPieceShouldReturnCorrectResult_WhenGivenInvalidMoves_ForKnight_WithObstaclesAsync(KnightObstacleValidationTestData knightObstacleValidationTestData)
     {
         // Arrange
         XiangqiBuilder builder = new();
@@ -85,14 +85,14 @@ public static class KnightValidationStrategyTests
         Coordinate destination = knightObstacleValidationTestData.Destination;
         Coordinate obstacleCoordinate = knightObstacleValidationTestData.Obstacle;
 
-        XiangqiGame game = builder
+        XiangqiGame game = await builder
                             .UseEmptyBoard()
                             .UseBoardConfig(config => 
                                 { 
                                     config.AddPiece(PieceType.Knight, Side.Red, knightCoordinate); 
                                     config.AddRandomPiece(obstacleCoordinate); 
                                 })
-                            .Build();
+                            .BuildAsync();
         // Act
         Knight knight = (Knight)game.BoardPosition.GetPieceAtPosition(knightCoordinate);
 

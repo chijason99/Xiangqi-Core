@@ -36,9 +36,9 @@ public static class XiangqiGameTests
         // Arrange
         XiangqiBuilder builder = new ();
 
-        XiangqiGame game = builder
+        XiangqiGame game = await builder
                             .UseCustomFen(testData.StartingFen)
-                            .Build();
+                            .BuildAsync();
 
         bool expectedResult = testData.ExpectedResult;
         
@@ -58,9 +58,9 @@ public static class XiangqiGameTests
         // Arrange
         XiangqiBuilder builder = new();
 
-        XiangqiGame game = builder
+        XiangqiGame game = await builder
                             .UseCustomFen(startingFen)
-                            .Build();
+                            .BuildAsync();
 
         List<string> moves = GameRecordParser.Parse(gameRecord);
 
@@ -84,9 +84,9 @@ public static class XiangqiGameTests
         // Arrange
         XiangqiBuilder builder = new();
             
-        XiangqiGame game = builder
+        XiangqiGame game = await builder
                             .UseCustomFen(startingFen)
-                            .Build();
+                            .BuildAsync();
 
         List<string> moves = GameRecordParser.Parse(gameRecord);
 
@@ -118,13 +118,13 @@ public static class XiangqiGameTests
 
     [Theory]
     [InlineData("1990全國個人賽", "趙國榮", "萬春林","黑龍江", "上海", GameResult.RedWin, "杭州", "rnbakabnr/9/1c5c1/p1p1p1p1p/9/9/P1P1P1P1P/1C5C1/9/RNBAKABNR w - - 0 0", 1990, 10, 16, "  1. 炮二平五  馬８進７    2. 馬二進三  車９平８\r\n  3. 車一平二  炮８進４    4. 兵三進一  炮２平５\r\n  5. 兵七進一  馬２進３    6. 馬八進七  車１平２\r\n  7. 車九平八  車２進４    8. 炮八平九  車２平８\r\n  9. 車八進六  炮５平６   10. 車八平七  象７進５\r\n 11. 兵七進一  炮８平７   12. 車二平一  車８平３\r\n 13. 車七退一  象５進３   14. 馬七進六  車８進４\r\n 15. 馬六進五  馬３進５   16. 炮五進四  炮６平３\r\n 17. 炮五退一  炮３進７   18. 仕六進五  炮７平１\r\n 19. 兵五進一  炮１退２   20. 車一平二  車８進５\r\n 21. 馬三退二  炮３平２   22. 馬二進三  炮１平５\r\n 23. 兵五進一  象３退５   24. 炮九平五  士４進５\r\n 25. 馬三進四  卒７進１   26. 兵三進一  象５進７\r\n 27. 兵五平四  象７退５   28. 兵四平三  炮２退６\r\n 29. 兵三進一  馬７退８   30. 兵一進一  卒１進１\r\n 31. 兵三平二  馬８進７   32. 兵二平三  馬７退８\r\n 33. 炮五平四  炮２進２   34. 兵三平二  將５平４\r\n 35. 兵二進一  炮２退４   36. 炮四平一  馬８進６\r\n 37. 兵二平三  士５進４   38. 炮一進四  炮２平５\r\n 39. 炮一平六  將４平５   40. 炮六平二  將５平４\r\n 41. 兵三平四  馬６退８   42. 炮二退三  象５進７\r\n 43. 相三進五  炮５進４   44. 兵一進一  士４退５\r\n 45. 兵一平二  馬８進９   46. 兵四平三  象３進５\r\n 47. 兵三平二  馬９進８   48. 馬四進二  炮５平２\r\n 49. 兵二平三  炮２退３   50. 炮二平一  卒１進１\r\n 51. 炮一進六  將４進１   52. 仕五進六  卒１平２\r\n 53. 兵三進一  卒２進１   54. 馬二退三  炮２進２\r\n 55. 仕四進五  士５進６   56. 兵三平四  士６進５\r\n 57. 炮一退六  卒２進１   58. 馬三進四  炮２平５\r\n 59. 帥五平四  卒２平３   60. 相五進三  將４退１\r\n 61. 炮一退一  卒３平４   62. 仕五進六  炮５平２\r\n 63. 馬四進六  炮２退３   64. 兵四平五  士６退５\r\n 65. 馬六進五  炮２平４   66. 馬五退三  炮４平７\r\n 67. 炮一退一  炮７平４   68. 炮一平五  炮４進１\r\n 69. 馬三退五  炮４進１   70. 炮五進二  炮４退２\r\n 71. 馬五進七  炮４平３   72. 炮五進三  將４進１\r\n 73. 帥四平五  象５進３   74. 炮五退五\r\n")]
-    public static void ExportGameAsPgn_ShouldReturnCorrectPgnString(string comp, string redPlayer, string blackPlayer, string redTeam, string blackTeam, GameResult result , string venue, string startingFen, int year, int month, int day                                                     , string moveRecord)
+    public static async Task ExportGameAsPgn_ShouldReturnCorrectPgnStringAsync(string comp, string redPlayer, string blackPlayer, string redTeam, string blackTeam, GameResult result , string venue, string startingFen, int year, int month, int day                                                     , string moveRecord)
     {
         // Arrange
         XiangqiBuilder builder = new();
         DateTime competitionDate = new(year, month, day);
 
-        XiangqiGame game = builder
+        XiangqiGame game = await builder
                             .UseCustomFen(startingFen)       
                             .WithRedPlayer(player =>
                             {
@@ -144,10 +144,10 @@ public static class XiangqiGameTests
                                     .WithName(comp);
                             })
                             .WithGameResult(result)
-                            .Build();
+                            .BuildAsync();
 
         // Act
-        string pgnString = game.ExportGameAsPgn();
+        string pgnString = game.ExportGameAsPgnString();
 
         // Assert
         pgnString.Should().Contain("[Game \"Chinese Chess\"]");

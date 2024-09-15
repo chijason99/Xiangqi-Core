@@ -42,11 +42,11 @@ public static class DefaultValidationStrategyTests
 
     [Theory]
     [MemberData(nameof(IsProposedMoveValidTestData))]
-    public static void IsProposedMoveValid_ShouldReturnExpectedResult(IsProposedMoveValidTestData testData)
+    public static async Task IsProposedMoveValid_ShouldReturnExpectedResultAsync(IsProposedMoveValidTestData testData)
     {
         // Arrange
         XiangqiBuilder builder = new();
-        XiangqiGame game = builder.UseCustomFen(testData.StartingFen).Build();
+        XiangqiGame game = await builder.UseCustomFen(testData.StartingFen).BuildAsync();
 
         Coordinate staringPosition = testData.StartingPosition;
         Coordinate destination = testData.Destination;

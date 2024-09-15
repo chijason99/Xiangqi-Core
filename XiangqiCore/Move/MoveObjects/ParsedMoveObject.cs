@@ -16,7 +16,12 @@ public record ParsedMoveObject
     }
 
     // For Chinese/English Notation
-    public ParsedMoveObject(Type pieceType, int startingColumn, MoveDirection moveDirection, int foruthCharacter, int pieceOrderIndex = 0)
+    public ParsedMoveObject(
+        Type pieceType, 
+        int startingColumn, 
+        MoveDirection moveDirection, 
+        int foruthCharacter, 
+        int pieceOrderIndex = 0)
     {
         PieceType = pieceType;
         StartingColumn = startingColumn;

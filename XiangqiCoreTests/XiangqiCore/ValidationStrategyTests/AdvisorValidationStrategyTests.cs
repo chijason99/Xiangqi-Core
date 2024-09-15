@@ -11,7 +11,7 @@ public static class AdvisorValidationStrategyTests
     [InlineData(4, 1)]
     [InlineData(6, 3)]
     [InlineData(6, 1)]
-    public static void ValidateMoveLogicForPieceShouldReturnTrue_WhenGivenValidMoves_ForRedAdvisor(int column, int row)
+    public static async Task ValidateMoveLogicForPieceShouldReturnTrue_WhenGivenValidMoves_ForRedAdvisorAsync(int column, int row)
     {
         // Arrange
         XiangqiBuilder builder = new();
@@ -19,10 +19,10 @@ public static class AdvisorValidationStrategyTests
         Coordinate destination = new(column, row);
         Coordinate advisorCoordinate = new(5, 2);
 
-        XiangqiGame game =  builder
+        XiangqiGame game =  await builder
                             .UseDefaultConfiguration()
                             .UseBoardConfig(config => config.AddPiece(PieceType.Advisor, Side.Red, advisorCoordinate))
-                            .Build();
+                            .BuildAsync();
         // Act
         Advisor advisor = (Advisor)game.BoardPosition.GetPieceAtPosition(advisorCoordinate);
 
@@ -37,7 +37,7 @@ public static class AdvisorValidationStrategyTests
     [InlineData(5, 2)]
     [InlineData(3, 4)]
     [InlineData(5, 1)]
-    public static void ValidateMoveLogicForPieceShouldReturnFalse_WhenGivenInvalidMoves_ForRedAdvisor(int column, int row)
+    public static async Task ValidateMoveLogicForPieceShouldReturnFalse_WhenGivenInvalidMoves_ForRedAdvisorAsync(int column, int row)
     {
         // Arrange
         XiangqiBuilder builder = new();
@@ -45,10 +45,10 @@ public static class AdvisorValidationStrategyTests
         Coordinate destination = new(column, row);
         Coordinate advisorCoordinate = new(5, 2);
 
-        XiangqiGame game = builder
+        XiangqiGame game = await builder
                             .UseDefaultConfiguration()
                             .UseBoardConfig(config => config.AddPiece(PieceType.Advisor, Side.Red, advisorCoordinate))
-                            .Build();
+                            .BuildAsync();
         // Act
         Advisor advisor = (Advisor)game.BoardPosition.GetPieceAtPosition(advisorCoordinate);
 
@@ -63,7 +63,7 @@ public static class AdvisorValidationStrategyTests
     [InlineData(6, 10)]
     [InlineData(4, 8)]
     [InlineData(6, 8)]
-    public static void ValidateMoveLogicForPieceShouldReturnTrue_WhenGivenValidMoves_ForBlackAdvisor(int column, int row)
+    public static async Task ValidateMoveLogicForPieceShouldReturnTrue_WhenGivenValidMoves_ForBlackAdvisorAsync(int column, int row)
     {
         // Arrange
         XiangqiBuilder builder = new();
@@ -71,10 +71,10 @@ public static class AdvisorValidationStrategyTests
         Coordinate destination = new(column, row);
         Coordinate advisorCoordinate = new(5, 9);
 
-        XiangqiGame game = builder
+        XiangqiGame game = await builder
                             .UseDefaultConfiguration()
                             .UseBoardConfig(config => config.AddPiece(PieceType.Advisor, Side.Black, advisorCoordinate))
-                            .Build();
+                            .BuildAsync();
         // Act
         Advisor advisor = (Advisor)game.BoardPosition.GetPieceAtPosition(advisorCoordinate);
 
@@ -89,7 +89,7 @@ public static class AdvisorValidationStrategyTests
     [InlineData(5, 7)]
     [InlineData(5, 9)]
     [InlineData(5, 10)]
-    public static void ValidateMoveLogicForPieceShouldReturnFalse_WhenGivenInvalidMoves_ForBlackAdvisor(int column, int row)
+    public static async Task ValidateMoveLogicForPieceShouldReturnFalse_WhenGivenInvalidMoves_ForBlackAdvisorAsync(int column, int row)
     {
         // Arrange
         XiangqiBuilder builder = new();
@@ -97,10 +97,10 @@ public static class AdvisorValidationStrategyTests
         Coordinate destination = new(column, row);
         Coordinate advisorCoordinate = new(5, 9);
 
-        XiangqiGame game = builder
+        XiangqiGame game = await builder
                             .UseDefaultConfiguration()
                             .UseBoardConfig(config => config.AddPiece(PieceType.Advisor, Side.Red, advisorCoordinate))
-                            .Build();
+                            .BuildAsync();
         // Act
         Advisor advisor = (Advisor)game.BoardPosition.GetPieceAtPosition(advisorCoordinate);
 

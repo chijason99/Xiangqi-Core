@@ -49,7 +49,7 @@ public static class RookValidationStrategyTests
 
     [Theory]
     [MemberData(nameof(RookValidationTestData))]
-    public static void ValidateMoveLogicForPieceShouldReturnExpectedResult_WhenGivenMoves_ForRook(RookValidationTestData rookValidationTestData) 
+    public static async Task ValidateMoveLogicForPieceShouldReturnExpectedResult_WhenGivenMoves_ForRookAsync(RookValidationTestData rookValidationTestData) 
     { 
         // Arrange
         XiangqiBuilder builder = new ();
@@ -57,10 +57,10 @@ public static class RookValidationStrategyTests
         Coordinate startingPosition = rookValidationTestData.StartingPosition;
         Coordinate destination = rookValidationTestData.Destination;
 
-        XiangqiGame game = builder
+        XiangqiGame game = await builder
                             .UseEmptyBoard()
                             .UseBoardConfig(config => config.AddPiece(PieceType.Rook, Side.Red, startingPosition))
-                            .Build();
+                            .BuildAsync();
         // Act
         Rook rook = (Rook)game.BoardPosition.GetPieceAtPosition(startingPosition);
 
@@ -74,7 +74,7 @@ public static class RookValidationStrategyTests
 
     [Theory]
     [MemberData(nameof(RookObstacleValidationTestData))]
-    public static void ValidateMoveLogicForPieceShouldReturnExpectedResult_WhenGivenMoves_ForRook_WithObstacles(RookObstacleValidationTestData rookValidationTestData)
+    public static async Task ValidateMoveLogicForPieceShouldReturnExpectedResult_WhenGivenMoves_ForRook_WithObstaclesAsync(RookObstacleValidationTestData rookValidationTestData)
     {
         // Arrange
         XiangqiBuilder builder = new();
@@ -83,10 +83,10 @@ public static class RookValidationStrategyTests
         Coordinate destination = rookValidationTestData.Destination;
         string startingFen = rookValidationTestData.StartingFen;
 
-        XiangqiGame game = builder
+        XiangqiGame game = await builder
                             .UseCustomFen(startingFen)
                             .UseBoardConfig(config => config.AddPiece(PieceType.Rook, Side.Red, startingPosition))
-                            .Build();
+                            .BuildAsync();
         // Act
         Rook rook = (Rook)game.BoardPosition.GetPieceAtPosition(startingPosition);
 

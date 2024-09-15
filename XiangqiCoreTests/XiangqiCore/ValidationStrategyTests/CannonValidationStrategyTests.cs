@@ -52,7 +52,7 @@ public static class CannonValidationStrategyTests
 
     [Theory]
     [MemberData(nameof(CannonValidationTestData))]
-    public static void ShouldReturnExpectedResult_WhenValidatingMoves_ForCannon(CannonValidationTestData cannonValidationTestData)
+    public static async Task ShouldReturnExpectedResult_WhenValidatingMoves_ForCannonAsync(CannonValidationTestData cannonValidationTestData)
     {
         // Arrange
         Coordinate startingPosition = cannonValidationTestData.StartingPosition;
@@ -60,10 +60,10 @@ public static class CannonValidationStrategyTests
         bool expectedResult = cannonValidationTestData.ExpectedResult;
 
         XiangqiBuilder builder = new ();
-        XiangqiGame game = builder
+        XiangqiGame game = await builder
                             .UseEmptyBoard()
                             .UseBoardConfig(config => config.AddPiece(PieceType.Cannon, Side.Red , startingPosition))
-                            .Build();
+                            .BuildAsync();
 
         Piece[,] boardPosition = game.BoardPosition;
         
@@ -78,7 +78,7 @@ public static class CannonValidationStrategyTests
 
     [Theory]
     [MemberData(nameof(CannonObstacleValidationTestData))]
-    public static void ShouldReturnExpectedResult_WhenValidatingMoves_ForCannon_WithObstacles(CannonObstacleValidationTestData cannonObstacleValidationTestData)
+    public static async Task ShouldReturnExpectedResult_WhenValidatingMoves_ForCannon_WithObstaclesAsync(CannonObstacleValidationTestData cannonObstacleValidationTestData)
     {
         // Arrange
         Coordinate startingPosition = cannonObstacleValidationTestData.StartingPosition;
@@ -87,9 +87,9 @@ public static class CannonValidationStrategyTests
         string startingFen = cannonObstacleValidationTestData.StartingFen;
 
         XiangqiBuilder builder = new();
-        XiangqiGame game = builder
+        XiangqiGame game = await builder
                             .UseCustomFen(startingFen)
-                            .Build();
+                            .BuildAsync();
 
         Piece[,] boardPosition = game.BoardPosition;
 

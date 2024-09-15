@@ -48,7 +48,7 @@ public static class PawnValidationStrategyTests
 
     [Theory]
     [MemberData(nameof(RedPawnCoordinates))]
-    public static void ValidateMoveLogicForPieceShouldReturnTrue_WhenGivenValidMoves_ForRedPawn(PawnValidationTestData pawnValidationTestData)
+    public static async Task ValidateMoveLogicForPieceShouldReturnTrue_WhenGivenValidMoves_ForRedPawnAsync(PawnValidationTestData pawnValidationTestData)
     {
         // Arrange
         XiangqiBuilder builder = new();
@@ -57,10 +57,10 @@ public static class PawnValidationStrategyTests
         Coordinate destination = pawnValidationTestData.Destination;
         Side side = pawnValidationTestData.Side;
 
-        XiangqiGame game =  builder
+        XiangqiGame game =  await builder
                             .UseEmptyBoard()
                             .UseBoardConfig(config => config.AddPiece(PieceType.Pawn, side, pawnCoordinate))
-                            .Build();
+                            .BuildAsync();
         // Act
         Pawn pawn = (Pawn)game.BoardPosition.GetPieceAtPosition(pawnCoordinate);
 

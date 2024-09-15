@@ -25,7 +25,7 @@ public static class BishopValidationStrategyTests
     [InlineData(3, 5)]
     [InlineData(7, 1)]
     [InlineData(7, 5)]
-    public static void ValidateMoveLogicForPieceShouldReturnTrue_WhenGivenValidMoves_ForRedBishop(int column, int row)
+    public static async Task ValidateMoveLogicForPieceShouldReturnTrue_WhenGivenValidMoves_ForRedBishopAsync(int column, int row)
     {
         // Arrange
         XiangqiBuilder builder = new();
@@ -33,10 +33,10 @@ public static class BishopValidationStrategyTests
         Coordinate destination = new(column, row);
         Coordinate bishopCoordinate = new(5, 3);
 
-        XiangqiGame game =  builder
+        XiangqiGame game =  await builder
                             .UseEmptyBoard()
                             .UseBoardConfig(config => config.AddPiece(PieceType.Bishop, Side.Red, bishopCoordinate))
-                            .Build();
+                            .BuildAsync();
         // Act
         Bishop bishop = (Bishop)game.BoardPosition.GetPieceAtPosition(bishopCoordinate);
 
@@ -51,7 +51,7 @@ public static class BishopValidationStrategyTests
     [InlineData(9, 3)]
     [InlineData(6, 3)]
     [InlineData(5, 1)]
-    public static void ValidateMoveLogicForPieceShouldReturnFalse_WhenGivenInvalidMoves_ForRedBishop(int column, int row)
+    public static async Task ValidateMoveLogicForPieceShouldReturnFalse_WhenGivenInvalidMoves_ForRedBishopAsync(int column, int row)
     {
         // Arrange
         XiangqiBuilder builder = new();
@@ -59,10 +59,10 @@ public static class BishopValidationStrategyTests
         Coordinate destination = new(column, row);
         Coordinate bishopCoordinate = new(5, 3);
 
-        XiangqiGame game = builder
+        XiangqiGame game = await builder
                             .UseEmptyBoard()
                             .UseBoardConfig(config => config.AddPiece(PieceType.Bishop, Side.Red, bishopCoordinate))
-                            .Build();
+                            .BuildAsync();
         // Act
         Bishop bishop = (Bishop)game.BoardPosition.GetPieceAtPosition(bishopCoordinate);
 
@@ -77,7 +77,7 @@ public static class BishopValidationStrategyTests
     [InlineData(7, 10)]
     [InlineData(3, 6)]
     [InlineData(7, 6)]
-    public static void ValidateMoveLogicForPieceShouldReturnTrue_WhenGivenValidMoves_ForBlackBishop(int column, int row)
+    public static async Task ValidateMoveLogicForPieceShouldReturnTrue_WhenGivenValidMoves_ForBlackBishopAsync(int column, int row)
     {
         // Arrange
         XiangqiBuilder builder = new();
@@ -85,10 +85,10 @@ public static class BishopValidationStrategyTests
         Coordinate destination = new(column, row);
         Coordinate bishopCoordinate = new(5, 8);
 
-        XiangqiGame game = builder
+        XiangqiGame game = await builder
                             .UseEmptyBoard()
                             .UseBoardConfig(config => config.AddPiece(PieceType.Bishop, Side.Black, bishopCoordinate))
-                            .Build();
+                            .BuildAsync();
         // Act
         Bishop bishop = (Bishop)game.BoardPosition.GetPieceAtPosition(bishopCoordinate);
 
@@ -100,19 +100,19 @@ public static class BishopValidationStrategyTests
 
     [Theory]
     [MemberData(nameof(BishopObstacleTestData))]
-    public static void ValidateMoveLogicForPiece_ShouldReturnExpectedResult_WithObstacles(BishopObstacleTestData testData)
+    public static async Task ValidateMoveLogicForPiece_ShouldReturnExpectedResult_WithObstaclesAsync(BishopObstacleTestData testData)
     {
         // Arrange
         XiangqiBuilder builder = new();
 
-        XiangqiGame game = builder
+        XiangqiGame game = await builder
                             .UseEmptyBoard()
                             .UseBoardConfig(config =>
                             {
                                 config.AddPiece(PieceType.Bishop, Side.Red, testData.BishopPosiiton);
                                 config.AddRandomPiece(testData.ObstaclePosition);
                             })
-                            .Build();
+                            .BuildAsync();
         bool expectedResult = testData.ExpectedResult;
 
         Bishop bishop = (Bishop)game.BoardPosition.GetPieceAtPosition(testData.BishopPosiiton);
