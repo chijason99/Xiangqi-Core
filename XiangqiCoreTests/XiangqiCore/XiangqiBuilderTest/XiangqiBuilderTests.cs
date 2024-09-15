@@ -14,7 +14,7 @@ public static class XiangqiBuilderTests
         XiangqiBuilder builder = new();
 
         // Act
-        XiangqiGame xiangqiGame = await builder.UseDefaultConfiguration().BuildAsync();
+        XiangqiGame xiangqiGame = await builder.WithDefaultConfiguration().BuildAsync();
 
         // Assert
         xiangqiGame.InitialFenString.Should().Be("rnbakabnr/9/1c5c1/p1p1p1p1p/9/9/P1P1P1P1P/1C5C1/9/RNBAKABNR w - - 0 1");
@@ -39,7 +39,7 @@ public static class XiangqiBuilderTests
         XiangqiBuilder builder = new();
 
         // Act
-        XiangqiGame xiangqiGame = await builder.UseDefaultConfiguration().UseCustomFen(customFen).BuildAsync();
+        XiangqiGame xiangqiGame = await builder.WithDefaultConfiguration().WithCustomFen(customFen).BuildAsync();
 
         // Assert
         xiangqiGame.InitialFenString.Should().Be(customFen);
@@ -54,7 +54,7 @@ public static class XiangqiBuilderTests
         XiangqiBuilder builder = new();
 
         // Act
-        XiangqiGame xiangqiGame = await builder.UseDefaultConfiguration()
+        XiangqiGame xiangqiGame = await builder.WithDefaultConfiguration()
                                         .WithRedPlayer(player =>
                                         {
                                             player.Name = playerName;
@@ -78,7 +78,7 @@ public static class XiangqiBuilderTests
         XiangqiBuilder builder = new();
 
         // Act
-        XiangqiGame xiangqiGame = await builder.UseDefaultConfiguration()
+        XiangqiGame xiangqiGame = await builder.WithDefaultConfiguration()
                                         .WithBlackPlayer(player =>
                                         {
                                             player.Name = playerName;
@@ -100,7 +100,7 @@ public static class XiangqiBuilderTests
         XiangqiBuilder builder = new();
 
         // Act
-        XiangqiGame xiangqiGame = await builder.UseDefaultConfiguration()
+        XiangqiGame xiangqiGame = await builder.WithDefaultConfiguration()
                             .WithCompetition(option =>
                             {
                                 option
@@ -127,7 +127,7 @@ public static class XiangqiBuilderTests
 
         // Act
         XiangqiGame xiangqiGame = await builder
-                                    .UseDefaultConfiguration()
+                                    .WithDefaultConfiguration()
                                     .WithGameResult(result)
                                     .BuildAsync();
 
@@ -158,8 +158,8 @@ public static class XiangqiBuilderTests
 
         // Act
         XiangqiGame xiangqiGame = await builder
-                                    .UseDefaultConfiguration()
-                                    .UseBoardConfig(config)
+                                    .WithDefaultConfiguration()
+                                    .WithBoardConfig(config)
                                     .BuildAsync();
 
         // Assert
@@ -184,7 +184,7 @@ public static class XiangqiBuilderTests
 
         // Act
         XiangqiGame xiangqiGame = await builder
-                                    .UseCustomFen(startingFen)
+                                    .WithCustomFen(startingFen)
                                     .WithMoveRecord(moveRecord)
                                     .BuildAsync();
 

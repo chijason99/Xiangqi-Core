@@ -61,8 +61,8 @@ public static class CannonValidationStrategyTests
 
         XiangqiBuilder builder = new ();
         XiangqiGame game = await builder
-                            .UseEmptyBoard()
-                            .UseBoardConfig(config => config.AddPiece(PieceType.Cannon, Side.Red , startingPosition))
+                            .WithEmptyBoard()
+                            .WithBoardConfig(config => config.AddPiece(PieceType.Cannon, Side.Red , startingPosition))
                             .BuildAsync();
 
         Piece[,] boardPosition = game.BoardPosition;
@@ -88,7 +88,7 @@ public static class CannonValidationStrategyTests
 
         XiangqiBuilder builder = new();
         XiangqiGame game = await builder
-                            .UseCustomFen(startingFen)
+                            .WithCustomFen(startingFen)
                             .BuildAsync();
 
         Piece[,] boardPosition = game.BoardPosition;

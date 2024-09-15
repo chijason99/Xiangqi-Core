@@ -61,8 +61,8 @@ public static class KnightValidationStrategyTests
         Coordinate destination = knightValidationTestData.Destination;
 
         XiangqiGame game = await builder
-                            .UseEmptyBoard()
-                            .UseBoardConfig(config => config.AddPiece(PieceType.Knight, Side.Red, knightCoordinate))
+                            .WithEmptyBoard()
+                            .WithBoardConfig(config => config.AddPiece(PieceType.Knight, Side.Red, knightCoordinate))
                             .BuildAsync();
         // Act
         Knight knight = (Knight)game.BoardPosition.GetPieceAtPosition(knightCoordinate);
@@ -86,8 +86,8 @@ public static class KnightValidationStrategyTests
         Coordinate obstacleCoordinate = knightObstacleValidationTestData.Obstacle;
 
         XiangqiGame game = await builder
-                            .UseEmptyBoard()
-                            .UseBoardConfig(config => 
+                            .WithEmptyBoard()
+                            .WithBoardConfig(config => 
                                 { 
                                     config.AddPiece(PieceType.Knight, Side.Red, knightCoordinate); 
                                     config.AddRandomPiece(obstacleCoordinate); 

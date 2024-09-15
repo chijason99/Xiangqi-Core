@@ -58,8 +58,8 @@ public static class RookValidationStrategyTests
         Coordinate destination = rookValidationTestData.Destination;
 
         XiangqiGame game = await builder
-                            .UseEmptyBoard()
-                            .UseBoardConfig(config => config.AddPiece(PieceType.Rook, Side.Red, startingPosition))
+                            .WithEmptyBoard()
+                            .WithBoardConfig(config => config.AddPiece(PieceType.Rook, Side.Red, startingPosition))
                             .BuildAsync();
         // Act
         Rook rook = (Rook)game.BoardPosition.GetPieceAtPosition(startingPosition);
@@ -84,8 +84,8 @@ public static class RookValidationStrategyTests
         string startingFen = rookValidationTestData.StartingFen;
 
         XiangqiGame game = await builder
-                            .UseCustomFen(startingFen)
-                            .UseBoardConfig(config => config.AddPiece(PieceType.Rook, Side.Red, startingPosition))
+                            .WithCustomFen(startingFen)
+                            .WithBoardConfig(config => config.AddPiece(PieceType.Rook, Side.Red, startingPosition))
                             .BuildAsync();
         // Act
         Rook rook = (Rook)game.BoardPosition.GetPieceAtPosition(startingPosition);

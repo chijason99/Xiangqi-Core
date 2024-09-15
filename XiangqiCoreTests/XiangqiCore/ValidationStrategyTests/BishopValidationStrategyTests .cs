@@ -34,8 +34,8 @@ public static class BishopValidationStrategyTests
         Coordinate bishopCoordinate = new(5, 3);
 
         XiangqiGame game =  await builder
-                            .UseEmptyBoard()
-                            .UseBoardConfig(config => config.AddPiece(PieceType.Bishop, Side.Red, bishopCoordinate))
+                            .WithEmptyBoard()
+                            .WithBoardConfig(config => config.AddPiece(PieceType.Bishop, Side.Red, bishopCoordinate))
                             .BuildAsync();
         // Act
         Bishop bishop = (Bishop)game.BoardPosition.GetPieceAtPosition(bishopCoordinate);
@@ -60,8 +60,8 @@ public static class BishopValidationStrategyTests
         Coordinate bishopCoordinate = new(5, 3);
 
         XiangqiGame game = await builder
-                            .UseEmptyBoard()
-                            .UseBoardConfig(config => config.AddPiece(PieceType.Bishop, Side.Red, bishopCoordinate))
+                            .WithEmptyBoard()
+                            .WithBoardConfig(config => config.AddPiece(PieceType.Bishop, Side.Red, bishopCoordinate))
                             .BuildAsync();
         // Act
         Bishop bishop = (Bishop)game.BoardPosition.GetPieceAtPosition(bishopCoordinate);
@@ -86,8 +86,8 @@ public static class BishopValidationStrategyTests
         Coordinate bishopCoordinate = new(5, 8);
 
         XiangqiGame game = await builder
-                            .UseEmptyBoard()
-                            .UseBoardConfig(config => config.AddPiece(PieceType.Bishop, Side.Black, bishopCoordinate))
+                            .WithEmptyBoard()
+                            .WithBoardConfig(config => config.AddPiece(PieceType.Bishop, Side.Black, bishopCoordinate))
                             .BuildAsync();
         // Act
         Bishop bishop = (Bishop)game.BoardPosition.GetPieceAtPosition(bishopCoordinate);
@@ -106,8 +106,8 @@ public static class BishopValidationStrategyTests
         XiangqiBuilder builder = new();
 
         XiangqiGame game = await builder
-                            .UseEmptyBoard()
-                            .UseBoardConfig(config =>
+                            .WithEmptyBoard()
+                            .WithBoardConfig(config =>
                             {
                                 config.AddPiece(PieceType.Bishop, Side.Red, testData.BishopPosiiton);
                                 config.AddRandomPiece(testData.ObstaclePosition);

@@ -71,6 +71,21 @@ public class XiangqiGame
 	/// </summary>
 	public Competition Competition { get; private set; }
 
+	public string GameName {
+		get
+		{ 
+			string gameResultChinese = GameResult switch
+			{
+				GameResult.RedWin => "先勝",
+				GameResult.BlackWin => "先負",
+				GameResult.Draw => "先和",
+				_ => "對"
+			};
+
+			return $"{RedPlayer.Name} {gameResultChinese} {BlackPlayer.Name}";
+		}
+	}
+
 	/// <summary>
 	/// Gets the game date.
 	/// </summary>
@@ -349,11 +364,11 @@ public class XiangqiGame
 			SwitchSideToMove();
 	}
 
-	private void SaveMoveRecordToHistory(string moveRecord)
+	private async Task SaveMoveRecordToHistory(string moveRecord)
 	{
 		List<string> moves = GameRecordParser.Parse(moveRecord);
 
 		foreach (string move in moves)
-			Move(move, MoveNotationType.Chinese);
+			await Move(move, MoveNotationType.Chinese);
 	}
 }

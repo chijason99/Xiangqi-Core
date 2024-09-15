@@ -11,19 +11,19 @@ public class XiangqiBuilder : IXiangqiBuilder
 	private const string _defaultStartingPositionFen = "rnbakabnr/9/1c5c1/p1p1p1p1p/9/9/P1P1P1P1P/1C5C1/9/RNBAKABNR w - - 0 1";
 	private const string _emptyStartingPositionFen = "9/9/9/9/9/9/9/9/9/9 w - - 0 1";
 
-    private string _initialFen { get; set; } = _defaultStartingPositionFen;
-    private Side _sideToMove { get; set; }
+	private string _initialFen { get; set; } = _defaultStartingPositionFen;
+	private Side _sideToMove { get; set; }
 
-    private Player _redPlayer { get; set; }
-    private Player _blackPlayer { get; set; }
+	private Player _redPlayer { get; set; }
+	private Player _blackPlayer { get; set; }
 
-    private Competition _competition { get; set; }
-    private GameResult _gameResult { get; set; } = GameResult.Unknown;
+	private Competition _competition { get; set; }
+	private GameResult _gameResult { get; set; } = GameResult.Unknown;
 
-    private bool _useBoardConfig { get; set; } = false;
-    private BoardConfig? _boardConfig { get; set; } = null;
+	private bool _useBoardConfig { get; set; } = false;
+	private BoardConfig? _boardConfig { get; set; } = null;
 
-    private string _moveRecord { get; set; } = "";
+	private string _moveRecord { get; set; } = "";
 
 	/// <summary>
 	/// Initializes a new instance of the <see cref="XiangqiBuilder"/> class.
@@ -36,45 +36,45 @@ public class XiangqiBuilder : IXiangqiBuilder
 	/// Sets the Xiangqi game configuration to the default starting position.
 	/// </summary>
 	/// <returns>The current instance of the <see cref="XiangqiBuilder"/> class.</returns>
-    public XiangqiBuilder UseDefaultConfiguration()
-    {
-        _initialFen = _defaultStartingPositionFen;
-        _sideToMove = Side.Red;
+	public XiangqiBuilder WithDefaultConfiguration()
+	{
+		_initialFen = _defaultStartingPositionFen;
+		_sideToMove = Side.Red;
 
-        _redPlayer = new();
-        _blackPlayer = new();
+		_redPlayer = new();
+		_blackPlayer = new();
 
-        CompetitionBuilder competitionBuilder = new();
+		CompetitionBuilder competitionBuilder = new();
 
-        // Create a default competition
-        _competition = competitionBuilder.Build();
-        _gameResult = GameResult.Unknown;
+		// Create a default competition
+		_competition = competitionBuilder.Build();
+		_gameResult = GameResult.Unknown;
 
-        return this;
-    }
+		return this;
+	}
 
 	/// <summary>
 	/// Sets the Xiangqi game configuration to a custom FEN (Forsyth-Edwards Notation).
 	/// </summary>
 	/// <param name="customFen">The custom FEN string representing the desired game configuration.</param>
 	/// <returns>The current instance of the <see cref="XiangqiBuilder"/> class.</returns>
-    public XiangqiBuilder UseCustomFen(string customFen)
-    {
-        _initialFen = customFen;
+	public XiangqiBuilder WithCustomFen(string customFen)
+	{
+		_initialFen = customFen;
 
-        return this;
-    }
+		return this;
+	}
 
 	/// <summary>
 	/// Sets the Xiangqi game configuration to an empty board.
 	/// </summary>
 	/// <returns>The current instance of the <see cref="XiangqiBuilder"/> class.</returns>
-    public XiangqiBuilder UseEmptyBoard()
-    {
-        _initialFen = _emptyStartingPositionFen;
+	public XiangqiBuilder WithEmptyBoard()
+	{
+		_initialFen = _emptyStartingPositionFen;
 
-        return this;
-    }
+		return this;
+	}
 
 	/// <summary>
 	/// Builds an instance of the Xiangqi game asynchronously.
@@ -88,100 +88,100 @@ public class XiangqiBuilder : IXiangqiBuilder
 	/// </summary>
 	/// <param name="action">An action that configures the red player.</param>
 	/// <returns>The current instance of the <see cref="XiangqiBuilder"/> class.</returns>
-    public XiangqiBuilder WithRedPlayer(Action<Player> action)
-    {
-        Player redPlayer = new();
+	public XiangqiBuilder WithRedPlayer(Action<Player> action)
+	{
+		Player redPlayer = new();
 
-        action(redPlayer);
+		action(redPlayer);
 
-        _redPlayer = redPlayer;
+		_redPlayer = redPlayer;
 
-        return this;
-    }
+		return this;
+	}
 
 	/// <summary>
 	/// Sets the configuration for the black player.
 	/// </summary>
 	/// <param name="action">An action that configures the black player.</param>
 	/// <returns>The current instance of the <see cref="XiangqiBuilder"/> class.</returns>
-    public XiangqiBuilder WithBlackPlayer(Action<Player> action)
-    {
-        Player blackPlayer = new();
+	public XiangqiBuilder WithBlackPlayer(Action<Player> action)
+	{
+		Player blackPlayer = new();
 
-        action(blackPlayer);
+		action(blackPlayer);
 
-        _blackPlayer = blackPlayer;
+		_blackPlayer = blackPlayer;
 
-        return this;
-    }
+		return this;
+	}
 
 	/// <summary>
 	/// Sets the game result for the Xiangqi game.
 	/// </summary>
 	/// <param name="gameResult">The game result.</param>
 	/// <returns>The current instance of the <see cref="XiangqiBuilder"/> class.</returns>
-    public XiangqiBuilder WithGameResult(GameResult gameResult)
-    {
-        _gameResult = gameResult;
+	public XiangqiBuilder WithGameResult(GameResult gameResult)
+	{
+		_gameResult = gameResult;
 
-        return this;
-    }
+		return this;
+	}
 
 	/// <summary>
 	/// Sets the configuration for the competition.
 	/// </summary>
 	/// <param name="action">An action that configures the competition.</param>
 	/// <returns>The current instance of the <see cref="XiangqiBuilder"/> class.</returns>
-    public XiangqiBuilder WithCompetition(Action<CompetitionBuilder> action)
-    {
-        CompetitionBuilder competitionBuilder = new();
+	public XiangqiBuilder WithCompetition(Action<CompetitionBuilder> action)
+	{
+		CompetitionBuilder competitionBuilder = new();
 
-        action.Invoke(competitionBuilder);
+		action.Invoke(competitionBuilder);
 
-        _competition = competitionBuilder.Build();
+		_competition = competitionBuilder.Build();
 
-        return this;
-    }
+		return this;
+	}
 
 	/// <summary>
 	/// Sets the board configuration for the Xiangqi game using a <see cref="BoardConfig" /> class instance.
 	/// </summary>
 	/// <param name="config">The board configuration.</param>
 	/// <returns>The current instance of the <see cref="XiangqiBuilder"/> class.</returns>
-    public XiangqiBuilder UseBoardConfig(BoardConfig config)
-    {
-        _boardConfig = config;
-        _useBoardConfig = true;
+	public XiangqiBuilder WithBoardConfig(BoardConfig config)
+	{
+		_boardConfig = config;
+		_useBoardConfig = true;
 
-        return this;
-    }
+		return this;
+	}
 
-    /// <summary>
+	/// <summary>
 	/// Sets the move record for the Xiangqi game.
-    /// </summary>
+	/// </summary>
 	/// <param name="moveRecord">The move record.</param>
 	/// <returns>The current instance of the <see cref="XiangqiBuilder"/> class.</returns>
-    public XiangqiBuilder WithMoveRecord(string moveRecord)
-    {
-        _moveRecord = moveRecord;
+	public XiangqiBuilder WithMoveRecord(string moveRecord)
+	{
+		_moveRecord = moveRecord;
 
-        return this;
-    }
+		return this;
+	}
 
 	/// <summary>
 	/// Sets the board configuration for the Xiangqi game using the APIs from the <see cref="BoardConfig"/> class.
 	/// </summary>
 	/// <param name="action">An action that configures the board configuration.</param>
 	/// <returns>The current instance of the <see cref="XiangqiBuilder"/> class.</returns>
-    public XiangqiBuilder UseBoardConfig(Action<BoardConfig> action)
-    {
-        BoardConfig config = new();
+	public XiangqiBuilder WithBoardConfig(Action<BoardConfig> action)
+	{
+		BoardConfig config = new();
 
-        action.Invoke(config);
+		action.Invoke(config);
 
-        _boardConfig = config;
-        _useBoardConfig = true;
+		_boardConfig = config;
+		_useBoardConfig = true;
 
-        return this;
-    }
+		return this;
+	}
 }

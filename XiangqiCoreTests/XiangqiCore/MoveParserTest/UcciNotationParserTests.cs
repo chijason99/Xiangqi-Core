@@ -45,7 +45,7 @@ public static class UcciNotationParserTests
         XiangqiBuilder builder = new();
         
         XiangqiGame game = await builder
-                            .UseCustomFen(startingFen)
+                            .WithCustomFen(startingFen)
                             .BuildAsync();
 
         bool moveResult = await game.Move(moveNotation, MoveNotationType.Chinese);

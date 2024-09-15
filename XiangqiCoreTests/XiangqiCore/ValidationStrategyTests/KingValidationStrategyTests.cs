@@ -20,8 +20,8 @@ public static class ValidateMoveTests
         Coordinate kingCoordinate = new(5, 2);
 
         XiangqiGame game = await builder
-                            .UseDefaultConfiguration()
-                            .UseBoardConfig(config => config.AddPiece(PieceType.King, Side.Red, kingCoordinate))
+                            .WithDefaultConfiguration()
+                            .WithBoardConfig(config => config.AddPiece(PieceType.King, Side.Red, kingCoordinate))
                             .BuildAsync();
         // Act
         King king = (King)game.Board.GetPieceAtPosition(kingCoordinate);
@@ -46,8 +46,8 @@ public static class ValidateMoveTests
         Coordinate destination = new(column, row);
 
         XiangqiGame game = await builder
-                            .UseDefaultConfiguration()
-                            .UseBoardConfig(config => config.AddPiece(PieceType.King, Side.Red, kingCoordinate))
+                            .WithDefaultConfiguration()
+                            .WithBoardConfig(config => config.AddPiece(PieceType.King, Side.Red, kingCoordinate))
                             .BuildAsync();
 
         King king = (King)game.Board.GetPieceAtPosition(kingCoordinate);
@@ -66,7 +66,7 @@ public static class ValidateMoveTests
     {
         // Arrange
         XiangqiBuilder builder = new();
-        XiangqiGame game = await builder.UseCustomFen(fen).BuildAsync();
+        XiangqiGame game = await builder.WithCustomFen(fen).BuildAsync();
 
         Coordinate startingPoint = new(startingPointCol, startingPointRow);
         Coordinate destination = new (destinationCol, destinationRow);

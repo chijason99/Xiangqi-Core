@@ -37,7 +37,7 @@ public static class XiangqiGameTests
         XiangqiBuilder builder = new ();
 
         XiangqiGame game = await builder
-                            .UseCustomFen(testData.StartingFen)
+                            .WithCustomFen(testData.StartingFen)
                             .BuildAsync();
 
         bool expectedResult = testData.ExpectedResult;
@@ -59,7 +59,7 @@ public static class XiangqiGameTests
         XiangqiBuilder builder = new();
 
         XiangqiGame game = await builder
-                            .UseCustomFen(startingFen)
+                            .WithCustomFen(startingFen)
                             .BuildAsync();
 
         List<string> moves = GameRecordParser.Parse(gameRecord);
@@ -85,7 +85,7 @@ public static class XiangqiGameTests
         XiangqiBuilder builder = new();
             
         XiangqiGame game = await builder
-                            .UseCustomFen(startingFen)
+                            .WithCustomFen(startingFen)
                             .BuildAsync();
 
         List<string> moves = GameRecordParser.Parse(gameRecord);
@@ -125,7 +125,7 @@ public static class XiangqiGameTests
         DateTime competitionDate = new(year, month, day);
 
         XiangqiGame game = await builder
-                            .UseCustomFen(startingFen)       
+                            .WithCustomFen(startingFen)       
                             .WithRedPlayer(player =>
                             {
                                 player.Name = redPlayer;

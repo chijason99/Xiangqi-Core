@@ -20,8 +20,8 @@ public static class AdvisorValidationStrategyTests
         Coordinate advisorCoordinate = new(5, 2);
 
         XiangqiGame game =  await builder
-                            .UseDefaultConfiguration()
-                            .UseBoardConfig(config => config.AddPiece(PieceType.Advisor, Side.Red, advisorCoordinate))
+                            .WithDefaultConfiguration()
+                            .WithBoardConfig(config => config.AddPiece(PieceType.Advisor, Side.Red, advisorCoordinate))
                             .BuildAsync();
         // Act
         Advisor advisor = (Advisor)game.BoardPosition.GetPieceAtPosition(advisorCoordinate);
@@ -46,8 +46,8 @@ public static class AdvisorValidationStrategyTests
         Coordinate advisorCoordinate = new(5, 2);
 
         XiangqiGame game = await builder
-                            .UseDefaultConfiguration()
-                            .UseBoardConfig(config => config.AddPiece(PieceType.Advisor, Side.Red, advisorCoordinate))
+                            .WithDefaultConfiguration()
+                            .WithBoardConfig(config => config.AddPiece(PieceType.Advisor, Side.Red, advisorCoordinate))
                             .BuildAsync();
         // Act
         Advisor advisor = (Advisor)game.BoardPosition.GetPieceAtPosition(advisorCoordinate);
@@ -72,8 +72,8 @@ public static class AdvisorValidationStrategyTests
         Coordinate advisorCoordinate = new(5, 9);
 
         XiangqiGame game = await builder
-                            .UseDefaultConfiguration()
-                            .UseBoardConfig(config => config.AddPiece(PieceType.Advisor, Side.Black, advisorCoordinate))
+                            .WithDefaultConfiguration()
+                            .WithBoardConfig(config => config.AddPiece(PieceType.Advisor, Side.Black, advisorCoordinate))
                             .BuildAsync();
         // Act
         Advisor advisor = (Advisor)game.BoardPosition.GetPieceAtPosition(advisorCoordinate);
@@ -98,8 +98,8 @@ public static class AdvisorValidationStrategyTests
         Coordinate advisorCoordinate = new(5, 9);
 
         XiangqiGame game = await builder
-                            .UseDefaultConfiguration()
-                            .UseBoardConfig(config => config.AddPiece(PieceType.Advisor, Side.Red, advisorCoordinate))
+                            .WithDefaultConfiguration()
+                            .WithBoardConfig(config => config.AddPiece(PieceType.Advisor, Side.Red, advisorCoordinate))
                             .BuildAsync();
         // Act
         Advisor advisor = (Advisor)game.BoardPosition.GetPieceAtPosition(advisorCoordinate);
