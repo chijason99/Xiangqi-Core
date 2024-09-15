@@ -39,7 +39,7 @@ public static class UcciNotationParserTests
     [InlineData("3akab2/9/2n1b4/p3p2Cp/2p2P3/5N3/PcP1P3P/N4c3/9/2BAKAB2 w - - 1 17", "炮二進一", "H6H7")]
     [InlineData("3k1abC1/4a1N2/9/4N3p/2p2P3/P8/5c2P/1c2Bn3/5K3/3A1AB2 w - - 3 32", "帥四平五", "F1E1")]
     [InlineData("3k1abC1/4a1N2/9/4N3p/2p2P3/P8/4c3P/1c3n3/4K4/2BA1AB2 b - - 6 34", "馬6退5", "F2E4")]
-    public static void TranslateToUcciNotation_ShouldReturnCorrectUcciNotation_WhenGivenMoveObject(string startingFen, string moveNotation, string expectedResult)
+    public async static Task TranslateToUcciNotation_ShouldReturnCorrectUcciNotation_WhenGivenMoveObject(string startingFen, string moveNotation, string expectedResult)
 	{
 		// Arrange
         XiangqiBuilder builder = new();
@@ -48,7 +48,7 @@ public static class UcciNotationParserTests
                             .UseCustomFen(startingFen)
                             .Build();
 
-        bool moveResult = game.Move(moveNotation, MoveNotationType.Chinese);
+        bool moveResult = await game.Move(moveNotation, MoveNotationType.Chinese);
 
         moveResult.Should().BeTrue();
         game.MoveHistory.Count.Should().Be(1);

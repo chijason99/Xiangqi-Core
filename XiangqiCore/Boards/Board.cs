@@ -8,18 +8,19 @@ using XiangqiCore.Move.MoveObjects;
 using XiangqiCore.Pieces;
 
 namespace XiangqiCore.Boards;
+
 public class Board
 {
     private const string _emptyBoardFen = "9/9/9/9/9/9/9/9/9/9 w - - 0 0";
 
     public Board()
     {
-        Position = FenHelper.CreatePositionFromFen(_emptyBoardFen);
+        _position = FenHelper.CreatePositionFromFen(_emptyBoardFen);
     }
 
     public Board(string fenString)
     {
-        Position = FenHelper.CreatePositionFromFen(fenString);
+        _position = FenHelper.CreatePositionFromFen(fenString);
     }
 
     /// <summary>
@@ -51,7 +52,7 @@ public class Board
 
     public static int[] GetPalaceColumns() => [4, 5, 6];
 
-    public MoveHistoryObject MakeMove(Coordinate startingPosition, Coordinate destination, Side sideToMove)
+    public async Task<MoveHistoryObject> MakeMove(Coordinate startingPosition, Coordinate destination, Side sideToMove)
     {
         if (!_position.HasPieceAtPosition(startingPosition))
             throw new InvalidOperationException($"There must be a piece on the starting position {startingPosition}");
@@ -64,18 +65,18 @@ public class Board
         if (!pieceToMove.ValidateMove(_position, startingPosition, destination))
             throw new InvalidOperationException($"The proposed move from {startingPosition} to {destination} violates the game logic"); ;
 
-        MoveHistoryObject moveHistory = CreateMoveHistory(sideToMove, startingPosition, destination);
+        MoveHistoryObject moveHistory = await CreateMoveHistory(sideToMove, startingPosition, destination);
         _position.MakeMove(startingPosition, destination);
 
         return moveHistory;
     }
 
-    public MoveHistoryObject MakeMove(ParsedMoveObject moveObject, Side sideToMove)
+    public async Task<MoveHistoryObject> MakeMove(ParsedMoveObject moveObject, Side sideToMove)
     {
         Coordinate startingPosition = FindStartingPosition(moveObject, sideToMove);
         Coordinate destination = FindDestination(moveObject, startingPosition);
 
-        return MakeMove(startingPosition, destination, sideToMove);
+        return await MakeMove(startingPosition, destination, sideToMove);
     }
 
     private Coordinate FindStartingPosition(ParsedMoveObject moveObject, Side sideToMove)
@@ -101,7 +102,7 @@ public class Board
 			else if (moveObject.PieceType == typeof(Advisor) || moveObject.PieceType == typeof(Bishop))
             {
                 int pieceOrderIndex = moveObject.MoveDirection == MoveDirection.Forward ? 1 : 0;
-        
+
 				pieceToMove = piecesToMove[pieceOrderIndex];
 			}
             else
@@ -116,7 +117,7 @@ public class Board
         MethodInfo method = typeof(PieceExtension).GetMethod(nameof(PieceExtension.GetPiecesOfType));
         MethodInfo genericMethod = method.MakeGenericMethod(pieceType);
 
-        IEnumerable<Piece> allPiecesOfType = ((IEnumerable<Piece>)genericMethod.Invoke(obj: null, parameters: [Position, sideToMove]));
+        IEnumerable<Piece> allPiecesOfType = ((IEnumerable<Piece>)genericMethod.Invoke(obj: null, parameters: [_position, sideToMove]));
 
         if (!allPiecesOfType.Any()) throw new InvalidOperationException($"Cannot find any columns containing more than one {EnumHelper<Side>.GetDisplayName(sideToMove)} {pieceType.Name}");
 
@@ -159,7 +160,7 @@ public class Board
         if (moveObject.IsFromUcciNotation)
             return moveObject.Destination.Value;
 
-        Piece pieceToMove = Position.GetPieceAtPosition(startingCoordinate);
+        Piece pieceToMove = _position.GetPieceAtPosition(startingCoordinate);
 
         MoveDirection moveDirection = moveObject.MoveDirection;
 
@@ -171,12 +172,12 @@ public class Board
         return destination;
     }
 
-    private MoveHistoryObject CreateMoveHistory(Side sideToMove, Coordinate startingPosition, Coordinate destination)
+    private async Task<MoveHistoryObject> CreateMoveHistory(Side sideToMove, Coordinate startingPosition, Coordinate destination)
     {
-        Piece[,] positionAfterTheProposedMove = Position.SimulateMove(startingPosition, destination);
-        bool isCapture = Position.HasPieceAtPosition(destination);
+        Piece[,] positionAfterTheProposedMove = _position.SimulateMove(startingPosition, destination);
+        bool isCapture = _position.HasPieceAtPosition(destination);
         bool isCheck = positionAfterTheProposedMove.IsKingInCheck(sideToMove.GetOppositeSide());
-        bool isCheckmate = positionAfterTheProposedMove.IsSideInCheckmate(sideToMove);
+        bool isCheckmate = await positionAfterTheProposedMove.IsSideInCheckmate(sideToMove);
         Piece pieceMoved = GetPieceAtPosition(startingPosition);
 
         MoveHistoryObject moveHistory = new (

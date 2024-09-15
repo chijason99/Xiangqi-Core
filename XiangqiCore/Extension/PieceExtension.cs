@@ -262,7 +262,7 @@ public static class PieceExtension
                position.IsKingAttackedBy<Knight>(targetKing.Coordinate);
     }
 
-    public static bool IsSideInCheckmate(this Piece[,] position, Side sideToCheck)
+    public static async Task<bool> IsSideInCheckmate(this Piece[,] position, Side sideToCheck)
     {
         Piece[] piecesToCheck = position
                                     .Cast<Piece>()
@@ -271,7 +271,7 @@ public static class PieceExtension
 
         foreach (Piece piece in piecesToCheck)
         {
-            List<Coordinate> availableCoordinatesForPiece = piece.GeneratePotentialMoves(position);
+            List<Coordinate> availableCoordinatesForPiece = await piece.GeneratePotentialMoves(position);
 
             if (availableCoordinatesForPiece.Any())
                 return false;
@@ -279,7 +279,6 @@ public static class PieceExtension
 
         return true;
     }
-
     public static bool HasDuplicatePieceOnColumn(this Piece[,] position, int column, PieceType pieceType, Side side)
 		=> position.GetPiecesOnColumn(column).Count(x => x.PieceType == pieceType && x.Side == side) > 1;
 

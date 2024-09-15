@@ -22,7 +22,7 @@ public static class MoveParserTestHelper
     public const string MultiPawnFen3Black = "4k4/9/9/9/9/6p2/4p1p2/6p2/6p2/3K5 b - - 0 0";
 
 
-    public static void AssertMoveWithNotationMethod(MoveNotationMethodTestData testData)
+    public async static Task AssertMoveWithNotationMethod(MoveNotationMethodTestData testData)
     {
         // Arrange
         XiangqiBuilder builder = new();
@@ -36,7 +36,7 @@ public static class MoveParserTestHelper
         pieceToMove.PieceType.Should().NotBe(PieceType.None);
 
         // Act
-        bool moveResult = game.Move(testData.MoveNotation, testData.NotationType);
+        bool moveResult = await game.Move(testData.MoveNotation, testData.NotationType);
 
         // Assert
         moveResult.Should().Be(testData.ExpectedResult);

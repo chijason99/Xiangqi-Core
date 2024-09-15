@@ -356,7 +356,7 @@ public static class PieceExtensionTests
     [InlineData("2N6/4a4/3k5/9/9/9/9/9/9/4K4 b - - 19 10", Side.Black, false)]
     [InlineData("2N6/4a4/3k5/9/9/9/9/9/9/4K4 b - - 19 10", Side.Red, false)]
     [InlineData("2b2k3/C1N6/4c4/5P3/2n6/2B3B2/9/3A1A3/5K3/9 b - - 8 73", Side.Black, false)]
-    public static void IsSideInCheckamte_ShouldReturnTrue_WhenGivenCheckmateFen(string sampleFen, Side sideToCheck, bool expectedResult)
+    public async static Task IsSideInCheckamte_ShouldReturnTrue_WhenGivenCheckmateFen(string sampleFen, Side sideToCheck, bool expectedResult)
     {
         // Arrange
         XiangqiBuilder builder = new();
@@ -366,7 +366,7 @@ public static class PieceExtensionTests
                             .Build();
 
         // Act
-        bool actualResult = game.BoardPosition.IsSideInCheckmate(sideToCheck);
+        bool actualResult = await game.BoardPosition.IsSideInCheckmate(sideToCheck);
 
         // Assert
         actualResult.Should().Be(expectedResult);
