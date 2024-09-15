@@ -97,14 +97,24 @@ public class Board
 
 			if (piecesToMove.Count(p => p.Coordinate.Column == actualStartingColumn) == 1)
                 pieceToMove = piecesToMove.Single(p => p.Coordinate.Column == actualStartingColumn);
-			// Edge case for Advisor and Bishop, as they will not be using 前 or 後 to indicate the starting column
-            // when there are two of them in the same column
-			else if (moveObject.PieceType == typeof(Advisor) || moveObject.PieceType == typeof(Bishop))
+            // Edge case: in some notation, there are two pieces of the same type on the same column and the notation
+            // do not mark which piece is moving, but only one of them would be able to perform the move specified validly
+            else if (moveObject.PieceOrderIndex == ParsedMoveObject.UnknownPieceOrderIndex)
             {
-                int pieceOrderIndex = moveObject.MoveDirection == MoveDirection.Forward ? 1 : 0;
+                pieceToMove = piecesToMove.First(x =>
+                {
+                    try
+                    {
+						Coordinate guessedDestination = x.GetDestinationCoordinateFromNotation(moveObject.MoveDirection, moveObject.FourthCharacter);
 
-				pieceToMove = piecesToMove[pieceOrderIndex];
-			}
+						return x.ValidateMove(_position.DeepClone(), x.Coordinate, guessedDestination);
+					}
+                    catch (ArgumentOutOfRangeException ex)
+                    {
+                        return false;
+                    }
+				});
+            }
             else
 				pieceToMove = piecesToMove[moveObject.PieceOrderIndex];
 		}

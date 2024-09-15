@@ -1,6 +1,7 @@
 ﻿using System.Text.RegularExpressions;
 
 namespace XiangqiCore.Misc;
+
 public static partial class GameRecordParser
 {
     /// <summary>
