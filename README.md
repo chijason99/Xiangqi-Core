@@ -34,7 +34,7 @@ XiangqiBuilder builder = new ();
 XiangqiGame game = await builder.WithDefaultConfiguration().BuildAsync();
 	
 // Make a move
-game.MakeMove("炮二平五", MoveNotationType.Chinese);
+await game.MakeMoveAsync("炮二平五", MoveNotationType.Chinese);
 ```
 Refer to the tests or documentation below (In progress) for more detailed examples and usage instructions.
 
@@ -352,8 +352,457 @@ BoardConfig config = new ();
 config.AddRandomPiece(new Coordinate(column: 5, row: 5));
 ```
 
+### XiangqiGame
 
-Example:
+The `XiangqiGame` class is the main class that represents a game of Xiangqi. 
+It provides a set of APIs for managing game states, making moves, and retrieving game information.
+
+#### Public Methods
+
+##### `MoveAsync(string move, MoveNotationType notationType)`
+Makes a move in the game based on the provided move notation and notation type. Returns a `Task<bool>` representing if the move is made successfully or not.
+Currently, the library supports UCCI, Chinese and English move notations.
+
+```c#
+using XiangqiCore.Game;
+
+XiangqiBuilder builder = new ();
+
+XiangqiGame game = await builder.WithDefaultConfiguration().BuildAsync();
+
+await game.MakeMoveAsync("炮二平五", MoveNotationType.Chinese);
+await game.MakeMoveAsync("h8+7", MoveNotationType.English);
+```
+
+##### `MoveAsync(Coodrinate startingPosition, Coordinate destination)`
+Makes a move in the game based on the starting and destination coordinates. Returns a `Task<bool>` representing if the move is made successfully or not
+
+```c#
+using XiangqiCore.Game;
+
+XiangqiBuilder builder = new ();
+
+XiangqiGame game = await builder.WithDefaultConfiguration().BuildAsync();
+
+await game.MakeMoveAsync(new Coordinate(column: 5, row: 2), new Coordinate(column: 5, row: 3));
+```
+
+#### `ExportMoveHistory()`
+Exports the move history of the game as a string.
+
+```c#
+using XiangqiCore.Game;
+
+XiangqiBuilder builder = new ();
+
+XiangqiGame game = await builder.WithDefaultConfiguration().BuildAsync();
+
+await game.MakeMoveAsync("炮二平五", MoveNotationType.Chinese);
+await game.MakeMoveAsync("馬8進7", MoveNotationType.Chinese);
+await game.MakeMoveAsync("馬二進三", MoveNotationType.Chinese);
+await game.MakeMoveAsync("車9平8", MoveNotationType.Chinese);
+
+string moveHistory = game.ExportMoveHistory();
+
+Console.WriteLine(moveHistory);
+
+// Output:
+// 1. 炮二平五 馬8進7 
+// 2. 馬二進三 車9平8
+```
+
+#### `ExportGameAsPgnString()`
+Exports the game as a PGN string.
+
+```c#
+using XiangqiCore.Game;
+
+XiangqiBuilder builder = new ();
+
+XiangqiGame game = await builder
+	.WithRedPlayer(player => player.Name = "吕钦")
+	.WithBlackPlayer(player => player.Name = "王嘉良")
+	.WithCompetition(competition => {
+		competition.Event = "全国象棋个人锦标赛";
+		competition.Date = "1987-11-30";
+	})
+	.WithMoveRecord(@"
+	1. 炮二平五  馬８進７    2. 馬二進三  車９平８
+  3. 馬八進七  卒３進１    4. 炮八平九  馬２進３
+  5. 車九平八  車１平２    6. 車一進一  象７進５
+  7. 車一平四  炮２進４    8. 車八進一  士６進５
+  9. 車八平六  炮２進１   10. 車四進五  卒７進１
+ 11. 車四平三  馬７退６   12. 車三平二  車８進１
+ 13. 兵五進一  炮８平７   14. 車二平三  車８進４
+ 15. 馬三進五  車８平６   16. 車六進五  炮２退１
+ 17. 炮五平二  車６平８   18. 馬五退四  車２進５
+ 19. 仕六進五  車２平５   20. 車六平八  車５平６
+ 21. 車八退三  車６進３   22. 炮二平四  車６平７
+ 23. 兵七進一  卒７進１   24. 兵七進一  車７退２
+ 25. 馬七進六  車７平２   26. 馬六退八  卒５進１
+ 27. 炮四進六  車８退４   28. 車三進一  車８平６
+ 29. 車三退一  車６進４   30. 兵七進一  馬３退２
+ 31. 馬八退六  卒５進１   32. 馬六進七  象５進３
+ 33. 炮九進四  馬６進５   34. 車三平一  卒５平４
+ 35. 馬七退八  車６進１   36. 馬八進九  車６平２
+ 37. 相三進五  象３進１   38. 兵七平六  馬２進３
+ 39. 炮九平八  車２退１   40. 車一進三  士５退６
+ 41. 兵六進一")
+	.WithGameResult(GameResult.RedWin)
+	.BuildAsync();
+
+string pgnString = game.ExportGameAsPgnString();
+
+Console.WriteLine(pgnString);
+
+// Output:
+// [Game "Chinese Chess"]
+// [Event "全国象棋个人锦标赛"]
+// [Site "Unknown"]
+// [Date "1987.11.30"]
+// [Red "吕钦"]
+// [RedTeam "Unknown"]
+// [Black "王嘉良"]
+// [BlackTeam "Unknown"]
+// [Result "1-0"]
+// [FEN "rnbakabnr/9/1c5c1/p1p1p1p1p/9/9/P1P1P1P1P/1C5C1/9/RNBAKABNR w - - 0 1"]
+// 1. 炮二平五  馬８進７
+// 2. 馬二進三  車９平８
+// 3. 馬八進七  卒３進１
+// 4. 炮八平九  馬２進３
+// 5. 車九平八  車１平２
+// 6. 車一進一  象７進５
+// 7. 車一平四  炮２進４
+// 8. 車八進一  士６進５
+// 9. 車八平六  炮２進１
+// 10. 車四進五  卒７進１
+// 11. 車四平三  馬７退６
+// 12. 車三平二  車８進１
+// 13. 兵五進一  炮８平７
+// 14. 車二平三  車８進４
+// 15. 馬三進五  車８平６
+// 16. 車六進五  炮２退１
+// 17. 炮五平二  車６平８
+// 18. 馬五退四  車２進５
+// 19. 仕六進五  車２平５
+// 20. 車六平八  車５平６
+// 21. 車八退三  車６進３
+// 22. 炮二平四  車６平７
+// 23. 兵七進一  卒７進１
+// 24. 兵七進一  車７退２
+// 25. 馬七進六  車７平２
+// 26. 馬六退八  卒５進１
+// 27. 炮四進六  車８退４
+// 28. 車三進一  車８平６
+// 29. 車三退一  車６進４
+// 30. 兵七進一  馬３退２
+// 31. 馬八退六  卒５進１
+// 32. 馬六進七  象５進３
+// 33. 炮九進四  馬６進５
+// 34. 車三平一  卒５平４
+// 35. 馬七退八  車６進１
+// 36. 馬八進九  車６平２
+// 37. 相三進五  象３進１
+// 38. 兵七平六  馬２進３
+// 39. 炮九平八  車２退１
+// 40. 車一進三  士５退６
+// 41. 兵六進一
+```
+
+#### `ExportGameAsPgnFileAsync(string filePath)`
+Exports the game as a PGN file to the specified filePath.
+
+```c#
+using XiangqiCore.Game;
+
+XiangqiBuilder builder = new ();
+
+XiangqiGame game = await builder
+	.WithRedPlayer(player => player.Name = "吕钦")
+	.WithBlackPlayer(player => player.Name = "王嘉良")
+	.WithCompetition(competition => {
+		competition.Event = "全国象棋个人锦标赛";
+		competition.Date = "1987-11-30";
+	})
+	.BuilAsync();
+
+await game.MakeMoveAsync("炮二平五", MoveNotationType.Chinese);
+await game.MakeMoveAsync("馬8進7", MoveNotationType.Chinese);
+await game.MakeMoveAsync("馬二進三", MoveNotationType.Chinese);
+await game.MakeMoveAsync("車9平8", MoveNotationType.Chinese);
+
+await game.ExportGameAsPgnFileAsync("game.pgn");
+```
+
+### Public Properties
+
+#### `CurrentFen`
+Gets the current FEN of the game.
+
+```c#
+using XiangqiCore.Game;
+
+XiangqiBuilder builder = new ();
+
+XiangqiGame game = await builder.WithDefaultConfiguration().BuildAsync();
+
+await game.MakeMoveAsync("炮二平五", MoveNotationType.Chinese);
+await game.MakeMoveAsync("馬8進7", MoveNotationType.Chinese);
+await game.MakeMoveAsync("馬二進三", MoveNotationType.Chinese);
+await game.MakeMoveAsync("車9平8", MoveNotationType.Chinese);
+
+string currentFen = game.CurrentFen;
+
+Console.WriteLine(currentFen);
+
+// Output:
+// rnbakabr1/9/1c4nc1/p1p1p1p1p/9/9/P1P1P1P1P/1C2C1N2/9/RNBAKAB1R w - - 4 2
+```
+
+#### `BoardPosition`
+Gets the current board position of the game. It returns a deep copy of the 2D array of `Piece` objects representing the board state.
+
+```c#
+using XiangqiCore.Game;
+using XiangqiCore.Extension;
+
+XiangqiBuilder builder = new ();
+
+XiangqiGame game = await builder.WithDefaultConfiguration().BuildAsync();
+
+await game.MakeMoveAsync("炮二平五", MoveNotationType.Chinese);
+
+Piece[,] boardPosition = game.BoardPosition;
+
+Console.WriteLine(boardPosition.GetPieceAtPosition(new Coordinate(column: 5, row: 3))); 
+
+// Output: 
+// XiangqiCore.Pieces.Cannon
+```
+
+#### `MoveHistory`
+Gets the move history of the game as a list of `MoveHistoryObject`.
+
+```c#
+using XiangqiCore.Game;
+using XiangqiCore.Move.MoveObjects;
+
+XiangqiBuilder builder = new ();
+
+XiangqiGame game = await builder.WithDefaultConfiguration().BuildAsync();
+
+await game.MakeMoveAsync("炮二平五", MoveNotationType.Chinese);
+
+await game.MakeMoveAsync("炮二平五", MoveNotationType.Chinese);
+await game.MakeMoveAsync("馬8進7", MoveNotationType.Chinese);
+await game.MakeMoveAsync("馬二進三", MoveNotationType.Chinese);
+await game.MakeMoveAsync("車9平8", MoveNotationType.Chinese);
+
+
+IReadOnlyList<MoveHistoryObject> moveHistory = game.MoveHistory;
+
+foreach (MoveHistoryObject move in moveHistory)
+	Console.WriteLine(move.MoveNotation);
+
+// Output:
+// 炮二平五
+// 馬8進7
+// 馬二進三
+// 車9平8
+
+```
+
+#### `GameName`
+Gets the name of the game. This property can be set in the `XiangqiBuilder` using the `WithGameName` method.
+The default value is {RedPlayerName}{GameResult}{BlackPlayerName}.
+
+```c#
+using XiangqiCore.Game;
+
+XiangqiBuilder builder = new ();
+
+XiangqiGame game1 = await builder
+	.WithRedPlayer(player => player.Name = "吕钦")
+	.WithBlackPlayer(player => player.Name = "王嘉良")
+	.WithGameResult(GameResult.RedWin)
+	.BuildAsync();
+
+XiangqiGame game2 = await builder
+	.WithRedPlayer(player => player.Name = "王天一")
+	.WithBlackPlayer(player => player.Name = "鄭惟恫")
+	.WithGameResult(GameResult.Draw)
+	.BuildAsync();
+
+XiangqiGame game3 = await builder
+	.WithRedPlayer(player => player.Name = "胡榮華")
+	.WithBlackPlayer(player => player.Name = "楊官璘")
+	.WithGameResult(GameResult.BlackWin)
+	.BuildAsync();
+
+XiangqiGame game4 = await builder
+	.WithRedPlayer(player => player.Name = "胡榮華")
+	.WithBlackPlayer(player => player.Name = "楊官璘")
+	.WithGameResult(GameResult.BlackWin)
+	.WithGameName("1980全國個人賽 胡榮華先负楊官璘")
+	.BuildAsync();
+
+string gameName1 = game1.GameName;
+string gameName2 = game2.GameName;
+string gameName3 = game3.GameName;
+string gameName4 = game3.GameName;
+
+Console.WriteLine(gameName1);
+Console.WriteLine(gameName2);
+Console.WriteLine(gameName3);
+Console.WriteLine(gameName4);
+
+// Output: 
+// 吕钦先勝王嘉良
+// 王天一先和鄭惟恫
+// 胡榮華先負楊官璘
+// 1980全國個人賽 胡榮華先负楊官璘
+```
+
+#### `GameResult`
+Gets the result of the game. This property can be set in the `XiangqiBuilder` using the `WithGameResult` method.
+The default value is GameResult.Unknown.
+
+```c#
+using XiangqiCore.Game;
+
+XiangqiBuilder builder = new ();
+
+XiangqiGame game = await builder
+	.WithDefaultConfiguration()
+	.WithGameResult(GameResult.RedWin)
+	.BuildAsync();
+
+GameResult gameResult = game.GameResult;
+
+Console.WriteLine(gameResult);
+
+// Output:
+// RedWin
+```
+
+#### `Competition`
+Gets the competition information of the game. This property can be set in the `XiangqiBuilder` using the `WithCompetition` method.
+
+```c#
+using XiangqiCore.Game;
+
+XiangqiBuilder builder = new ();
+
+XiangqiGame game = await builder
+	.WithDefaultConfiguration()
+	.WithCompetition(competition => {
+		competition.WithName("全国象棋个人锦标赛");
+		competition.WithGameDate(DateTime.Parse"1987-11-30");
+	})
+	.BuildAsync();
+
+Competition competition = game.Competition;
+
+Console.WriteLine(competition.Name);
+Console.WriteLine(competition.GameDate);
+
+// Output:
+// 全国象棋个人锦标赛
+// 30/11/1987 00:00:00
+```
+
+#### `RedPlayer`
+Gets the red player information of the game. This property can be set in the `XiangqiBuilder` using the `WithRedPlayer` method.
+
+```c#
+using XiangqiCore.Game;
+
+XiangqiBuilder builder = new ();
+
+XiangqiGame game = await builder
+	.WithDefaultConfiguration()
+	.WithRedPlayer(player => {
+		player.Name = "吕钦";
+		player.Team = "广东";
+	})
+	.BuildAsync();
+
+Player redPlayer = game.RedPlayer;
+
+Console.WriteLine(redPlayer.Name);
+Console.WriteLine(redPlayer.Team);
+
+// Output:
+// 吕钦
+// 广东
+```
+
+#### `BlackPlayer`
+Gets the black player information of the game. This property can be set in the `XiangqiBuilder` using the `WithBlackPlayer` method.
+
+```c#
+using XiangqiCore.Game;
+
+XiangqiBuilder builder = new ();
+
+XiangqiGame game = await builder
+	.WithDefaultConfiguration()
+	.WithBlackPlayer(player => {
+		player.Name = "王嘉良";
+		player.Team = "黑龍江";
+	})
+	.BuildAsync();
+
+Player blackPlayer = game.BlackPlayer;
+
+Console.WriteLine(blackPlayer.Name);
+Console.WriteLine(blackPlayer.Team);
+
+// Output:
+// 王嘉良
+// 黑龍江
+```
+
+#### `SideToMove`
+Gets the side to move in the game. The default value is Side.Red.
+
+```c#
+using XiangqiCore.Game;
+
+XiangqiBuilder builder = new ();
+
+XiangqiGame game = await builder.WithDefaultConfiguration().BuildAsync();
+
+Side sideToMove = game.SideToMove;
+
+Console.WriteLine(sideToMove);
+
+// Output:
+// Red
+```
+
+### `Coordinate`
+A struct representing a coordinate on the Xiangqi board. It has two properties, `Column` and `Row`, representing the column and row of the coordinate.
+Below is a simple diagram of how the coodrinate in XiangqiCore is represented.
+The maximum column and row are 9 and 10, respectively.
+
+``` Bash
+   1 2 3 4 5 6 7 8 9
+10 ┌─┬─┬─┬─┬─┬─┬─┬─┐
+9  │ │ │ │ │ │ │ │─┤
+8  ├─┼─┼─┼─┼─┼─┼─┼─┤
+7  │ │ │ │ │ │ │ │─┤
+6  ├─┼─┼─┼─┼─┼─┼─┼─┤
+5  │ │ │ │ │ │ │ │─┤
+4  ├─┼─┼─┼─┼─┼─┼─┼─┤
+3  │ │ │ │ │ │ │ │─┤
+2  ├─┼─┼─┼─┼─┼─┼─┼─┤
+1  │ │ │ │ │ │ │ │─┤
+   └─┴─┴─┴─┴─┴─┴─┴─┘
+```
+
+
+
 ## Contributing
 
 Contributions to Xiangqi-Core are welcome! If you have suggestions for improvements or bug fixes, please feel free to fork the repository and submit a pull request.
