@@ -1,4 +1,5 @@
 ﻿using System.Text;
+using XiangqiCore.Attributes;
 using XiangqiCore.Boards;
 using XiangqiCore.Exceptions;
 using XiangqiCore.Extension;
@@ -245,6 +246,7 @@ public class XiangqiGame
 	/// </summary>
 	/// <param name="targetNotationType">The target notation type.</param>
 	/// <returns>The move history in the specified notation type.</returns>
+	[BetaMethod("Currently only supports converting MoveNotationType from Chinese/English to UCCI. The translation would not work for Chinese -> English or English -> Chinese")]
 	public string ExportMoveHistory(MoveNotationType targetNotationType = MoveNotationType.Chinese)
 	{
 		List<string> movesOfEachRound = [];

@@ -31,10 +31,10 @@ using XiangqiCore.Game;
 
 // Create a new game instance with the help of the XiangqiBuilder
 XiangqiBuilder builder = new (); 
-XiangqiGame game = await builder.WithDefaultConfiguration().BuildAsync();
+XiangqiGame game = builder.WithDefaultConfiguration().Build();
 	
 // Make a move
-await game.MakeMoveAsync("炮二平五", MoveNotationType.Chinese);
+game.MakeMove("炮二平五", MoveNotationType.Chinese);
 ```
 Refer to the tests or documentation below (In progress) for more detailed examples and usage instructions.
 
@@ -57,14 +57,14 @@ Default Configuration:
 - Game result: Unknown
 - Competition: Unknown
 
-If the above fields are not set when calling the ``BuildAsync`` method, these default values will be used by default.
+If the above fields are not set when calling the ``Build`` method, these default values will be used by default.
 
 ```c#
 using XiangqiCore.Game;
 
 XiangqiBuilder builder = new ();
 
-XiangqiGame game = await builder.WithDefaultConfiguration().BuildAsync();
+XiangqiGame game = builder.WithDefaultConfiguration().Build();
 ```
 
 ##### `WithStartingFen(string customFen)`
@@ -75,9 +75,9 @@ using XiangqiCore.Game;
 
 XiangqiBuilder builder = new (); 
 
-XiangqiGame game = await builder
+XiangqiGame game =  builder
 	.WithStartingFen("1r2kabr1/4a4/1c2b1n2/p3p1C1p/2pn2P2/9/P1P1P2cP/N3C1N2/2R6/2BAKABR1 b - - 2 10")
-	.BuildAsync();
+	.Build();
 ```
 
 ##### `WithEmptyBoard()`
@@ -89,13 +89,13 @@ using XiangqiCore.Game;
 
 XiangqiBuilder builder = new (); 
 
-XiangqiGame game = await builder
+XiangqiGame game = builder
 	.WithEmptyBoard()
-	.BuildAsync();
+	.Build();
 ```
 
-##### `BuildAsync()`
-Builds an instance of the Xiangqi game asynchronously.
+##### `Build()`
+Builds an instance of the Xiangqi game hronously.
 
 ##### `WithRedPlayer(Action<Player> action)`
 Sets the configuration for the red player. If the Name or Team is not set for the player, the default value will be "Unknown".
@@ -105,13 +105,13 @@ using XiangqiCore.Game;
 
 XiangqiBuilder builder = new (); 
 
-XiangqiGame game = await builder
+XiangqiGame game =  builder
 	.WithDefaultConfiguration()
 	.WithRedPlayer(player => { 
 		player.Name = "許銀川";
 		plyaer.Team = "廣東":
 	})
-	.BuildAsync();
+	.Build();
 ```
 
 ##### `WithBlackPlayer(Action<Player> action)`
@@ -122,10 +122,10 @@ using XiangqiCore.Game;
 
 XiangqiBuilder builder = new (); 
 
-XiangqiGame game = await builder
+XiangqiGame game =  builder
 	.WithDefaultConfiguration()
 	.WithBlackPlayer(player => player.Name = "趙國榮")
-	.BuildAsync();
+	.Build();
 ```
 
 ##### `WithGameResult(GameResult gameResult)`
@@ -136,10 +136,10 @@ using XiangqiCore.Game;
 
 XiangqiBuilder builder = new ();
 
-XiangqiGame game = await builder
+XiangqiGame game =  builder
 	.WithDefaultConfiguration()
 	.WithGameResult(GameResult.RedWin)
-	.BuildAsync();
+	.Build();
 ```
 
 ##### `WithCompetition(Action<CompetitionBuilder> action)`
@@ -151,14 +151,14 @@ using XiangqiCore.Game;
 
 XiangqiBuilder builder = new ();
 
-XiangqiGame game = await builder
+XiangqiGame game =  builder
 	.WithDefaultConfiguration()
 	.WithCompetition(competition => {
 		competition.Event = "World Xiangqi Championship";
 		competition.Site = "Beijing, China";
 		competition.Date = "2022-10-01";
 	})
-	.BuildAsync();
+	.Build();
 ```
 
 ##### `WithBoardConfig(BoardConfig config)`
@@ -178,10 +178,10 @@ config.AddPiece(new Coordinate(column: 5, row: 5), PieceType.Rook, PieceColor.Re
 config.AddPiece(new Coordinate(column: 5, row: 1), PieceType.King, PieceColor.Red);
 config.AddPiece(new Coordinate(column: 4, row: 10), PieceType.King, PieceColor.Black);
 
-XiangqiGame game = await builder
+XiangqiGame game =  builder
 	.WithEmptyBoard()
 	.WithBoardConfig(config)
-	.BuildAsync();
+	.Build();
 ```
 
 ##### `WithBoardConfig(Action<BoardConfig> action)`
@@ -193,14 +193,14 @@ using XiangqiCore.Boards;
 
 XiangqiBuilder builder = new ();
 
-XiangqiGame game = await builder
+XiangqiGame game =  builder
 	.WithEmptyBoard()
 	.WithBoardConfig(config => {
 		config.AddPiece(new Coordinate(column: 5, row: 5), PieceType.Rook, PieceColor.Red);
 		config.AddPiece(new Coordinate(column: 5, row: 1), PieceType.King, PieceColor.Red);
 		config.AddPiece(new Coordinate(column: 4, row: 10), PieceType.King, PieceColor.Black);
 	})
-	.BuildAsync();
+	.Build();
 ```
 
 ##### `WithMoveRecord(string moveRecord)`
@@ -211,10 +211,10 @@ using XiangqiCore.Game;
 
 XiangqiBuilder builder = new ();
 
-XiangqiGame game = await builder
+XiangqiGame game =  builder
 	.WithDefaultConfiguration()
 	.WithMoveRecord("1. 炮二平五 炮8平5")
-	.BuildAsync();
+	.Build();
 ```
 
 ##### `WithGameName(string gameName)`
@@ -225,10 +225,10 @@ using XiangqiCore.Game;
 
 XiangqiBuilder builder = new ();
 
-XiangqiGame game = await builder
+XiangqiGame game =  builder
 	.WithDefaultConfiguration()
 	.WithGameName("呂欽專集 第一局 ")
-	.BuildAsync();
+	.Build();
 ```
 
 ##### `WithDpxqGameRecord(string dpxqGameRecord)`
@@ -240,7 +240,7 @@ using XiangqiCore.Game;
 
 XiangqiBuilder builder = new ();
 
-XiangqiGame game = await builder
+XiangqiGame game =  builder
 	.WithDpxqGameRecord(@"标题: 杭州环境集团队 王天一 和 四川成都懿锦金弈队 武俊强
 分类: 全国象棋甲级联赛
 赛事: 2023年腾讯棋牌天天象棋全国象棋甲级联赛
@@ -317,7 +317,7 @@ XiangqiGame game = await builder
 　　42. 相九退七
  
 棋谱由 http://www.dpxq.com/ 生成")
-	.BuildAsync();
+	.Build();
 ```
  
 ### `BoardConfig`
@@ -359,8 +359,8 @@ It provides a set of APIs for managing game states, making moves, and retrieving
 
 #### Public Methods
 
-##### `MoveAsync(string move, MoveNotationType notationType)`
-Makes a move in the game based on the provided move notation and notation type. Returns a `Task<bool>` representing if the move is made successfully or not.
+##### `MakeMove(string move, MoveNotationType notationType)`
+Makes a move in the game based on the provided move notation and notation type. Returns a boolean representing if the move is made successfully or not.
 Currently, the library supports UCCI, Chinese and English move notations.
 
 ```c#
@@ -368,23 +368,23 @@ using XiangqiCore.Game;
 
 XiangqiBuilder builder = new ();
 
-XiangqiGame game = await builder.WithDefaultConfiguration().BuildAsync();
+XiangqiGame game =  builder.WithDefaultConfiguration().Build();
 
-await game.MakeMoveAsync("炮二平五", MoveNotationType.Chinese);
-await game.MakeMoveAsync("h8+7", MoveNotationType.English);
+ game.MakeMove("炮二平五", MoveNotationType.Chinese);
+ game.MakeMove("h8+7", MoveNotationType.English);
 ```
 
-##### `MoveAsync(Coodrinate startingPosition, Coordinate destination)`
-Makes a move in the game based on the starting and destination coordinates. Returns a `Task<bool>` representing if the move is made successfully or not
+##### `MakeMove(Coodrinate startingPosition, Coordinate destination)`
+Makes a move in the game based on the starting and destination coordinates. Returns a boolean representing if the move is made successfully or not
 
 ```c#
 using XiangqiCore.Game;
 
 XiangqiBuilder builder = new ();
 
-XiangqiGame game = await builder.WithDefaultConfiguration().BuildAsync();
+XiangqiGame game =  builder.WithDefaultConfiguration().Build();
 
-await game.MakeMoveAsync(new Coordinate(column: 5, row: 2), new Coordinate(column: 5, row: 3));
+ game.MakeMove(new Coordinate(column: 5, row: 2), new Coordinate(column: 5, row: 3));
 ```
 
 #### `ExportMoveHistory()`
@@ -395,12 +395,12 @@ using XiangqiCore.Game;
 
 XiangqiBuilder builder = new ();
 
-XiangqiGame game = await builder.WithDefaultConfiguration().BuildAsync();
+XiangqiGame game =  builder.WithDefaultConfiguration().Build();
 
-await game.MakeMoveAsync("炮二平五", MoveNotationType.Chinese);
-await game.MakeMoveAsync("馬8進7", MoveNotationType.Chinese);
-await game.MakeMoveAsync("馬二進三", MoveNotationType.Chinese);
-await game.MakeMoveAsync("車9平8", MoveNotationType.Chinese);
+ game.MakeMove("炮二平五", MoveNotationType.Chinese);
+ game.MakeMove("馬8進7", MoveNotationType.Chinese);
+ game.MakeMove("馬二進三", MoveNotationType.Chinese);
+ game.MakeMove("車9平8", MoveNotationType.Chinese);
 
 string moveHistory = game.ExportMoveHistory();
 
@@ -419,7 +419,7 @@ using XiangqiCore.Game;
 
 XiangqiBuilder builder = new ();
 
-XiangqiGame game = await builder
+XiangqiGame game =  builder
 	.WithRedPlayer(player => player.Name = "吕钦")
 	.WithBlackPlayer(player => player.Name = "王嘉良")
 	.WithCompetition(competition => {
@@ -449,7 +449,7 @@ XiangqiGame game = await builder
  39. 炮九平八  車２退１   40. 車一進三  士５退６
  41. 兵六進一")
 	.WithGameResult(GameResult.RedWin)
-	.BuildAsync();
+	.Build();
 
 string pgnString = game.ExportGameAsPgnString();
 
@@ -509,7 +509,7 @@ Console.WriteLine(pgnString);
 // 41. 兵六進一
 ```
 
-#### `ExportGameAsPgnFileAsync(string filePath)`
+#### `ExportGameAsPgnFile(string filePath)`
 Exports the game as a PGN file to the specified filePath.
 
 ```c#
@@ -517,21 +517,21 @@ using XiangqiCore.Game;
 
 XiangqiBuilder builder = new ();
 
-XiangqiGame game = await builder
+XiangqiGame game =  builder
 	.WithRedPlayer(player => player.Name = "吕钦")
 	.WithBlackPlayer(player => player.Name = "王嘉良")
 	.WithCompetition(competition => {
 		competition.Event = "全国象棋个人锦标赛";
 		competition.Date = "1987-11-30";
 	})
-	.BuilAsync();
+	.Buil();
 
-await game.MakeMoveAsync("炮二平五", MoveNotationType.Chinese);
-await game.MakeMoveAsync("馬8進7", MoveNotationType.Chinese);
-await game.MakeMoveAsync("馬二進三", MoveNotationType.Chinese);
-await game.MakeMoveAsync("車9平8", MoveNotationType.Chinese);
+ game.MakeMove("炮二平五", MoveNotationType.Chinese);
+ game.MakeMove("馬8進7", MoveNotationType.Chinese);
+ game.MakeMove("馬二進三", MoveNotationType.Chinese);
+ game.MakeMove("車9平8", MoveNotationType.Chinese);
 
-await game.ExportGameAsPgnFileAsync("game.pgn");
+ game.ExportGameAsPgnFile("game.pgn");
 ```
 
 ### Public Properties
@@ -544,12 +544,12 @@ using XiangqiCore.Game;
 
 XiangqiBuilder builder = new ();
 
-XiangqiGame game = await builder.WithDefaultConfiguration().BuildAsync();
+XiangqiGame game =  builder.WithDefaultConfiguration().Build();
 
-await game.MakeMoveAsync("炮二平五", MoveNotationType.Chinese);
-await game.MakeMoveAsync("馬8進7", MoveNotationType.Chinese);
-await game.MakeMoveAsync("馬二進三", MoveNotationType.Chinese);
-await game.MakeMoveAsync("車9平8", MoveNotationType.Chinese);
+ game.MakeMove("炮二平五", MoveNotationType.Chinese);
+ game.MakeMove("馬8進7", MoveNotationType.Chinese);
+ game.MakeMove("馬二進三", MoveNotationType.Chinese);
+ game.MakeMove("車9平8", MoveNotationType.Chinese);
 
 string currentFen = game.CurrentFen;
 
@@ -568,9 +568,9 @@ using XiangqiCore.Extension;
 
 XiangqiBuilder builder = new ();
 
-XiangqiGame game = await builder.WithDefaultConfiguration().BuildAsync();
+XiangqiGame game =  builder.WithDefaultConfiguration().Build();
 
-await game.MakeMoveAsync("炮二平五", MoveNotationType.Chinese);
+ game.MakeMove("炮二平五", MoveNotationType.Chinese);
 
 Piece[,] boardPosition = game.BoardPosition;
 
@@ -589,14 +589,14 @@ using XiangqiCore.Move.MoveObjects;
 
 XiangqiBuilder builder = new ();
 
-XiangqiGame game = await builder.WithDefaultConfiguration().BuildAsync();
+XiangqiGame game =  builder.WithDefaultConfiguration().Build();
 
-await game.MakeMoveAsync("炮二平五", MoveNotationType.Chinese);
+ game.MakeMove("炮二平五", MoveNotationType.Chinese);
 
-await game.MakeMoveAsync("炮二平五", MoveNotationType.Chinese);
-await game.MakeMoveAsync("馬8進7", MoveNotationType.Chinese);
-await game.MakeMoveAsync("馬二進三", MoveNotationType.Chinese);
-await game.MakeMoveAsync("車9平8", MoveNotationType.Chinese);
+ game.MakeMove("炮二平五", MoveNotationType.Chinese);
+ game.MakeMove("馬8進7", MoveNotationType.Chinese);
+ game.MakeMove("馬二進三", MoveNotationType.Chinese);
+ game.MakeMove("車9平8", MoveNotationType.Chinese);
 
 
 IReadOnlyList<MoveHistoryObject> moveHistory = game.MoveHistory;
@@ -621,30 +621,30 @@ using XiangqiCore.Game;
 
 XiangqiBuilder builder = new ();
 
-XiangqiGame game1 = await builder
+XiangqiGame game1 =  builder
 	.WithRedPlayer(player => player.Name = "吕钦")
 	.WithBlackPlayer(player => player.Name = "王嘉良")
 	.WithGameResult(GameResult.RedWin)
-	.BuildAsync();
+	.Build();
 
-XiangqiGame game2 = await builder
+XiangqiGame game2 =  builder
 	.WithRedPlayer(player => player.Name = "王天一")
 	.WithBlackPlayer(player => player.Name = "鄭惟恫")
 	.WithGameResult(GameResult.Draw)
-	.BuildAsync();
+	.Build();
 
-XiangqiGame game3 = await builder
+XiangqiGame game3 =  builder
 	.WithRedPlayer(player => player.Name = "胡榮華")
 	.WithBlackPlayer(player => player.Name = "楊官璘")
 	.WithGameResult(GameResult.BlackWin)
-	.BuildAsync();
+	.Build();
 
-XiangqiGame game4 = await builder
+XiangqiGame game4 =  builder
 	.WithRedPlayer(player => player.Name = "胡榮華")
 	.WithBlackPlayer(player => player.Name = "楊官璘")
 	.WithGameResult(GameResult.BlackWin)
 	.WithGameName("1980全國個人賽 胡榮華先负楊官璘")
-	.BuildAsync();
+	.Build();
 
 string gameName1 = game1.GameName;
 string gameName2 = game2.GameName;
@@ -672,10 +672,10 @@ using XiangqiCore.Game;
 
 XiangqiBuilder builder = new ();
 
-XiangqiGame game = await builder
+XiangqiGame game =  builder
 	.WithDefaultConfiguration()
 	.WithGameResult(GameResult.RedWin)
-	.BuildAsync();
+	.Build();
 
 GameResult gameResult = game.GameResult;
 
@@ -693,13 +693,13 @@ using XiangqiCore.Game;
 
 XiangqiBuilder builder = new ();
 
-XiangqiGame game = await builder
+XiangqiGame game =  builder
 	.WithDefaultConfiguration()
 	.WithCompetition(competition => {
 		competition.WithName("全国象棋个人锦标赛");
 		competition.WithGameDate(DateTime.Parse"1987-11-30");
 	})
-	.BuildAsync();
+	.Build();
 
 Competition competition = game.Competition;
 
@@ -719,13 +719,13 @@ using XiangqiCore.Game;
 
 XiangqiBuilder builder = new ();
 
-XiangqiGame game = await builder
+XiangqiGame game =  builder
 	.WithDefaultConfiguration()
 	.WithRedPlayer(player => {
 		player.Name = "吕钦";
 		player.Team = "广东";
 	})
-	.BuildAsync();
+	.Build();
 
 Player redPlayer = game.RedPlayer;
 
@@ -745,13 +745,13 @@ using XiangqiCore.Game;
 
 XiangqiBuilder builder = new ();
 
-XiangqiGame game = await builder
+XiangqiGame game =  builder
 	.WithDefaultConfiguration()
 	.WithBlackPlayer(player => {
 		player.Name = "王嘉良";
 		player.Team = "黑龍江";
 	})
-	.BuildAsync();
+	.Build();
 
 Player blackPlayer = game.BlackPlayer;
 
@@ -771,7 +771,7 @@ using XiangqiCore.Game;
 
 XiangqiBuilder builder = new ();
 
-XiangqiGame game = await builder.WithDefaultConfiguration().BuildAsync();
+XiangqiGame game =  builder.WithDefaultConfiguration().Build();
 
 Side sideToMove = game.SideToMove;
 
@@ -805,17 +805,18 @@ The maximum column and row are 9 and 10, respectively.
 
 ## Release Notes
 
-Version 2.0.0
+Version 1.2.0
 
 Features:
 - Rename the APIs in `XiangqiBuilder` class to prefix with `With`.
-- Rename the `Build` Method in `XiangqiBuilder` class to `BuildAsync` and make it asynchronous.
-- Rename the `Move` Method in `XiangqiGame` class to `MakeMoveAsync` and make it asynchronous to improve performance.
+- Improve the performance of the process for checking for checkmates.
 - Add the `WithDpxqGameRecord` method to import a game from dpxq.com. (Beta)
-- Add the `ExportGameAsPgnFileAsync` method to export the game as a PGN file.
+- Add the `ExportGameAsPgnFile` method to export the game as a PGN file.
+- `ExportMoveHistory` can now accept the MoveNotationType parameter to export the move history in the specified notation. Currently it only supports the transaltion of Chinese/English to UCCI notation. The other translation would be added in the future.
+- The `MakeMove` method now can also accepts Simplified Chinese notation.
 
 Bug Fixes:
-- Fix the issue where the MakeMoveAsync method does not handle the edge case that, in some notations, there are two pieces of the same type on the same column and the notation
+- Fix the issue where the MakeMove method does not handle the edge case that, in some notations, there are two pieces of the same type on the same column and the notation
 does not mark which piece is moving, as only one of them would be able to perform the move validly.
 
 ## Contributing
