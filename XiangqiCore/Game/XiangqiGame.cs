@@ -210,11 +210,11 @@ public class XiangqiGame
 	/// <param name="startingPosition">The starting position of the move.</param>
 	/// <param name="destination">The destination position of the move.</param>
 	/// <returns><c>true</c> if the move is valid and successful; otherwise, <c>false</c>.</returns>
-	public async Task<bool> Move(Coordinate startingPosition, Coordinate destination)
+	public async Task<bool> MakeMoveAsync(Coordinate startingPosition, Coordinate destination)
 	{
 		try
 		{
-			MoveHistoryObject moveHistoryObject = await Board.MakeMove(startingPosition, destination, SideToMove);
+			MoveHistoryObject moveHistoryObject = await Board.MakeMoveAsync(startingPosition, destination, SideToMove);
 
 			UpdateGameInfo(moveHistoryObject);
 
@@ -233,14 +233,14 @@ public class XiangqiGame
 	/// <param name="moveNotation">The move notation.</param>
 	/// <param name="moveNotationType">The type of move notation.</param>
 	/// <returns><c>true</c> if the move is valid and successful; otherwise, <c>false</c>.</returns>
-	public async Task<bool> Move(string moveNotation, MoveNotationType moveNotationType)
+	public async Task<bool> MakeMoveAsync(string moveNotation, MoveNotationType moveNotationType)
 	{
 		try
 		{
 			IMoveNotationParser parser = MoveNotationParserFactory.GetParser(moveNotationType);
 			ParsedMoveObject parsedMoveObject = parser.Parse(moveNotation);
 
-			MoveHistoryObject moveHistoryObject = await Board.MakeMove(parsedMoveObject, SideToMove);
+			MoveHistoryObject moveHistoryObject = await Board.MakeMoveAsync(parsedMoveObject, SideToMove);
 			moveHistoryObject.UpdateMoveNotation(moveNotation, moveNotationType);
 
 			UpdateGameInfo(moveHistoryObject);
@@ -381,7 +381,7 @@ public class XiangqiGame
 
 		foreach (string move in moves)
 		{
-			bool isSuccessful = await Move(move, MoveNotationType.Chinese);
+			bool isSuccessful = await MakeMoveAsync(move, MoveNotationType.Chinese);
 
 			if (!isSuccessful)
 				throw new ParesMoveRecordException($"Unable to add {move} to the game.");

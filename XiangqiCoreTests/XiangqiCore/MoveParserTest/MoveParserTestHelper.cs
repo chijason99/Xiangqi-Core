@@ -36,7 +36,7 @@ public static class MoveParserTestHelper
         pieceToMove.PieceType.Should().NotBe(PieceType.None);
 
         // Act
-        bool moveResult = await game.Move(testData.MoveNotation, testData.NotationType);
+        bool moveResult = await game.MakeMoveAsync(testData.MoveNotation, testData.NotationType);
 
         // Assert
         moveResult.Should().Be(testData.ExpectedResult);

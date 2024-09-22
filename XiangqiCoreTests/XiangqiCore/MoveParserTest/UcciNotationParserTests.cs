@@ -1,7 +1,6 @@
 ﻿using XiangqiCore.Game;
 using XiangqiCore.Move;
 using XiangqiCore.Move.MoveObjects;
-using XiangqiCore.Move.NotationParsers;
 using XiangqiCore.Pieces.PieceTypes;
 
 namespace xiangqi_core_test.XiangqiCore.MoveParserTest;
@@ -48,7 +47,7 @@ public static class UcciNotationParserTests
                             .WithStartingFen(startingFen)
                             .BuildAsync();
 
-        bool moveResult = await game.Move(moveNotation, MoveNotationType.Chinese);
+        bool moveResult = await game.MakeMoveAsync(moveNotation, MoveNotationType.Chinese);
 
         moveResult.Should().BeTrue();
         game.MoveHistory.Count.Should().Be(1);

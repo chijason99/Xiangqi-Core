@@ -43,7 +43,7 @@ public static class XiangqiGameTests
         bool expectedResult = testData.ExpectedResult;
         
         // Act
-        bool actualResult = await game.Move(testData.StartingPosition, testData.Destination);
+        bool actualResult = await game.MakeMoveAsync(testData.StartingPosition, testData.Destination);
 
         // Assert
         actualResult.Should().Be(expectedResult);
@@ -67,7 +67,7 @@ public static class XiangqiGameTests
         // Act
         foreach (string move in moves)
         {
-            bool isMoveSuccessful = await game.Move(move, MoveNotationType.Chinese);
+            bool isMoveSuccessful = await game.MakeMoveAsync(move, MoveNotationType.Chinese);
             isMoveSuccessful.Should().BeTrue();
         }
 
@@ -92,7 +92,7 @@ public static class XiangqiGameTests
 
         foreach (string move in moves)
         {
-            bool isMoveSuccessful = await game.Move(move, MoveNotationType.Chinese);
+            bool isMoveSuccessful = await game.MakeMoveAsync(move, MoveNotationType.Chinese);
             isMoveSuccessful.Should().BeTrue();
         }
 

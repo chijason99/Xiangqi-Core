@@ -37,7 +37,7 @@ public class Board
 
     public Piece[,] Position => _position.DeepClone();
 
-	public void SetPieceAtPosition(Coordinate targetCoordinates, Piece targetPiece) => _position.SetPieceAtPosition(targetCoordinates, targetPiece);
+	private void SetPieceAtPosition(Coordinate targetCoordinates, Piece targetPiece) => _position.SetPieceAtPosition(targetCoordinates, targetPiece);
 
     public Piece GetPieceAtPosition(Coordinate targetCoordinates) => _position.GetPieceAtPosition(targetCoordinates);
 
@@ -52,7 +52,7 @@ public class Board
 
     public static int[] GetPalaceColumns() => [4, 5, 6];
 
-    public async Task<MoveHistoryObject> MakeMove(Coordinate startingPosition, Coordinate destination, Side sideToMove)
+    public async Task<MoveHistoryObject> MakeMoveAsync(Coordinate startingPosition, Coordinate destination, Side sideToMove)
     {
         if (!_position.HasPieceAtPosition(startingPosition))
             throw new InvalidOperationException($"There must be a piece on the starting position {startingPosition}");
@@ -71,12 +71,12 @@ public class Board
         return moveHistory;
     }
 
-    public async Task<MoveHistoryObject> MakeMove(ParsedMoveObject moveObject, Side sideToMove)
+    public async Task<MoveHistoryObject> MakeMoveAsync(ParsedMoveObject moveObject, Side sideToMove)
     {
         Coordinate startingPosition = FindStartingPosition(moveObject, sideToMove);
         Coordinate destination = FindDestination(moveObject, startingPosition);
 
-        return await MakeMove(startingPosition, destination, sideToMove);
+        return await MakeMoveAsync(startingPosition, destination, sideToMove);
     }
 
     private Coordinate FindStartingPosition(ParsedMoveObject moveObject, Side sideToMove)
