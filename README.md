@@ -787,6 +787,7 @@ Below is a simple diagram of how the coodrinate in XiangqiCore is represented.
 The maximum column and row are 9 and 10, respectively.
 
 ``` Bash
+	Black
    1 2 3 4 5 6 7 8 9
 10 ┌─┬─┬─┬─┬─┬─┬─┬─┐
 9  │ │ │ │ │ │ │ │─┤
@@ -798,10 +799,24 @@ The maximum column and row are 9 and 10, respectively.
 3  │ │ │ │ │ │ │ │─┤
 2  ├─┼─┼─┼─┼─┼─┼─┼─┤
 1  │ │ │ │ │ │ │ │─┤
-   └─┴─┴─┴─┴─┴─┴─┴─┘
+   1 2 3 4 5 6 7 8 9
+	Red
 ```
 
+## Release Notes
 
+Version 2.0.0
+
+Features:
+- Rename the APIs in `XiangqiBuilder` class to prefix with `With`.
+- Rename the `Build` Method in `XiangqiBuilder` class to `BuildAsync` and make it asynchronous.
+- Rename the `Move` Method in `XiangqiGame` class to `MakeMoveAsync` and make it asynchronous to improve performance.
+- Add the `WithDpxqGameRecord` method to import a game from dpxq.com. (Beta)
+- Add the `ExportGameAsPgnFileAsync` method to export the game as a PGN file.
+
+Bug Fixes:
+- Fix the issue where the MakeMoveAsync method does not handle the edge case that, in some notations, there are two pieces of the same type on the same column and the notation
+does not mark which piece is moving, as only one of them would be able to perform the move validly.
 
 ## Contributing
 
