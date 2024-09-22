@@ -27,7 +27,7 @@ public class XiangqiGame
 	/// <param name="blackPlayer">The black player.</param>
 	/// <param name="competition">The competition.</param>
 	/// <param name="result">The game result.</param>
-	private XiangqiGame(
+	internal XiangqiGame(
 		string initialFenString,
 		Side sideToMove,
 		Player redPlayer,
@@ -42,7 +42,6 @@ public class XiangqiGame
 		BlackPlayer = blackPlayer;
 		Competition = competition;
 		GameResult = result;
-		GameDate = competition.GameDate;
 
 		if (string.IsNullOrWhiteSpace(gameName))
 		{
@@ -60,9 +59,6 @@ public class XiangqiGame
 		{
 			GameName = gameName;
 		}
-
-		CreatedDate = DateTime.Today;
-		UpdatedDate = DateTime.Today;
 	}
 
 	/// <summary>
@@ -98,17 +94,7 @@ public class XiangqiGame
 	/// <summary>
 	/// Gets the game date.
 	/// </summary>
-	public DateTime GameDate { get; private set; }
-
-	/// <summary>
-	/// Gets the created date.
-	/// </summary>
-	public DateTime CreatedDate { get; private set; }
-
-	/// <summary>
-	/// Gets the updated date.
-	/// </summary>
-	public DateTime UpdatedDate { get; private set; }
+	public DateTime GameDate => Competition.GameDate;
 
 	/// <summary>
 	/// Gets the game board.
@@ -164,7 +150,7 @@ public class XiangqiGame
 	/// <param name="gameResult">The game result.</param>
 	/// <param name="moveRecord">The move record.</param>
 	/// <returns>A new instance of the <see cref="XiangqiGame"/> class.</returns>
-	public async static Task<XiangqiGame> Create(
+	internal async static Task<XiangqiGame> Create(
 		string initialFenString, 
 		Player redPlayer, 
 		Player blackPlayer,
