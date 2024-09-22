@@ -269,7 +269,7 @@ public class XiangqiBuilder : IXiangqiBuilder
 				case resultKey:
 					_gameResult = value switch
 					{
-						"红胜" or "紅方胜" => GameResult.RedWin,
+						"红胜" or "红方胜" => GameResult.RedWin,
 						"黑胜" or "黑方胜" => GameResult.BlackWin,
 						"和棋" => GameResult.Draw,
 						_ => GameResult.Unknown
@@ -306,6 +306,7 @@ public class XiangqiBuilder : IXiangqiBuilder
 
 	private List<string> ValidateMoveRecordByRoundNumber(MatchCollection moveRecordMatches)
 	{
+		const int roundNumberModifierForBrokenMoveRecord = 1;
 		int expectedRoundNumber = 1;
 		List<string> validMoves = [];
 
@@ -317,11 +318,19 @@ public class XiangqiBuilder : IXiangqiBuilder
 
 			bool successfulParse = int.TryParse(roundNumberString, out int parsedRoundNumber);
 
-			if (!successfulParse || parsedRoundNumber != expectedRoundNumber)
+			// If the round number is not the expected round number, but it is the expected round number plus 1, then it is a broken move record
+			bool isBrokenMoveRecord = parsedRoundNumber != expectedRoundNumber && 
+									  parsedRoundNumber + roundNumberModifierForBrokenMoveRecord == expectedRoundNumber;
+
+			bool isRoundNumberValid = successfulParse && (parsedRoundNumber == expectedRoundNumber || isBrokenMoveRecord);
+
+			if (!isRoundNumberValid)
 				continue;
 
 			validMoves.Add(moveRecord.Value);
-			expectedRoundNumber++;
+
+			if (!isBrokenMoveRecord)
+				expectedRoundNumber++;
 		}
 
 		return validMoves;
