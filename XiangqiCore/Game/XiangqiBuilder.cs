@@ -1,4 +1,5 @@
 ﻿using System.Text.RegularExpressions;
+using XiangqiCore.Attributes;
 using XiangqiCore.Boards;
 using XiangqiCore.Misc;
 
@@ -209,6 +210,7 @@ public class XiangqiBuilder : IXiangqiBuilder
 	/// </summary>
 	/// <param name="dpxqGameRecord"></param>
 	/// <returns></returns>
+	[BetaMethod("This method would require more testing because of the lack of standard of the game records on dpxq.com")]
 	public XiangqiBuilder WithDpxqGameRecord(string dpxqGameRecord)
 	{
 		ExtractGameInfoFromDpxqRecord(dpxqGameRecord);
