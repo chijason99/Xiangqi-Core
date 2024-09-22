@@ -384,7 +384,7 @@ public class XiangqiGame
 			bool isSuccessful = await Move(move, MoveNotationType.Chinese);
 
 			if (!isSuccessful)
-				throw new InvalidOperationException($"Unable to add {move} to the game.");
+				throw new ParesMoveRecordException($"Unable to add {move} to the game.");
 		}
 	}
 }

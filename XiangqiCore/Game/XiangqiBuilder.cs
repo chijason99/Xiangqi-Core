@@ -1,10 +1,6 @@
-﻿using System;
-using System.Reflection.Metadata.Ecma335;
-using System.Text.RegularExpressions;
+﻿using System.Text.RegularExpressions;
 using XiangqiCore.Boards;
 using XiangqiCore.Misc;
-using static System.Net.Mime.MediaTypeNames;
-using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace XiangqiCore.Game;
 
@@ -271,8 +267,8 @@ public class XiangqiBuilder : IXiangqiBuilder
 				case resultKey:
 					_gameResult = value switch
 					{
-						"红胜" => GameResult.RedWin,
-						"黑胜" => GameResult.BlackWin,
+						"红胜" or "紅方胜" => GameResult.RedWin,
+						"黑胜" or "黑方胜" => GameResult.BlackWin,
 						"和棋" => GameResult.Draw,
 						_ => GameResult.Unknown
 					};
@@ -293,14 +289,39 @@ public class XiangqiBuilder : IXiangqiBuilder
 
 		// \d+: Matches one or more digits.
 		// \.: Matches a literal dot.
-		// \s +: Matches one or more whitespace characters.
-		// .*?: Lazily matches any character(except for line terminators) as few times as possible.
+		// \s{0,2}: Matches 0 to 2 whitespace characters.
+		// .*[\u4e00-\u9fa5]: Lazily matches any character(except for line terminators) as few times as possible, make sure it contains at least one chinese character.
 		// (?=\d +\.\s +|$): Positive lookahead to ensure the match is followed by another round number or the end of the string.
-		Regex moveRecordPattern = new(@"(\d+\.\s+.*?(?=\d+\.\s+|$))", RegexOptions.Multiline);
+		Regex moveRecordPattern = new(@"(\d+\.\s{0,2}.*?[\u4e00-\u9fa5]+.*?(?=\d+\.\s+|$))", RegexOptions.Multiline);
 		MatchCollection moveRecordMatches = moveRecordPattern.Matches(sanitizedDpxqGameRecord);
 
-		string combinedMoves = string.Join("\n\r", moveRecordMatches);
+		List<string> validMoves = ValidateMoveRecordByRoundNumber(moveRecordMatches);
 
-		_moveRecord = combinedMoves;
+		string moveRecord = string.Join("\n\r", validMoves);
+
+		_moveRecord = moveRecord;
+	}
+
+	private List<string> ValidateMoveRecordByRoundNumber(MatchCollection moveRecordMatches)
+	{
+		int expectedRoundNumber = 1;
+		List<string> validMoves = [];
+
+		foreach (Match moveRecord in moveRecordMatches)
+		{
+			int numberOfDigitsOfMove = (int)Math.Floor(Math.Log10(expectedRoundNumber));
+			int substringEndIndex = numberOfDigitsOfMove + 1;
+			string roundNumberString = moveRecord.Value[..substringEndIndex];
+
+			bool successfulParse = int.TryParse(roundNumberString, out int parsedRoundNumber);
+
+			if (!successfulParse || parsedRoundNumber != expectedRoundNumber)
+				continue;
+
+			validMoves.Add(moveRecord.Value);
+			expectedRoundNumber++;
+		}
+
+		return validMoves;
 	}
 }

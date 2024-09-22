@@ -353,5 +353,190 @@ public static class XiangqiBuilderTests
 
 		xiangqiGame.GameResult.Should().Be(GameResult.Draw);
         xiangqiGame.MoveHistory.Should().HaveCount(41*2 + 1);
+        xiangqiGame.MoveHistory.Last().FenAfterMove.Should().Be("4kab2/4a4/4b4/7N1/4p3p/2P2n3/2c1P4/4BC3/4A4/2BAK4 b - - 3 42");
+	}
+
+    [Fact]
+    public async static Task ShouldCreateGameWithCommentsCorrectly_WhenDpxqRecordContainsExtraMovesInComments()
+    {
+        // Arrange
+
+        string sample2 = @"标题: 南方 许银川 胜 北方 刘殿中
+分类: 其他大师或以上级别大赛
+赛事: 2005年“大新杯”南北棋王对抗赛
+轮次: 第01轮
+布局: B20 中炮对左三步虎
+红方: 南方 许银川
+黑方: 北方 刘殿中
+结果: 红方胜
+日期: 2005.11.12
+地点: 佛山顺德乐从
+评论: 孙志伟
+结束方式: 认负
+记时规则: 30分包干
+棋局类型: 全局
+棋局性质: 慢棋
+红方团体: 南方
+红方姓名: 许银川
+黑方团体: 北方
+黑方姓名: 刘殿中
+棋谱主人: mdf800921
+棋谱价值: 4
+浏览次数: 7883
+来源网站: www.dpxq.com
+ 
+ 
+【主变: 红胜】
+1.炮二平五 马８进７
+
+2.马二进三 车９平８
+
+3.兵七进一 卒７进１
+
+4.马八进七 炮８平９
+
+5.炮八平九
+
+这是2005年全国象棋个人赛之后举办的“大新杯”南北棋王对抗赛第1轮，南方许银川与北方刘殿中的一局角斗。双方以中炮七路马对三步虎列阵。红平边炮准备抢出左车，不落俗套的走法。一般多走车一进一或炮八进二，双方另有不同攻守。
+　　5. …………　　马２进３
+
+6.车九平八 车１平２
+
+7.车八进六 车８进８ ①
+　　黑方进车红方下二路。意在防止红方车一进一出动右车。似不如改走炮2平1，红如车八进三(如车八平七，炮1退1，黑有反击之势)，则马3退2，车一进一，车8进5，兵五进一，炮1平5，黑可对抗。
+　　8.炮九进四 士４进５
+
+9.车一进一 车８退２
+黑方退车，保持变化的走法。如改走车8平9，则马三退一，红方多兵占优。
+　　10.马七进六 车８平７
+
+11.车一进一 卒７进１
+
+12.炮五平九 炮２平１
+
+13.车八进三 马３退２
+
+14.相三进五 马２进３
+
+15.前炮退二 马７进８
+
+16.后炮平七 马８进６
+
+17.马六进四
+
+红方跃进骑河马，巧妙地牵制了黑方过河的车马卒三子，为扩先取势创造了有利条件。
+　　17. …………　　象３进５
+
+18.炮九平八 车７平６
+
+19.炮八平四 卒７进１ ②
+　　黑方不如改走卒7平6，红如接走马四进六，士5进4，兵七进一，马3进1，要比实战走法为好。
+　　20.马四进六 士５进４
+
+21.炮四平一
+
+如图形势，红方平炮邀兑黑方边炮，可使黑方右翼马炮失去策应之势，是扩大主动的简明有力之着。
+　　21. …………　　炮９进３
+
+22.兵一进一 卒７进１
+
+23.兵七进一
+
+红方冲兵，在黑方右翼发难，攻击点十分准确。
+　　23. …………　　车６平５
+
+24.兵七进一 车５平３
+
+25.兵七进一 车３进１
+
+26.马六退七
+
+红方回马关车，是以退为进的老练走法。
+　　26. …………　　士４退５
+
+27.车一平三 炮１进１
+
+28.车三进一 卒５进１
+黑如改走车3进1，则车五平八，黑方亦难应付。
+　　29.车三进三 炮１退３
+
+30.兵七进一
+
+红方不平车吃卒，而冲七路兵直逼九宫，紧凑有力的走法。
+　　30. …………　　车３退１
+
+31.车三平九 炮１平４
+
+32.兵七平六
+
+如图形势，红方平兵搞死黑炮，为取胜奠定了基础。
+　　32. …………　　卒５进１
+
+33.兵六进一 将５平４
+
+34.车九平一 士５进４
+
+35.车一平六 士６进５
+
+36.兵一进一 车３平９
+
+37.兵一平二 车９平８
+
+38.兵二平一 车８平６
+
+39.车六退一 车６退１
+
+40.兵九进一 卒５平４
+
+41.马七进六
+
+黑方少子不敌，遂停钟认负。
+ 
+变①接主变第7回合
+
+{ 1rbakabr1 / 9 / 1cn3n1c / pRp1p3p / 6p2 / 2P6 / P3P1P1P / C1N1C1N2 / 9 / 2BAKAB1R b}
+	7. …………　　炮２平１
+
+8.车八进三
+
+如车八平七，炮1退1，黑有反击之势。
+　　8. …………　　马３退２
+
+9.车一进一 车８进５
+
+10.兵五进一 炮１平５
+黑可对抗。
+
+
+变②接主变第19回合
+
+{ 4kab2 / 4a4 / c1n1b3c / 2p1p3p / 5N3 / 2P2Cp2 / P3Pr2P / 2C1B1N1R / 9 / 2BAKA3 b}
+	19. …………　　卒７平６
+
+20.马四进六 士５进４
+
+21.兵七进一 马３进１
+要比实战走法为好。
+
+
+棋谱由 http://www.dpxq.com/ 生成";
+
+		XiangqiBuilder builder = new();
+
+        // Act
+        XiangqiGame xiangqiGame = await builder.WithDpxqGameRecord(sample2).BuildAsync();
+
+		// Assert
+		xiangqiGame.Competition.Location.Should().Be("佛山顺德乐从");
+		xiangqiGame.Competition.Name.Should().Be("2005年“大新杯”南北棋王对抗赛");
+		xiangqiGame.Competition.GameDate.Should().Be(new DateTime(2005, 11, 12));
+
+		xiangqiGame.RedPlayer.Name.Should().Be("许银川");
+		xiangqiGame.RedPlayer.Team.Should().Be("南方");
+		xiangqiGame.BlackPlayer.Name.Should().Be("刘殿中");
+		xiangqiGame.BlackPlayer.Team.Should().Be("北方");
+
+		xiangqiGame.GameResult.Should().Be(GameResult.RedWin);
+		xiangqiGame.MoveHistory.Should().HaveCount(40 * 2 + 1);
 	}
 }
