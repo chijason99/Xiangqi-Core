@@ -47,55 +47,55 @@ public static class RookValidationStrategyTests
         }
     }
 
-    [Theory]
-    [MemberData(nameof(RookValidationTestData))]
-    public static async Task ValidateMoveLogicForPieceShouldReturnExpectedResult_WhenGivenMoves_ForRookAsync(RookValidationTestData rookValidationTestData) 
-    { 
-        // Arrange
-        XiangqiBuilder builder = new ();
+	[Theory]
+	[MemberData(nameof(RookValidationTestData))]
+	public static void ValidateMoveLogicForPieceShouldReturnExpectedResult_WhenGivenMoves_ForRook(RookValidationTestData rookValidationTestData)
+	{
+		// Arrange
+		XiangqiBuilder builder = new();
 
-        Coordinate startingPosition = rookValidationTestData.StartingPosition;
-        Coordinate destination = rookValidationTestData.Destination;
+		Coordinate startingPosition = rookValidationTestData.StartingPosition;
+		Coordinate destination = rookValidationTestData.Destination;
 
-        XiangqiGame game = await builder
-                            .WithEmptyBoard()
-                            .WithBoardConfig(config => config.AddPiece(PieceType.Rook, Side.Red, startingPosition))
-                            .BuildAsync();
-        // Act
-        Rook rook = (Rook)game.BoardPosition.GetPieceAtPosition(startingPosition);
+		XiangqiGame game = builder
+							.WithEmptyBoard()
+							.WithBoardConfig(config => config.AddPiece(PieceType.Rook, Side.Red, startingPosition))
+							.Build();
+		// Act
+		Rook rook = (Rook)game.BoardPosition.GetPieceAtPosition(startingPosition);
 
-        bool isMoveValid = rook.ValidationStrategy.ValidateMoveLogicForPiece(game.BoardPosition, startingPosition, destination);
-        bool expectedResult = rookValidationTestData.ExpectedResult;
-        
-        // Assert
-        isMoveValid.Should().Be(expectedResult);
-    }
+		bool isMoveValid = rook.ValidationStrategy.ValidateMoveLogicForPiece(game.BoardPosition, startingPosition, destination);
+		bool expectedResult = rookValidationTestData.ExpectedResult;
+
+		// Assert
+		isMoveValid.Should().Be(expectedResult);
+	}
 
 
-    [Theory]
-    [MemberData(nameof(RookObstacleValidationTestData))]
-    public static async Task ValidateMoveLogicForPieceShouldReturnExpectedResult_WhenGivenMoves_ForRook_WithObstaclesAsync(RookObstacleValidationTestData rookValidationTestData)
-    {
-        // Arrange
-        XiangqiBuilder builder = new();
+	[Theory]
+	[MemberData(nameof(RookObstacleValidationTestData))]
+	public static void ValidateMoveLogicForPieceShouldReturnExpectedResult_WhenGivenMoves_ForRook_WithObstacles(RookObstacleValidationTestData rookValidationTestData)
+	{
+		// Arrange
+		XiangqiBuilder builder = new();
 
-        Coordinate startingPosition = rookValidationTestData.StartingPosition;
-        Coordinate destination = rookValidationTestData.Destination;
-        string startingFen = rookValidationTestData.StartingFen;
+		Coordinate startingPosition = rookValidationTestData.StartingPosition;
+		Coordinate destination = rookValidationTestData.Destination;
+		string startingFen = rookValidationTestData.StartingFen;
 
-        XiangqiGame game = await builder
-                            .WithStartingFen(startingFen)
-                            .WithBoardConfig(config => config.AddPiece(PieceType.Rook, Side.Red, startingPosition))
-                            .BuildAsync();
-        // Act
-        Rook rook = (Rook)game.BoardPosition.GetPieceAtPosition(startingPosition);
+		XiangqiGame game = builder
+							.WithStartingFen(startingFen)
+							.WithBoardConfig(config => config.AddPiece(PieceType.Rook, Side.Red, startingPosition))
+							.Build();
+		// Act
+		Rook rook = (Rook)game.BoardPosition.GetPieceAtPosition(startingPosition);
 
-        bool isMoveValid = rook.ValidationStrategy.ValidateMoveLogicForPiece(game.BoardPosition, startingPosition, destination);
-        bool expectedResult = rookValidationTestData.ExpectedResult;
+		bool isMoveValid = rook.ValidationStrategy.ValidateMoveLogicForPiece(game.BoardPosition, startingPosition, destination);
+		bool expectedResult = rookValidationTestData.ExpectedResult;
 
-        // Assert
-        isMoveValid.Should().Be(expectedResult);
-    }
+		// Assert
+		isMoveValid.Should().Be(expectedResult);
+	}
 }
 
 public record RookValidationTestData(Coordinate StartingPosition, Coordinate Destination, bool ExpectedResult);

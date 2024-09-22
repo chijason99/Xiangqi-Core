@@ -234,10 +234,10 @@ public static class FenHelperTests
         string positionFen = sampleFen.Split(" ").First();
         XiangqiBuilder builder = new();
 
-        XiangqiGame gameInstance = await builder
+        XiangqiGame gameInstance = builder
                             .WithDefaultConfiguration()
                             .WithStartingFen(sampleFen)
-                            .BuildAsync();
+                            .Build();
 
         // Act
         string resultFen = gameInstance.Board.GetFenFromPosition;

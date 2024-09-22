@@ -50,57 +50,57 @@ public static class CannonValidationStrategyTests
         }
     }
 
-    [Theory]
-    [MemberData(nameof(CannonValidationTestData))]
-    public static async Task ShouldReturnExpectedResult_WhenValidatingMoves_ForCannonAsync(CannonValidationTestData cannonValidationTestData)
-    {
-        // Arrange
-        Coordinate startingPosition = cannonValidationTestData.StartingPosition;
-        Coordinate destination = cannonValidationTestData.Destination;
-        bool expectedResult = cannonValidationTestData.ExpectedResult;
+	[Theory]
+	[MemberData(nameof(CannonValidationTestData))]
+	public static void ShouldReturnExpectedResult_WhenValidatingMoves_ForCannon(CannonValidationTestData cannonValidationTestData)
+	{
+		// Arrange
+		Coordinate startingPosition = cannonValidationTestData.StartingPosition;
+		Coordinate destination = cannonValidationTestData.Destination;
+		bool expectedResult = cannonValidationTestData.ExpectedResult;
 
-        XiangqiBuilder builder = new ();
-        XiangqiGame game = await builder
-                            .WithEmptyBoard()
-                            .WithBoardConfig(config => config.AddPiece(PieceType.Cannon, Side.Red , startingPosition))
-                            .BuildAsync();
+		XiangqiBuilder builder = new();
+		XiangqiGame game = builder
+							.WithEmptyBoard()
+							.WithBoardConfig(config => config.AddPiece(PieceType.Cannon, Side.Red, startingPosition))
+							.Build();
 
-        Piece[,] boardPosition = game.BoardPosition;
-        
-        // Act
-        Cannon cannon = (Cannon) boardPosition.GetPieceAtPosition(startingPosition);
+		Piece[,] boardPosition = game.BoardPosition;
 
-        bool result = cannon.ValidationStrategy.ValidateMoveLogicForPiece(boardPosition, startingPosition, destination);
+		// Act
+		Cannon cannon = (Cannon)boardPosition.GetPieceAtPosition(startingPosition);
 
-        // Assert
-        result.Should().Be(expectedResult);
-    }
+		bool result = cannon.ValidationStrategy.ValidateMoveLogicForPiece(boardPosition, startingPosition, destination);
 
-    [Theory]
-    [MemberData(nameof(CannonObstacleValidationTestData))]
-    public static async Task ShouldReturnExpectedResult_WhenValidatingMoves_ForCannon_WithObstaclesAsync(CannonObstacleValidationTestData cannonObstacleValidationTestData)
-    {
-        // Arrange
-        Coordinate startingPosition = cannonObstacleValidationTestData.StartingPosition;
-        Coordinate destination = cannonObstacleValidationTestData.Destination;
-        bool expectedResult = cannonObstacleValidationTestData.ExpectedResult;
-        string startingFen = cannonObstacleValidationTestData.StartingFen;
+		// Assert
+		result.Should().Be(expectedResult);
+	}
 
-        XiangqiBuilder builder = new();
-        XiangqiGame game = await builder
-                            .WithStartingFen(startingFen)
-                            .BuildAsync();
+	[Theory]
+	[MemberData(nameof(CannonObstacleValidationTestData))]
+	public static void ShouldReturnExpectedResult_WhenValidatingMoves_ForCannon_WithObstacles(CannonObstacleValidationTestData cannonObstacleValidationTestData)
+	{
+		// Arrange
+		Coordinate startingPosition = cannonObstacleValidationTestData.StartingPosition;
+		Coordinate destination = cannonObstacleValidationTestData.Destination;
+		bool expectedResult = cannonObstacleValidationTestData.ExpectedResult;
+		string startingFen = cannonObstacleValidationTestData.StartingFen;
 
-        Piece[,] boardPosition = game.BoardPosition;
+		XiangqiBuilder builder = new();
+		XiangqiGame game = builder
+							.WithStartingFen(startingFen)
+							.Build();
 
-        // Act
-        Cannon cannon = (Cannon)boardPosition.GetPieceAtPosition(startingPosition);
+		Piece[,] boardPosition = game.BoardPosition;
 
-        bool result = cannon.ValidationStrategy.ValidateMoveLogicForPiece(boardPosition, startingPosition, destination);
+		// Act
+		Cannon cannon = (Cannon)boardPosition.GetPieceAtPosition(startingPosition);
 
-        // Assert
-        result.Should().Be(expectedResult);
-    }
+		bool result = cannon.ValidationStrategy.ValidateMoveLogicForPiece(boardPosition, startingPosition, destination);
+
+		// Assert
+		result.Should().Be(expectedResult);
+	}
 }
 
 public record CannonValidationTestData(Coordinate StartingPosition, Coordinate Destination, bool ExpectedResult);

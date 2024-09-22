@@ -262,20 +262,18 @@ public static class PieceExtension
                position.IsKingAttackedBy<Knight>(targetKing.Coordinate);
     }
 
-    public static async Task<bool> IsSideInCheckmate(this Piece[,] position, Side sideToCheck)
-    {
-        foreach (Piece piece in GetPiecesToCheck(position, sideToCheck))
-        {
-            List<Coordinate> availableCoordinatesForPiece = await piece.GeneratePotentialMoves(position);
+	public static bool IsSideInCheckmate(this Piece[,] position, Side sideToCheck)
+	{
+		foreach (Piece piece in GetPiecesToCheck(position, sideToCheck))
+		{
+			foreach (Coordinate potentatialCoordinate in piece.GeneratePotentialMoves(position))
+				return false;
+		}
 
-            if (availableCoordinatesForPiece.Count > 0)
-                return false;
-        }
+		return true;
+	}
 
-        return true;
-    }
-
-    private static IEnumerable<Piece> GetPiecesToCheck(Piece[,] position, Side sideToCheck)
+	private static IEnumerable<Piece> GetPiecesToCheck(Piece[,] position, Side sideToCheck)
     {
         var piecesToCheck = position
                             .Cast<Piece>()

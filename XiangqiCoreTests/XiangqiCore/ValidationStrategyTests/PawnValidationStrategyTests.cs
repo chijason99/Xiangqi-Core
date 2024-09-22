@@ -46,29 +46,29 @@ public static class PawnValidationStrategyTests
         }
     }
 
-    [Theory]
-    [MemberData(nameof(RedPawnCoordinates))]
-    public static async Task ValidateMoveLogicForPieceShouldReturnTrue_WhenGivenValidMoves_ForRedPawnAsync(PawnValidationTestData pawnValidationTestData)
-    {
-        // Arrange
-        XiangqiBuilder builder = new();
+	[Theory]
+	[MemberData(nameof(RedPawnCoordinates))]
+	public static void ValidateMoveLogicForPieceShouldReturnTrue_WhenGivenValidMoves_ForRedPawn(PawnValidationTestData pawnValidationTestData)
+	{
+		// Arrange
+		XiangqiBuilder builder = new();
 
-        Coordinate pawnCoordinate = pawnValidationTestData.StartingPosition;
-        Coordinate destination = pawnValidationTestData.Destination;
-        Side side = pawnValidationTestData.Side;
+		Coordinate pawnCoordinate = pawnValidationTestData.StartingPosition;
+		Coordinate destination = pawnValidationTestData.Destination;
+		Side side = pawnValidationTestData.Side;
 
-        XiangqiGame game =  await builder
-                            .WithEmptyBoard()
-                            .WithBoardConfig(config => config.AddPiece(PieceType.Pawn, side, pawnCoordinate))
-                            .BuildAsync();
-        // Act
-        Pawn pawn = (Pawn)game.BoardPosition.GetPieceAtPosition(pawnCoordinate);
+		XiangqiGame game = builder
+							.WithEmptyBoard()
+							.WithBoardConfig(config => config.AddPiece(PieceType.Pawn, side, pawnCoordinate))
+							.Build();
+		// Act
+		Pawn pawn = (Pawn)game.BoardPosition.GetPieceAtPosition(pawnCoordinate);
 
-        bool isMoveValid = pawn.ValidationStrategy.ValidateMoveLogicForPiece(game.BoardPosition, pawnCoordinate, destination);
-        bool expectedResult = pawnValidationTestData.ExpectedResult;
-        // Assert
-        isMoveValid.Should().Be(expectedResult);
-    }
+		bool isMoveValid = pawn.ValidationStrategy.ValidateMoveLogicForPiece(game.BoardPosition, pawnCoordinate, destination);
+		bool expectedResult = pawnValidationTestData.ExpectedResult;
+		// Assert
+		isMoveValid.Should().Be(expectedResult);
+	}
 }
 
 public record PawnValidationTestData(Side Side, Coordinate StartingPosition, Coordinate Destination, bool ExpectedResult);

@@ -84,15 +84,15 @@ public class XiangqiBuilder : IXiangqiBuilder
 	/// Builds an instance of the Xiangqi game asynchronously.
 	/// </summary>
 	/// <returns>An instance of the <see cref="XiangqiGame"/> class.</returns>
-	public async Task<XiangqiGame> BuildAsync()
-		=> await XiangqiGame.Create(
-			_initialFen, 
-			_redPlayer, 
-			_blackPlayer, 
-			_competition, 
-			_useBoardConfig, 
-			_boardConfig, 
-			_gameResult, 
+	public XiangqiGame Build()
+		=> XiangqiGame.Create(
+			_initialFen,
+			_redPlayer,
+			_blackPlayer,
+			_competition,
+			_useBoardConfig,
+			_boardConfig,
+			_gameResult,
 			_moveRecord,
 			_gameName);
 

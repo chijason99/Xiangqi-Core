@@ -50,58 +50,58 @@ public static class KnightValidationStrategyTests
         }
     }
 
-    [Theory]
-    [MemberData(nameof(KnightValidMoveTestData))]
-    public static async Task ValidateMoveLogicForPieceShouldReturnTrue_WhenGivenValidMoves_ForKnightAsync(KnightValidationTestData knightValidationTestData)
-    {
-        // Arrange
-        XiangqiBuilder builder = new();
+	[Theory]
+	[MemberData(nameof(KnightValidMoveTestData))]
+	public static void ValidateMoveLogicForPieceShouldReturnTrue_WhenGivenValidMoves_ForKnight(KnightValidationTestData knightValidationTestData)
+	{
+		// Arrange
+		XiangqiBuilder builder = new();
 
-        Coordinate knightCoordinate = knightValidationTestData.StartingPosition;
-        Coordinate destination = knightValidationTestData.Destination;
+		Coordinate knightCoordinate = knightValidationTestData.StartingPosition;
+		Coordinate destination = knightValidationTestData.Destination;
 
-        XiangqiGame game = await builder
-                            .WithEmptyBoard()
-                            .WithBoardConfig(config => config.AddPiece(PieceType.Knight, Side.Red, knightCoordinate))
-                            .BuildAsync();
-        // Act
-        Knight knight = (Knight)game.BoardPosition.GetPieceAtPosition(knightCoordinate);
+		XiangqiGame game = builder
+							.WithEmptyBoard()
+							.WithBoardConfig(config => config.AddPiece(PieceType.Knight, Side.Red, knightCoordinate))
+							.Build();
+		// Act
+		Knight knight = (Knight)game.BoardPosition.GetPieceAtPosition(knightCoordinate);
 
-        bool isMoveValid = knight.ValidationStrategy.ValidateMoveLogicForPiece(game.BoardPosition, knightCoordinate, destination);
-        bool expectedResult = knightValidationTestData.ExpectedResult;
+		bool isMoveValid = knight.ValidationStrategy.ValidateMoveLogicForPiece(game.BoardPosition, knightCoordinate, destination);
+		bool expectedResult = knightValidationTestData.ExpectedResult;
 
-        // Assert
-        isMoveValid.Should().Be(expectedResult);
-    }
+		// Assert
+		isMoveValid.Should().Be(expectedResult);
+	}
 
-    [Theory]
-    [MemberData(nameof(KnightObstacleMoveTestData))]
-    public static async Task ValidateMoveLogicForPieceShouldReturnCorrectResult_WhenGivenInvalidMoves_ForKnight_WithObstaclesAsync(KnightObstacleValidationTestData knightObstacleValidationTestData)
-    {
-        // Arrange
-        XiangqiBuilder builder = new();
+	[Theory]
+	[MemberData(nameof(KnightObstacleMoveTestData))]
+	public static void ValidateMoveLogicForPieceShouldReturnCorrectResult_WhenGivenInvalidMoves_ForKnight_WithObstacles(KnightObstacleValidationTestData knightObstacleValidationTestData)
+	{
+		// Arrange
+		XiangqiBuilder builder = new();
 
-        Coordinate knightCoordinate = knightObstacleValidationTestData.StartingPosition;
-        Coordinate destination = knightObstacleValidationTestData.Destination;
-        Coordinate obstacleCoordinate = knightObstacleValidationTestData.Obstacle;
+		Coordinate knightCoordinate = knightObstacleValidationTestData.StartingPosition;
+		Coordinate destination = knightObstacleValidationTestData.Destination;
+		Coordinate obstacleCoordinate = knightObstacleValidationTestData.Obstacle;
 
-        XiangqiGame game = await builder
-                            .WithEmptyBoard()
-                            .WithBoardConfig(config => 
-                                { 
-                                    config.AddPiece(PieceType.Knight, Side.Red, knightCoordinate); 
-                                    config.AddRandomPiece(obstacleCoordinate); 
-                                })
-                            .BuildAsync();
-        // Act
-        Knight knight = (Knight)game.BoardPosition.GetPieceAtPosition(knightCoordinate);
+		XiangqiGame game = builder
+							.WithEmptyBoard()
+							.WithBoardConfig(config =>
+								{
+									config.AddPiece(PieceType.Knight, Side.Red, knightCoordinate);
+									config.AddRandomPiece(obstacleCoordinate);
+								})
+							.Build();
+		// Act
+		Knight knight = (Knight)game.BoardPosition.GetPieceAtPosition(knightCoordinate);
 
-        bool isMoveValid = knight.ValidationStrategy.ValidateMoveLogicForPiece(game.BoardPosition, knightCoordinate, destination);
-        bool expectedResult = knightObstacleValidationTestData.ExpectedResult;
+		bool isMoveValid = knight.ValidationStrategy.ValidateMoveLogicForPiece(game.BoardPosition, knightCoordinate, destination);
+		bool expectedResult = knightObstacleValidationTestData.ExpectedResult;
 
-        // Assert
-        isMoveValid.Should().Be(expectedResult);
-    }
+		// Assert
+		isMoveValid.Should().Be(expectedResult);
+	}
 }
 
 public record KnightValidationTestData(Coordinate StartingPosition, Coordinate Destination, bool ExpectedResult);

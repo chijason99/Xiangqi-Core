@@ -150,14 +150,14 @@ public class XiangqiGame
 	/// <param name="gameResult">The game result.</param>
 	/// <param name="moveRecord">The move record.</param>
 	/// <returns>A new instance of the <see cref="XiangqiGame"/> class.</returns>
-	internal async static Task<XiangqiGame> Create(
-		string initialFenString, 
-		Player redPlayer, 
+	internal static XiangqiGame Create(
+		string initialFenString,
+		Player redPlayer,
 		Player blackPlayer,
-		Competition competition, 
-		bool useBoardConfig = false, 
+		Competition competition,
+		bool useBoardConfig = false,
 		BoardConfig? boardConfig = null,
-		GameResult gameResult = GameResult.Unknown, 
+		GameResult gameResult = GameResult.Unknown,
 		string moveRecord = "",
 		string gameName = "")
 	{
@@ -168,12 +168,12 @@ public class XiangqiGame
 		Side sideToMoveFromFen = FenHelper.GetSideToMoveFromFen(initialFenString);
 
 		XiangqiGame createdGameInstance = new(
-			initialFenString, 
-			sideToMoveFromFen, 
-			redPlayer, 
-			blackPlayer, 
-			competition, 
-			gameResult, 
+			initialFenString,
+			sideToMoveFromFen,
+			redPlayer,
+			blackPlayer,
+			competition,
+			gameResult,
 			gameName)
 		{
 			Board = useBoardConfig ? new Board(initialFenString, boardConfig!) : new Board(initialFenString),
@@ -185,7 +185,7 @@ public class XiangqiGame
 			createdGameInstance.InitialFenString = FenHelper.GetFenFromPosition(createdGameInstance.Board.Position);
 
 		if (!string.IsNullOrEmpty(moveRecord))
-			await createdGameInstance.SaveMoveRecordToHistory(moveRecord);
+			createdGameInstance.SaveMoveRecordToHistory(moveRecord);
 
 		return createdGameInstance;
 	}
@@ -196,11 +196,11 @@ public class XiangqiGame
 	/// <param name="startingPosition">The starting position of the move.</param>
 	/// <param name="destination">The destination position of the move.</param>
 	/// <returns><c>true</c> if the move is valid and successful; otherwise, <c>false</c>.</returns>
-	public async Task<bool> MakeMoveAsync(Coordinate startingPosition, Coordinate destination)
+	public bool MakeMove(Coordinate startingPosition, Coordinate destination)
 	{
 		try
 		{
-			MoveHistoryObject moveHistoryObject = await Board.MakeMoveAsync(startingPosition, destination, SideToMove);
+			MoveHistoryObject moveHistoryObject = Board.MakeMove(startingPosition, destination, SideToMove);
 
 			UpdateGameInfo(moveHistoryObject);
 
@@ -219,14 +219,14 @@ public class XiangqiGame
 	/// <param name="moveNotation">The move notation.</param>
 	/// <param name="moveNotationType">The type of move notation.</param>
 	/// <returns><c>true</c> if the move is valid and successful; otherwise, <c>false</c>.</returns>
-	public async Task<bool> MakeMoveAsync(string moveNotation, MoveNotationType moveNotationType)
+	public bool MakeMove(string moveNotation, MoveNotationType moveNotationType)
 	{
 		try
 		{
 			IMoveNotationParser parser = MoveNotationParserFactory.GetParser(moveNotationType);
 			ParsedMoveObject parsedMoveObject = parser.Parse(moveNotation);
 
-			MoveHistoryObject moveHistoryObject = await Board.MakeMoveAsync(parsedMoveObject, SideToMove);
+			MoveHistoryObject moveHistoryObject = Board.MakeMove(parsedMoveObject, SideToMove);
 			moveHistoryObject.UpdateMoveNotation(moveNotation, moveNotationType);
 
 			UpdateGameInfo(moveHistoryObject);
@@ -361,13 +361,13 @@ public class XiangqiGame
 			SwitchSideToMove();
 	}
 
-	private async Task SaveMoveRecordToHistory(string moveRecord)
+	private void SaveMoveRecordToHistory(string moveRecord)
 	{
 		List<string> moves = GameRecordParser.Parse(moveRecord);
 
 		foreach (string move in moves)
 		{
-			bool isSuccessful = await MakeMoveAsync(move, MoveNotationType.Chinese);
+			bool isSuccessful = MakeMove(move, MoveNotationType.Chinese);
 
 			if (!isSuccessful)
 				throw new ParesMoveRecordException($"Unable to add {move} to the game.");

@@ -13,5 +13,5 @@ public interface IXiangqiBuilder
     XiangqiBuilder WithBoardConfig(BoardConfig config);
     XiangqiBuilder WithBoardConfig(Action<BoardConfig> action);
     XiangqiBuilder WithGameName(string gameName);
-	Task<XiangqiGame> BuildAsync();
+	XiangqiGame Build();
 }

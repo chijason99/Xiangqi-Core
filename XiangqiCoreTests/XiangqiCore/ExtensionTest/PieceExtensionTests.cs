@@ -137,240 +137,240 @@ public static class PieceExtensionTests
         }
     }
 
-    [Theory]
-    [InlineData("rnbakab1r/9/1c4nc1/p1p1p1p1p/9/9/P1P1P1P1P/1C2C4/9/RNBAKABNR w - - 2 1", 1, 9)]
-    [InlineData("4kab2/cR2a2r1/2n1b2c1/p1p1p2Rp/5np2/3r5/P1P1P3P/N2C2N2/4AC3/2BAK1B2 w - - 12 14", 8, 3)]
-    public async static Task ShouldReturnCorrectPiecesInOrder_WhenCallingGetPiecesOnRow(string fen, int rowNumber, int piecesCountOnRow)
-    {
-        // Arrange
-        XiangqiBuilder builder = new ();
-        XiangqiGame game = await builder.WithStartingFen(fen).BuildAsync();
+	[Theory]
+	[InlineData("rnbakab1r/9/1c4nc1/p1p1p1p1p/9/9/P1P1P1P1P/1C2C4/9/RNBAKABNR w - - 2 1", 1, 9)]
+	[InlineData("4kab2/cR2a2r1/2n1b2c1/p1p1p2Rp/5np2/3r5/P1P1P3P/N2C2N2/4AC3/2BAK1B2 w - - 12 14", 8, 3)]
+	public static void ShouldReturnCorrectPiecesInOrder_WhenCallingGetPiecesOnRow(string fen, int rowNumber, int piecesCountOnRow)
+	{
+		// Arrange
+		XiangqiBuilder builder = new();
+		XiangqiGame game = builder.WithStartingFen(fen).Build();
 
-        Piece[,] position = game.BoardPosition;
+		Piece[,] position = game.BoardPosition;
 
-        // Act
-        IEnumerable<Piece> result = position.GetPiecesOnRow(rowNumber);
+		// Act
+		IEnumerable<Piece> result = position.GetPiecesOnRow(rowNumber);
 
-        // Assert
-        result.Count().Should().Be(piecesCountOnRow);
+		// Assert
+		result.Count().Should().Be(piecesCountOnRow);
 
-        foreach (Piece piece in result)
-        {
-            piece.Should().NotBeNull();
-            
-            Coordinate pieceCoordinate = piece.Coordinate;
+		foreach (Piece piece in result)
+		{
+			piece.Should().NotBeNull();
 
-            position.GetPieceAtPosition(pieceCoordinate).Should().BeEquivalentTo(piece);
-        }
-    }
+			Coordinate pieceCoordinate = piece.Coordinate;
 
-    [Theory]
-    [MemberData(nameof(CountPiecesBetweenTwoCoordinatesOnRowTestData))]
-    public async static Task ShouldReturnCorrectNumberOfPiecesBetweenTwoCoordinates_WhenProviingTwoCoordinatesOnTheSameRow(CountPiecesBetweenTwoCoordinatesTestData testData)
-    {
-        // Arrange
-        string startingFen = testData.StartingFen;
-        Coordinate startingPosition = testData.StartingPosition;
-        Coordinate destination = testData.Destination;
-        XiangqiBuilder builder = new ();
+			position.GetPieceAtPosition(pieceCoordinate).Should().BeEquivalentTo(piece);
+		}
+	}
 
-        XiangqiGame game = await builder
-                            .WithStartingFen(startingFen)
-                            .BuildAsync();
+	[Theory]
+	[MemberData(nameof(CountPiecesBetweenTwoCoordinatesOnRowTestData))]
+	public static void ShouldReturnCorrectNumberOfPiecesBetweenTwoCoordinates_WhenProviingTwoCoordinatesOnTheSameRow(CountPiecesBetweenTwoCoordinatesTestData testData)
+	{
+		// Arrange
+		string startingFen = testData.StartingFen;
+		Coordinate startingPosition = testData.StartingPosition;
+		Coordinate destination = testData.Destination;
+		XiangqiBuilder builder = new();
 
-        Piece[,] position = game.BoardPosition;
-        // Act
-        int result = position.CountPiecesBetweenOnRow(startingPosition, destination);
+		XiangqiGame game = builder
+							.WithStartingFen(startingFen)
+							.Build();
 
-        int expectedNumberOfPieces = testData.ExpectedResult;
+		Piece[,] position = game.BoardPosition;
+		// Act
+		int result = position.CountPiecesBetweenOnRow(startingPosition, destination);
 
-        // Assert
-        result.Should().Be(expectedNumberOfPieces);
-    }
+		int expectedNumberOfPieces = testData.ExpectedResult;
 
-    [Theory]
-    [MemberData(nameof(CountPiecesBetweenTwoCoordinatesOnColumnTestData))]
-    public static async Task ShouldReturnCorrectNumberOfPiecesBetweenTwoCoordinates_WhenProviingTwoCoordinatesOnTheSameColumnAsync (CountPiecesBetweenTwoCoordinatesTestData testData)
-    {
-        // Arrange
-        string startingFen = testData.StartingFen;
-        Coordinate startingPosition = testData.StartingPosition;
-        Coordinate destination = testData.Destination;
-        XiangqiBuilder builder = new ();
+		// Assert
+		result.Should().Be(expectedNumberOfPieces);
+	}
 
-        XiangqiGame game = await builder
-                            .WithStartingFen(startingFen)
-                            .BuildAsync();
+	[Theory]
+	[MemberData(nameof(CountPiecesBetweenTwoCoordinatesOnColumnTestData))]
+	public static void ShouldReturnCorrectNumberOfPiecesBetweenTwoCoordinates_WhenProviingTwoCoordinatesOnTheSameColumn(CountPiecesBetweenTwoCoordinatesTestData testData)
+	{
+		// Arrange
+		string startingFen = testData.StartingFen;
+		Coordinate startingPosition = testData.StartingPosition;
+		Coordinate destination = testData.Destination;
+		XiangqiBuilder builder = new();
 
-        Piece[,] position = game.BoardPosition;
-        // Act
-        int result = position.CountPiecesBetweenOnColumn(startingPosition, destination);
+		XiangqiGame game = builder
+							.WithStartingFen(startingFen)
+							.Build();
 
-        int expectedNumberOfPieces = testData.ExpectedResult;
+		Piece[,] position = game.BoardPosition;
+		// Act
+		int result = position.CountPiecesBetweenOnColumn(startingPosition, destination);
 
-        // Assert
-        result.Should().Be(expectedNumberOfPieces);
-    }
+		int expectedNumberOfPieces = testData.ExpectedResult;
 
-    [Theory]
-    [MemberData(nameof(WillExposeKingToDangerTestData))]
-    public static async Task WillExposeKingToDanger_ShouldReturnCorrectResultAsync(WillExposeKingToDangerTestData willExposeKingToDangerTestData)
-    {
-        // Arrange
-        XiangqiBuilder builder = new();
-        string startingFen = willExposeKingToDangerTestData.StartingFen;
-        Coordinate startingPosition = willExposeKingToDangerTestData.StartingPosition;
-        Coordinate destination = willExposeKingToDangerTestData.Destination;
-        bool expectedResult = willExposeKingToDangerTestData.ExpectedResult;
-        XiangqiGame game = await builder
-                            .WithStartingFen(startingFen)
-                            .BuildAsync();
+		// Assert
+		result.Should().Be(expectedNumberOfPieces);
+	}
 
-        Piece[,] boardPosition = game.BoardPosition;
-        // Act
-        bool actualResult = boardPosition.WillExposeKingToDanger(startingPosition, destination);
+	[Theory]
+	[MemberData(nameof(WillExposeKingToDangerTestData))]
+	public static void WillExposeKingToDanger_ShouldReturnCorrectResult(WillExposeKingToDangerTestData willExposeKingToDangerTestData)
+	{
+		// Arrange
+		XiangqiBuilder builder = new();
+		string startingFen = willExposeKingToDangerTestData.StartingFen;
+		Coordinate startingPosition = willExposeKingToDangerTestData.StartingPosition;
+		Coordinate destination = willExposeKingToDangerTestData.Destination;
+		bool expectedResult = willExposeKingToDangerTestData.ExpectedResult;
+		XiangqiGame game = builder
+							.WithStartingFen(startingFen)
+							.Build();
 
-        // Assert
-        actualResult.Should().Be(expectedResult);
-    }
+		Piece[,] boardPosition = game.BoardPosition;
+		// Act
+		bool actualResult = boardPosition.WillExposeKingToDanger(startingPosition, destination);
 
-    [Theory]
-    [MemberData(nameof(IsKingAttackedByRookTestData))]
-    public static async Task IsKingAttackedByRook_ShouldReturnExpectedResultAsync(IsKingAttackedTestData testData)
-    {
-        // Arrange
-        XiangqiBuilder builder = new();
-        string startingFen = testData.StartingFen;
-        bool expectedResult = testData.ExpectedResult;
-        Coordinate kingCoordinate = testData.KingCoordinate;
+		// Assert
+		actualResult.Should().Be(expectedResult);
+	}
 
-        XiangqiGame game = await builder
-                            .WithStartingFen(startingFen)
-                            .BuildAsync();
+	[Theory]
+	[MemberData(nameof(IsKingAttackedByRookTestData))]
+	public static void IsKingAttackedByRook_ShouldReturnExpectedResult(IsKingAttackedTestData testData)
+	{
+		// Arrange
+		XiangqiBuilder builder = new();
+		string startingFen = testData.StartingFen;
+		bool expectedResult = testData.ExpectedResult;
+		Coordinate kingCoordinate = testData.KingCoordinate;
 
-        Piece[,] boardPosition = game.BoardPosition;
+		XiangqiGame game = builder
+							.WithStartingFen(startingFen)
+							.Build();
 
-        // Act
-        bool actualResult = boardPosition.IsKingAttackedBy<Rook>(kingCoordinate);
+		Piece[,] boardPosition = game.BoardPosition;
 
-        // Assert
-        actualResult.Should().Be(expectedResult);
-    }
+		// Act
+		bool actualResult = boardPosition.IsKingAttackedBy<Rook>(kingCoordinate);
 
-    [Theory]
-    [MemberData(nameof(IsKingExposedToOpponentKingTestData))]
-    public static async Task IsKingExposedToOpponentKing_ShouldReturnExpectedResultAsync(IsKingAttackedTestData testData)
-    {
-        // Arrange
-        XiangqiBuilder builder = new();
-        string startingFen = testData.StartingFen;
-        bool expectedResult = testData.ExpectedResult;
-        Coordinate kingCoordinate = testData.KingCoordinate;
+		// Assert
+		actualResult.Should().Be(expectedResult);
+	}
 
-        XiangqiGame game = await builder
-                            .WithStartingFen(startingFen)
-                            .BuildAsync();
+	[Theory]
+	[MemberData(nameof(IsKingExposedToOpponentKingTestData))]
+	public static void IsKingExposedToOpponentKing_ShouldReturnExpectedResult(IsKingAttackedTestData testData)
+	{
+		// Arrange
+		XiangqiBuilder builder = new();
+		string startingFen = testData.StartingFen;
+		bool expectedResult = testData.ExpectedResult;
+		Coordinate kingCoordinate = testData.KingCoordinate;
 
-        Piece[,] boardPosition = game.BoardPosition;
+		XiangqiGame game = builder
+							.WithStartingFen(startingFen)
+							.Build();
 
-        // Act
-        bool actualResult = boardPosition.IsKingExposedDirectlyToEnemyKing(kingCoordinate);
+		Piece[,] boardPosition = game.BoardPosition;
 
-        // Assert
-        actualResult.Should().Be(expectedResult);
-    }
+		// Act
+		bool actualResult = boardPosition.IsKingExposedDirectlyToEnemyKing(kingCoordinate);
 
-    [Theory]
-    [MemberData(nameof(IsKingAttackedByCannonTestData))]
-    public static async Task IsKingAttackedByCannon_ShouldReturnExpectedResultAsync(IsKingAttackedTestData testData)
-    {
-        // Arrange
-        XiangqiBuilder builder = new();
-        string startingFen = testData.StartingFen;
-        bool expectedResult = testData.ExpectedResult;
-        Coordinate kingCoordinate = testData.KingCoordinate;
+		// Assert
+		actualResult.Should().Be(expectedResult);
+	}
 
-        XiangqiGame game = await builder
-                            .WithStartingFen(startingFen)
-                            .BuildAsync();
+	[Theory]
+	[MemberData(nameof(IsKingAttackedByCannonTestData))]
+	public static void IsKingAttackedByCannon_ShouldReturnExpectedResult(IsKingAttackedTestData testData)
+	{
+		// Arrange
+		XiangqiBuilder builder = new();
+		string startingFen = testData.StartingFen;
+		bool expectedResult = testData.ExpectedResult;
+		Coordinate kingCoordinate = testData.KingCoordinate;
 
-        Piece[,] boardPosition = game.BoardPosition;
+		XiangqiGame game = builder
+							.WithStartingFen(startingFen)
+							.Build();
 
-        // Act
-        bool actualResult = boardPosition.IsKingAttackedBy<Cannon>(kingCoordinate);
+		Piece[,] boardPosition = game.BoardPosition;
 
-        // Assert
-        actualResult.Should().Be(expectedResult);
-    }
+		// Act
+		bool actualResult = boardPosition.IsKingAttackedBy<Cannon>(kingCoordinate);
 
-    [Theory]
-    [MemberData(nameof(IsKingAttackedByKnightTestData))]
-    public static async Task IsKingAttackedByKnight_ShouldReturnExpectedResultAsync(IsKingAttackedTestData testData)
-    {
-        // Arrange
-        XiangqiBuilder builder = new();
-        string startingFen = testData.StartingFen;
-        bool expectedResult = testData.ExpectedResult;
-        Coordinate kingCoordinate = testData.KingCoordinate;
+		// Assert
+		actualResult.Should().Be(expectedResult);
+	}
 
-        XiangqiGame game = await builder
-                            .WithStartingFen(startingFen)
-                            .BuildAsync();
+	[Theory]
+	[MemberData(nameof(IsKingAttackedByKnightTestData))]
+	public static void IsKingAttackedByKnight_ShouldReturnExpectedResult(IsKingAttackedTestData testData)
+	{
+		// Arrange
+		XiangqiBuilder builder = new();
+		string startingFen = testData.StartingFen;
+		bool expectedResult = testData.ExpectedResult;
+		Coordinate kingCoordinate = testData.KingCoordinate;
 
-        Piece[,] boardPosition = game.BoardPosition;
+		XiangqiGame game = builder
+							.WithStartingFen(startingFen)
+							.Build();
 
-        // Act
-        bool actualResult = boardPosition.IsKingAttackedBy<Knight>(kingCoordinate);
+		Piece[,] boardPosition = game.BoardPosition;
 
-        // Assert
-        actualResult.Should().Be(expectedResult);
-    }
+		// Act
+		bool actualResult = boardPosition.IsKingAttackedBy<Knight>(kingCoordinate);
 
-    [Theory]
-    [MemberData(nameof(IsKingAttackedByPawnTestData))]
-    public static async Task IsKingAttackedByPawn_ShouldReturnExpectedResultAsync(IsKingAttackedTestData testData)
-    {
-        // Arrange
-        XiangqiBuilder builder = new();
-        string startingFen = testData.StartingFen;
-        bool expectedResult = testData.ExpectedResult;
-        Coordinate kingCoordinate = testData.KingCoordinate;
+		// Assert
+		actualResult.Should().Be(expectedResult);
+	}
 
-        XiangqiGame game = await builder
-                            .WithStartingFen(startingFen)
-                            .BuildAsync();
+	[Theory]
+	[MemberData(nameof(IsKingAttackedByPawnTestData))]
+	public static void IsKingAttackedByPawn_ShouldReturnExpectedResult(IsKingAttackedTestData testData)
+	{
+		// Arrange
+		XiangqiBuilder builder = new();
+		string startingFen = testData.StartingFen;
+		bool expectedResult = testData.ExpectedResult;
+		Coordinate kingCoordinate = testData.KingCoordinate;
 
-        Piece[,] boardPosition = game.BoardPosition;
+		XiangqiGame game = builder
+							.WithStartingFen(startingFen)
+							.Build();
 
-        // Act
-        bool actualResult = boardPosition.IsKingAttackedBy<Pawn>(kingCoordinate);
+		Piece[,] boardPosition = game.BoardPosition;
 
-        // Assert
-        actualResult.Should().Be(expectedResult);
-    }
+		// Act
+		bool actualResult = boardPosition.IsKingAttackedBy<Pawn>(kingCoordinate);
 
-    [Theory]
-    [InlineData("3k5/3NP4/3Cb4/3n5/9/5c3/1pc1p4/4B4/3C5/2BAK4 b - - 1 52", Side.Black, true)]
-    [InlineData("2Rrkab2/4n4/3Nna3/p3C2rp/2p6/5p3/P3P3P/4B4/9/3AKAB2 b - - 2 6", Side.Black, true)]
-    [InlineData("3k5/4P4/9/9/9/9/9/9/4K4/6B2 b - - 0 10", Side.Black, true)]
-    [InlineData("2N6/4a4/3k5/9/9/9/9/9/9/4K4 b - - 19 10", Side.Black, false)]
-    [InlineData("2N6/4a4/3k5/9/9/9/9/9/9/4K4 b - - 19 10", Side.Red, false)]
-    [InlineData("2b2k3/C1N6/4c4/5P3/2n6/2B3B2/9/3A1A3/5K3/9 b - - 8 73", Side.Black, false)]
-    public async static Task IsSideInCheckamte_ShouldReturnTrue_WhenGivenCheckmateFen(string sampleFen, Side sideToCheck, bool expectedResult)
-    {
-        // Arrange
-        XiangqiBuilder builder = new();
+		// Assert
+		actualResult.Should().Be(expectedResult);
+	}
 
-        XiangqiGame game = await builder
-                            .WithStartingFen(sampleFen)
-                            .BuildAsync();
+	[Theory]
+	[InlineData("3k5/3NP4/3Cb4/3n5/9/5c3/1pc1p4/4B4/3C5/2BAK4 b - - 1 52", Side.Black, true)]
+	[InlineData("2Rrkab2/4n4/3Nna3/p3C2rp/2p6/5p3/P3P3P/4B4/9/3AKAB2 b - - 2 6", Side.Black, true)]
+	[InlineData("3k5/4P4/9/9/9/9/9/9/4K4/6B2 b - - 0 10", Side.Black, true)]
+	[InlineData("2N6/4a4/3k5/9/9/9/9/9/9/4K4 b - - 19 10", Side.Black, false)]
+	[InlineData("2N6/4a4/3k5/9/9/9/9/9/9/4K4 b - - 19 10", Side.Red, false)]
+	[InlineData("2b2k3/C1N6/4c4/5P3/2n6/2B3B2/9/3A1A3/5K3/9 b - - 8 73", Side.Black, false)]
+	public static void IsSideInCheckamte_ShouldReturnTrue_WhenGivenCheckmateFen(string sampleFen, Side sideToCheck, bool expectedResult)
+	{
+		// Arrange
+		XiangqiBuilder builder = new();
 
-        // Act
-        bool actualResult = await game.BoardPosition.IsSideInCheckmate(sideToCheck);
+		XiangqiGame game = builder
+							.WithStartingFen(sampleFen)
+							.Build();
 
-        // Assert
-        actualResult.Should().Be(expectedResult);
-    }
+		// Act
+		bool actualResult = game.BoardPosition.IsSideInCheckmate(sideToCheck);
+
+		// Assert
+		actualResult.Should().Be(expectedResult);
+	}
 }
 
 public record CountPiecesBetweenTwoCoordinatesTestData(string StartingFen, Coordinate StartingPosition, Coordinate Destination, int ExpectedResult);

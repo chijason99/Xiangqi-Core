@@ -22,27 +22,27 @@ public static class MoveParserTestHelper
     public const string MultiPawnFen3Black = "4k4/9/9/9/9/6p2/4p1p2/6p2/6p2/3K5 b - - 0 0";
 
 
-    public async static Task AssertMoveWithNotationMethod(MoveNotationMethodTestData testData)
-    {
-        // Arrange
-        XiangqiBuilder builder = new();
+	public static void AssertMoveWithNotationMethod(MoveNotationMethodTestData testData)
+	{
+		// Arrange
+		XiangqiBuilder builder = new();
 
-        XiangqiGame game = await builder
-                            .WithStartingFen(testData.StartingFen)
-                            .BuildAsync();
+		XiangqiGame game = builder
+							.WithStartingFen(testData.StartingFen)
+							.Build();
 
-        Piece pieceToMove = game.Board.GetPieceAtPosition(testData.StartingPosition);
+		Piece pieceToMove = game.Board.GetPieceAtPosition(testData.StartingPosition);
 
-        pieceToMove.PieceType.Should().NotBe(PieceType.None);
+		pieceToMove.PieceType.Should().NotBe(PieceType.None);
 
-        // Act
-        bool moveResult = await game.MakeMoveAsync(testData.MoveNotation, testData.NotationType);
+		// Act
+		bool moveResult = game.MakeMove(testData.MoveNotation, testData.NotationType);
 
-        // Assert
-        moveResult.Should().Be(testData.ExpectedResult);
-        game.Board.GetPieceAtPosition(testData.StartingPosition).PieceType.Should().Be(PieceType.None);
-        game.Board.GetPieceAtPosition(testData.Destination).PieceType.Should().Be(testData.MovingPieceType);
-    }
+		// Assert
+		moveResult.Should().Be(testData.ExpectedResult);
+		game.Board.GetPieceAtPosition(testData.StartingPosition).PieceType.Should().Be(PieceType.None);
+		game.Board.GetPieceAtPosition(testData.Destination).PieceType.Should().Be(testData.MovingPieceType);
+	}
 }
 
 public record MoveNotationMethodTestData(string StartingFen, string MoveNotation, MoveNotationType NotationType, Coordinate StartingPosition, Coordinate Destination, PieceType MovingPieceType, bool ExpectedResult);
