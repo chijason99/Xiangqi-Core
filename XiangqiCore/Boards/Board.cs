@@ -8,173 +8,200 @@ using XiangqiCore.Move.MoveObjects;
 using XiangqiCore.Pieces;
 
 namespace XiangqiCore.Boards;
+
 public class Board
 {
-    private const string _emptyBoardFen = "9/9/9/9/9/9/9/9/9/9 w - - 0 0";
+	private const string _emptyBoardFen = "9/9/9/9/9/9/9/9/9/9 w - - 0 0";
 
-    public Board()
-    {
-        Position = FenHelper.CreatePositionFromFen(_emptyBoardFen);
-    }
+	internal Board()
+	{
+		_position = FenHelper.CreatePositionFromFen(_emptyBoardFen);
+	}
 
-    public Board(string fenString)
-    {
-        Position = FenHelper.CreatePositionFromFen(fenString);
-    }
+	internal Board(string fenString)
+	{
+		_position = FenHelper.CreatePositionFromFen(fenString);
+	}
 
-    /// <summary>
-    /// Use the BoardConfig to override existing pieces on board
-    /// </summary>
-    /// <param name="config"></param>
-    public Board(string fenString, BoardConfig config) : this(fenString)
-    {
-        foreach (var keyValuePair in config.PiecesToAdd)
-            SetPieceAtPosition(keyValuePair.Key, keyValuePair.Value);
-    }
+	/// <summary>
+	/// Use the BoardConfig to override existing pieces on board
+	/// </summary>
+	/// <param name="config"></param>
+	internal Board(string fenString, BoardConfig config) : this(fenString)
+	{
+		foreach (var keyValuePair in config.PiecesToAdd)
+			SetPieceAtPosition(keyValuePair.Key, keyValuePair.Value);
+	}
 
-    public Piece[,] Position { get; private set; }
+	private Piece[,] _position { get; set; }
 
-    public void SetPieceAtPosition(Coordinate targetCoordinates, Piece targetPiece) => Position.SetPieceAtPosition(targetCoordinates, targetPiece);
+	public Piece[,] Position => _position.DeepClone();
 
-    public Piece GetPieceAtPosition(Coordinate targetCoordinates) => Position.GetPieceAtPosition(targetCoordinates);
+	private void SetPieceAtPosition(Coordinate targetCoordinates, Piece targetPiece) => _position.SetPieceAtPosition(targetCoordinates, targetPiece);
 
-    public string GetFenFromPosition => FenHelper.GetFenFromPosition(Position);
+	public Piece GetPieceAtPosition(Coordinate targetCoordinates) => _position.GetPieceAtPosition(targetCoordinates);
 
-    public static int[] GetAllRows() => [1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
+	public string GetFenFromPosition => FenHelper.GetFenFromPosition(_position);
 
-    public static int[] GetAllColumns() => [1, 2, 3, 4, 5, 6, 7, 8, 9];
+	public static int[] GetAllRows() => [1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
 
-    public static int[] GetPalaceRows(Side color)
-        => color == Side.Red ? [1, 2, 3] : color == Side.Black ? [8, 9, 10] : throw new ArgumentException("Please provide the correct Side that you are looking for");
+	public static int[] GetAllColumns() => [1, 2, 3, 4, 5, 6, 7, 8, 9];
 
-    public static int[] GetPalaceColumns() => [4, 5, 6];
+	public static int[] GetPalaceRows(Side color)
+		=> color == Side.Red ? [1, 2, 3] : color == Side.Black ? [8, 9, 10] : throw new ArgumentException("Please provide the correct Side that you are looking for");
 
-    public MoveHistoryObject MakeMove(Coordinate startingPosition, Coordinate destination, Side sideToMove)
-    {
-        if (!Position.HasPieceAtPosition(startingPosition))
-            throw new InvalidOperationException("There must be a piece on the starting position");
+	public static int[] GetPalaceColumns() => [4, 5, 6];
 
-        Piece pieceToMove = GetPieceAtPosition(startingPosition);
+	internal MoveHistoryObject MakeMove(Coordinate startingPosition, Coordinate destination, Side sideToMove)
+	{
+		if (!_position.HasPieceAtPosition(startingPosition))
+			throw new InvalidOperationException($"There must be a piece on the starting position {startingPosition}");
 
-        if (pieceToMove.Side != sideToMove)
-            throw new InvalidOperationException($"The side to move now should be {EnumHelper<Side>.GetDisplayName(sideToMove)}");
+		Piece pieceToMove = GetPieceAtPosition(startingPosition);
 
-        if (!pieceToMove.ValidateMove(Position, startingPosition, destination))
-            throw new InvalidOperationException($"The proposed move violates the game logic"); ;
+		if (pieceToMove.Side != sideToMove)
+			throw new InvalidOperationException($"The side to move now should be {EnumHelper<Side>.GetDisplayName(sideToMove)}");
 
-        MoveHistoryObject moveHistory = CreateMoveHistory(sideToMove, startingPosition, destination);
-        Position.MakeMove(startingPosition, destination);
+		if (!pieceToMove.ValidateMove(_position, startingPosition, destination))
+			throw new InvalidOperationException($"The proposed move from {startingPosition} to {destination} violates the game logic"); ;
 
-        return moveHistory;
-    }
+		MoveHistoryObject moveHistory = CreateMoveHistory(sideToMove, startingPosition, destination);
+		_position.MakeMove(startingPosition, destination);
 
-    public MoveHistoryObject MakeMove(ParsedMoveObject moveObject, Side sideToMove)
-    {
-        Coordinate startingPosition = FindStartingPosition(moveObject, sideToMove);
-        Coordinate destination = FindDestination(moveObject, startingPosition);
+		return moveHistory;
+	}
 
-        return MakeMove(startingPosition, destination, sideToMove);
-    }
+	internal MoveHistoryObject MakeMove(ParsedMoveObject moveObject, Side sideToMove)
+	{
+		Coordinate startingPosition = FindStartingPosition(moveObject, sideToMove);
+		Coordinate destination = FindDestination(moveObject, startingPosition);
 
-    private Coordinate FindStartingPosition(ParsedMoveObject moveObject, Side sideToMove)
-    {
-        if (moveObject.IsFromUcciNotation)
-            return moveObject.StartingPosition.Value;
+		return MakeMove(startingPosition, destination, sideToMove);
+	}
 
-        Piece[] piecesToMove = GetPiecesToMove(moveObject.PieceType, sideToMove);
-        Piece pieceToMove;
+	private Coordinate FindStartingPosition(ParsedMoveObject moveObject, Side sideToMove)
+	{
+		if (moveObject.IsFromUcciNotation)
+			return moveObject.StartingPosition.Value;
 
-        // If the starting column is provided, then find the piece that has the same column as the starting column;
-        // Otherwise, i.e. there are more than one piece of the same type and side in the column, pick the one following the order
-        if(moveObject is MultiColumnPawnParsedMoveObject multiColumnPawnObject)
-            pieceToMove = FindPieceToMoveForMultiColumnPawn(multiColumnPawnObject, piecesToMove, sideToMove);
-        else
-            pieceToMove = piecesToMove.SingleOrDefault(p => p.Coordinate.Column == moveObject.StartingColumn.ConvertToColumnBasedOnSide(sideToMove)) ??
-                          piecesToMove[moveObject.PieceOrderIndex];
-        
-        return pieceToMove.Coordinate;
-    }
+		Piece[] piecesToMove = GetPiecesToMove(moveObject.PieceType, sideToMove);
+		Piece pieceToMove;
 
-    private Piece[] GetPiecesToMove (Type pieceType, Side sideToMove)
-    {
-        MethodInfo method = typeof(PieceExtension).GetMethod(nameof(PieceExtension.GetPiecesOfType));
-        MethodInfo genericMethod = method.MakeGenericMethod(pieceType);
+		// If the starting column is provided, then find the piece that has the same column as the starting column;
+		// Otherwise, i.e. there are more than one piece of the same type and side in the column, pick the one following the order
+		if (moveObject is MultiColumnPawnParsedMoveObject multiColumnPawnObject)
+			pieceToMove = FindPieceToMoveForMultiColumnPawn(multiColumnPawnObject, piecesToMove, sideToMove);
+		else
+		{
+			int actualStartingColumn = moveObject.StartingColumn.ConvertToColumnBasedOnSide(sideToMove);
 
-        IEnumerable<Piece> allPiecesOfType = ((IEnumerable<Piece>)genericMethod.Invoke(obj: null, parameters: [Position, sideToMove]));
+			if (piecesToMove.Count(p => p.Coordinate.Column == actualStartingColumn) == 1)
+				pieceToMove = piecesToMove.Single(p => p.Coordinate.Column == actualStartingColumn);
+			// Edge case: in some notation, there are two pieces of the same type on the same column and the notation
+			// do not mark which piece is moving, but only one of them would be able to perform the move specified validly
+			else if (moveObject.PieceOrderIndex == ParsedMoveObject.UnknownPieceOrderIndex)
+			{
+				pieceToMove = piecesToMove.First(x =>
+				{
+					try
+					{
+						Coordinate guessedDestination = x.GetDestinationCoordinateFromNotation(moveObject.MoveDirection, moveObject.FourthCharacter);
 
-        if (!allPiecesOfType.Any()) throw new InvalidOperationException($"Cannot find any columns containing more than one {EnumHelper<Side>.GetDisplayName(sideToMove)} {pieceType.Name}");
+						return x.ValidateMove(_position.DeepClone(), x.Coordinate, guessedDestination);
+					}
+					catch (ArgumentOutOfRangeException ex)
+					{
+						return false;
+					}
+				});
+			}
+			else
+				pieceToMove = piecesToMove[moveObject.PieceOrderIndex];
+		}
 
-        Piece[] piecesToMove = allPiecesOfType
-                                    .OrderByRowWithSide(sideToMove)
-                                    .ToArray();
+		return pieceToMove.Coordinate;
+	}
 
-        return piecesToMove;
-    }
+	private Piece[] GetPiecesToMove(Type pieceType, Side sideToMove)
+	{
+		MethodInfo method = typeof(PieceExtension).GetMethod(nameof(PieceExtension.GetPiecesOfType));
+		MethodInfo genericMethod = method.MakeGenericMethod(pieceType);
 
-    private Piece FindPieceToMoveForMultiColumnPawn(MultiColumnPawnParsedMoveObject moveObject, Piece[] piecesToMove, Side sideToMove)
-    {
-        Piece[] pawnsOnColumn;
+		IEnumerable<Piece> allPiecesOfType = ((IEnumerable<Piece>)genericMethod.Invoke(obj: null, parameters: [_position, sideToMove]));
 
-        if (moveObject.StartingColumn != ParsedMoveObject.UnknownStartingColumn)
-        {
-            pawnsOnColumn = piecesToMove
-                                .Where(p => p.Coordinate.Column == moveObject.StartingColumn.ConvertToColumnBasedOnSide(sideToMove))
-                                .OrderByRowWithSide(sideToMove)
-                                .ToArray();
-        }
-        else
-        {
-            pawnsOnColumn = piecesToMove
-                                .GroupBy(p => p.Coordinate.Column)
-                                .Where(group => group.Count() >= moveObject.MinNumberOfPawnsOnColumn)
-                                .SelectMany(group => group)
-                                .OrderByRowWithSide(sideToMove)
-                                .ToArray();
-        }
+		if (!allPiecesOfType.Any()) throw new InvalidOperationException($"Cannot find any columns containing more than one {EnumHelper<Side>.GetDisplayName(sideToMove)} {pieceType.Name}");
 
-        if (moveObject.PieceOrderIndex == MultiColumnPawnParsedMoveObject.LastPawnIndex)
-            return pawnsOnColumn.Last();
-        else
-            return pawnsOnColumn[moveObject.PieceOrderIndex];
-    }
+		Piece[] piecesToMove = allPiecesOfType
+									.OrderByRowWithSide(sideToMove)
+									.ToArray();
 
-    private Coordinate FindDestination(ParsedMoveObject moveObject, Coordinate startingCoordinate)
-    {
-        if (moveObject.IsFromUcciNotation)
-            return moveObject.Destination.Value;
+		return piecesToMove;
+	}
 
-        Piece pieceToMove = Position.GetPieceAtPosition(startingCoordinate);
+	private Piece FindPieceToMoveForMultiColumnPawn(MultiColumnPawnParsedMoveObject moveObject, Piece[] piecesToMove, Side sideToMove)
+	{
+		Piece[] pawnsOnColumn;
 
-        MoveDirection moveDirection = moveObject.MoveDirection;
+		if (moveObject.StartingColumn != ParsedMoveObject.UnknownStartingColumn)
+		{
+			pawnsOnColumn = piecesToMove
+								.Where(p => p.Coordinate.Column == moveObject.StartingColumn.ConvertToColumnBasedOnSide(sideToMove))
+								.OrderByRowWithSide(sideToMove)
+								.ToArray();
+		}
+		else
+		{
+			pawnsOnColumn = piecesToMove
+								.GroupBy(p => p.Coordinate.Column)
+								.Where(group => group.Count() >= moveObject.MinNumberOfPawnsOnColumn)
+								.SelectMany(group => group)
+								.OrderByRowWithSide(sideToMove)
+								.ToArray();
+		}
 
-        if (pieceToMove.GetType().GetCustomAttribute<MoveInDiagonalsAttribute>() is not null && moveDirection == MoveDirection.Horizontal)
-            throw new ArgumentException($"Piece type {moveObject.PieceType.Name} cannot move horizontally");
+		if (moveObject.PieceOrderIndex == MultiColumnPawnParsedMoveObject.LastPawnIndex)
+			return pawnsOnColumn.Last();
+		else
+			return pawnsOnColumn[moveObject.PieceOrderIndex];
+	}
 
-        Coordinate destination = pieceToMove.GetDestinationCoordinateFromNotation(moveObject.MoveDirection, moveObject.FourthCharacter);
+	private Coordinate FindDestination(ParsedMoveObject moveObject, Coordinate startingCoordinate)
+	{
+		if (moveObject.IsFromUcciNotation)
+			return moveObject.Destination.Value;
 
-        return destination;
-    }
+		Piece pieceToMove = _position.GetPieceAtPosition(startingCoordinate);
 
-    private MoveHistoryObject CreateMoveHistory(Side sideToMove, Coordinate startingPosition, Coordinate destination)
-    {
-        Piece[,] positionAfterTheProposedMove = Position.SimulateMove(startingPosition, destination);
-        bool isCapture = Position.HasPieceAtPosition(destination);
-        bool isCheck = positionAfterTheProposedMove.IsKingInCheck(sideToMove.GetOppositeSide());
-        bool isCheckmate = positionAfterTheProposedMove.IsSideInCheckmate(sideToMove);
-        Piece pieceMoved = GetPieceAtPosition(startingPosition);
+		MoveDirection moveDirection = moveObject.MoveDirection;
 
-        MoveHistoryObject moveHistory = new (
-            fenAfterMove: FenHelper.GetFenFromPosition(positionAfterTheProposedMove),
-            fenBeforeMove: GetFenFromPosition,
-            isCapture,
-            isCheck,
-            isCheckmate,
-            pieceMoved.PieceType,
-            sideToMove,
-            startingPosition,
-            destination
-        );
+		if (pieceToMove.GetType().GetCustomAttribute<MoveInDiagonalsAttribute>() is not null && moveDirection == MoveDirection.Horizontal)
+			throw new ArgumentException($"Piece type {moveObject.PieceType.Name} cannot move horizontally");
 
-        return moveHistory;
-    }
+		Coordinate destination = pieceToMove.GetDestinationCoordinateFromNotation(moveObject.MoveDirection, moveObject.FourthCharacter);
+
+		return destination;
+	}
+
+	private MoveHistoryObject CreateMoveHistory(Side sideToMove, Coordinate startingPosition, Coordinate destination)
+	{
+		Piece[,] positionAfterTheProposedMove = _position.SimulateMove(startingPosition, destination);
+		bool isCapture = _position.HasPieceAtPosition(destination);
+		bool isCheck = positionAfterTheProposedMove.IsKingInCheck(sideToMove.GetOppositeSide());
+		bool isCheckmate = positionAfterTheProposedMove.IsSideInCheckmate(sideToMove);
+		Piece pieceMoved = GetPieceAtPosition(startingPosition);
+
+		MoveHistoryObject moveHistory = new(
+			fenAfterMove: FenHelper.GetFenFromPosition(positionAfterTheProposedMove),
+			fenBeforeMove: GetFenFromPosition,
+			isCapture,
+			isCheck,
+			isCheckmate,
+			pieceMoved.PieceType,
+			sideToMove,
+			startingPosition,
+			destination
+		);
+
+		return moveHistory;
+	}
 }

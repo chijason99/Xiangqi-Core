@@ -1,6 +1,7 @@
 ﻿using System.ComponentModel;
 
 namespace XiangqiCore.Game;
+
 public enum GameResult
 {
     [Description("1-0")]

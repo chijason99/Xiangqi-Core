@@ -40,27 +40,27 @@ public static class DefaultValidationStrategyTests
         }
     }
 
-    [Theory]
-    [MemberData(nameof(IsProposedMoveValidTestData))]
-    public static void IsProposedMoveValid_ShouldReturnExpectedResult(IsProposedMoveValidTestData testData)
-    {
-        // Arrange
-        XiangqiBuilder builder = new();
-        XiangqiGame game = builder.UseCustomFen(testData.StartingFen).Build();
+	[Theory]
+	[MemberData(nameof(IsProposedMoveValidTestData))]
+	public static void IsProposedMoveValid_ShouldReturnExpectedResult(IsProposedMoveValidTestData testData)
+	{
+		// Arrange
+		XiangqiBuilder builder = new();
+		XiangqiGame game = builder.WithStartingFen(testData.StartingFen).Build();
 
-        Coordinate staringPosition = testData.StartingPosition;
-        Coordinate destination = testData.Destination;
-        bool expectedResult = testData.ExpectedResult;
+		Coordinate staringPosition = testData.StartingPosition;
+		Coordinate destination = testData.Destination;
+		bool expectedResult = testData.ExpectedResult;
 
-        Piece[,] boardPosition = game.BoardPosition;
-        Piece pieceToMove = boardPosition.GetPieceAtPosition(staringPosition);
+		Piece[,] boardPosition = game.BoardPosition;
+		Piece pieceToMove = boardPosition.GetPieceAtPosition(staringPosition);
 
-        // Act
-        bool actualResult = pieceToMove.ValidationStrategy.IsProposedMoveValid(boardPosition, staringPosition, destination);
+		// Act
+		bool actualResult = pieceToMove.ValidationStrategy.IsProposedMoveValid(boardPosition, staringPosition, destination);
 
-        // Assert
-        actualResult.Should().Be(actualResult);
-    }
+		// Assert
+		actualResult.Should().Be(actualResult);
+	}
 }
 
 public record IsProposedMoveValidTestData(string StartingFen, Coordinate StartingPosition, Coordinate Destination, bool ExpectedResult);

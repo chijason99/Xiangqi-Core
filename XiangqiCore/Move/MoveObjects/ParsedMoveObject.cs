@@ -6,6 +6,7 @@ public record ParsedMoveObject
     // The starting column would be unknown if there are more than one piece on the same column,
     // which the notation would skip the starting column
     public static int UnknownStartingColumn => -1;
+    public static int UnknownPieceOrderIndex => -1;
     public ParsedMoveObject() { }
 
     // For UCCI notation
@@ -16,7 +17,12 @@ public record ParsedMoveObject
     }
 
     // For Chinese/English Notation
-    public ParsedMoveObject(Type pieceType, int startingColumn, MoveDirection moveDirection, int foruthCharacter, int pieceOrderIndex = 0)
+    public ParsedMoveObject(
+        Type pieceType, 
+        int startingColumn, 
+        MoveDirection moveDirection, 
+        int foruthCharacter, 
+        int pieceOrderIndex = -1)
     {
         PieceType = pieceType;
         StartingColumn = startingColumn;

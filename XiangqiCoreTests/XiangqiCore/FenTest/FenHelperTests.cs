@@ -228,15 +228,15 @@ public static class FenHelperTests
     [InlineData("2bak4/r3a4/n3c1n1b/p1p3p1p/4P4/2P3P2/P2Rc2rP/1C2C1N2/4AR3/2BAK1B2 w - - 4 15")]
     [InlineData("r1bakab1r/9/nc2c1n2/p1p1p1p1p/9/9/P1P1P1P1P/1C2C1N2/3R5/RNBAKAB2 b - - 7 4")]
     [InlineData("3akn3/4aP3/nr2b3b/p1p3p1p/5R3/2P3P2/P4R2P/4B4/4A4/3AK1B2 b - - 2 26")]
-    public static void ShouldReturnCorrectFen_WhenCallingGetFenFromPosition(string sampleFen)
+    public static async Task ShouldReturnCorrectFen_WhenCallingGetFenFromPositionAsync(string sampleFen)
     {
         // Arrange
         string positionFen = sampleFen.Split(" ").First();
         XiangqiBuilder builder = new();
 
-        var gameInstance = builder
-                            .UseDefaultConfiguration()
-                            .UseCustomFen(sampleFen)
+        XiangqiGame gameInstance = builder
+                            .WithDefaultConfiguration()
+                            .WithStartingFen(sampleFen)
                             .Build();
 
         // Act

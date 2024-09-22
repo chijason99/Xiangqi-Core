@@ -220,7 +220,7 @@ public static class PieceExtension
         if (!boardPosition.HasPieceAtPosition(startingPosition))
             throw new ArgumentException("There must be a piece at the starting position on the board");
 
-        Piece[,] boardPositionClone = (Piece[,])boardPosition.Clone();
+        Piece[,] boardPositionClone = boardPosition.DeepClone();
         boardPositionClone.MakeMove(startingPosition, destination);
 
         return boardPositionClone;
@@ -262,24 +262,51 @@ public static class PieceExtension
                position.IsKingAttackedBy<Knight>(targetKing.Coordinate);
     }
 
-    public static bool IsSideInCheckmate(this Piece[,] position, Side sideToCheck)
+	public static bool IsSideInCheckmate(this Piece[,] position, Side sideToCheck)
+	{
+		foreach (Piece piece in GetPiecesToCheck(position, sideToCheck))
+		{
+			foreach (Coordinate potentatialCoordinate in piece.GeneratePotentialMoves(position))
+				return false;
+		}
+
+		return true;
+	}
+
+	private static IEnumerable<Piece> GetPiecesToCheck(Piece[,] position, Side sideToCheck)
     {
-        Piece[] piecesToCheck = position
-                                    .Cast<Piece>()
-                                    .Where(p => p.Side == sideToCheck)
-                                    .ToArray();
+        var piecesToCheck = position
+                            .Cast<Piece>()
+                            .Where(p => p.Side == sideToCheck);
 
-        foreach (Piece piece in piecesToCheck)
-        {
-            List<Coordinate> availableCoordinatesForPiece = piece.GeneratePotentialMoves(position);
-
-            if (availableCoordinatesForPiece.Any())
-                return false;
-        }
-
-        return true;
-    }
+        foreach (Piece pieceToCheck in piecesToCheck)
+            yield return pieceToCheck;
+	}
 
     public static bool HasDuplicatePieceOnColumn(this Piece[,] position, int column, PieceType pieceType, Side side)
 		=> position.GetPiecesOnColumn(column).Count(x => x.PieceType == pieceType && x.Side == side) > 1;
+
+    public static Piece[,] DeepClone(this Piece[,] position)
+    {
+        Piece[,] deepClonedPosition = new Piece[10, 9];
+
+		for (int row = 0; row < 10; row++)
+		{
+			for (int column = 0; column < 9; column++)
+			{
+                Piece originalPiece = position[row, column];
+
+                Piece clonedPiece = originalPiece.PieceType != PieceType.None ? 
+                    PieceFactory.Create(
+                    originalPiece.PieceType, 
+                    originalPiece.Side, 
+                    new Coordinate(column + 1, row + 1)) :
+                new EmptyPiece();
+
+				deepClonedPosition[row, column] = clonedPiece;
+			}
+		}
+
+        return deepClonedPosition;
+	}
 }

@@ -1,7 +1,6 @@
 ﻿using XiangqiCore.Extension;
 using XiangqiCore.Misc;
 using XiangqiCore.Move.MoveObject;
-using XiangqiCore.Move.MoveObjects;
 using XiangqiCore.Pieces;
 using XiangqiCore.Pieces.PieceTypes;
 
@@ -19,22 +18,24 @@ public class ChineseNotationParser : MoveNotationBase
 
 	public override ParsedMoveObject Parse(string notation)
 	{
-		Side notationSide = GetNotationSide(notation);
-		bool isMultiColumnPawn = IsMultiColumnPawn(notation);
+		string translatedNotation = notation.Translate(Chinese.Traditional);
 
-		Type pieceType = ParsePieceType(notation);
-		int startingColumn = ParseStartingColumn(notation, notationSide);
-		MoveDirection moveDirection = ParseMoveDirection(notation);
-		int foruthCharacter = ParseFourthCharacter(notation);
+		Side notationSide = GetNotationSide(translatedNotation);
+		bool isMultiColumnPawn = IsMultiColumnPawn(translatedNotation);
+
+		Type pieceType = ParsePieceType(translatedNotation);
+		int startingColumn = ParseStartingColumn(translatedNotation, notationSide);
+		MoveDirection moveDirection = ParseMoveDirection(translatedNotation);
+		int foruthCharacter = ParseFourthCharacter(translatedNotation);
 
 		ParsedMoveObject result = new(pieceType, startingColumn, moveDirection, foruthCharacter)
 		{
-			PieceOrderIndex = isMultiColumnPawn ? ParsePieceOrderIndexForMultiColumnPawn(notation) : ParsePieceOrderIndex(notation)
+			PieceOrderIndex = isMultiColumnPawn ? ParsePieceOrderIndexForMultiColumnPawn(translatedNotation) : ParsePieceOrderIndex(translatedNotation)
 		};
 
 		if (isMultiColumnPawn)
 		{
-			int minNumberOfPawnsOnColumn = GetMinNumberOfPawnsOnColumn(notation);
+			int minNumberOfPawnsOnColumn = GetMinNumberOfPawnsOnColumn(translatedNotation);
 			MultiColumnPawnParsedMoveObject multiColumnPawnResult = new(result, minNumberOfPawnsOnColumn);
 
 			return multiColumnPawnResult;
@@ -101,7 +102,7 @@ public class ChineseNotationParser : MoveNotationBase
 	}
 
 	private int ParsePieceOrderIndex(string notation)
-		=> notation[0] == '前' ? 0 : 1;
+		=> notation[0] == '後' ? 1 : notation[0] == '前' ? 0 : ParsedMoveObject.UnknownPieceOrderIndex;
 
 	// Multi Column Pawn situation
 	// Meaning that there are more than one columns holding two or more pawns of the same color

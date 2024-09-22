@@ -1,4 +1,5 @@
 ﻿using System.Text;
+using XiangqiCore.Attributes;
 using XiangqiCore.Boards;
 using XiangqiCore.Exceptions;
 using XiangqiCore.Extension;
@@ -11,215 +12,367 @@ using XiangqiCore.Pieces;
 
 namespace XiangqiCore.Game;
 
+/// <summary>
+/// Represents a game of Xiangqi.
+/// </summary>
 public class XiangqiGame
 {
-    internal XiangqiGame() { }
+	internal XiangqiGame() { }
 
-    private XiangqiGame(string initialFenString,
-                         Side sideToMove,
-                         Player redPlayer,
-                         Player blackPlayer,
-                         Competition competition,
-                         GameResult result)
-    {
-        InitialFenString = initialFenString;
-        SideToMove = sideToMove;
-        RedPlayer = redPlayer;
-        BlackPlayer = blackPlayer;
-        Competition = competition;
-        GameResult = result;
+	/// <summary>
+	/// Initializes a new instance of the <see cref="XiangqiGame"/> class.
+	/// </summary>
+	/// <param name="initialFenString">The initial FEN string representing the board position.</param>
+	/// <param name="sideToMove">The side to move.</param>
+	/// <param name="redPlayer">The red player.</param>
+	/// <param name="blackPlayer">The black player.</param>
+	/// <param name="competition">The competition.</param>
+	/// <param name="result">The game result.</param>
+	internal XiangqiGame(
+		string initialFenString,
+		Side sideToMove,
+		Player redPlayer,
+		Player blackPlayer,
+		Competition competition,
+		GameResult result,
+		string gameName)
+	{
+		InitialFenString = initialFenString;
+		SideToMove = sideToMove;
+		RedPlayer = redPlayer;
+		BlackPlayer = blackPlayer;
+		Competition = competition;
+		GameResult = result;
 
-        CreatedDate = DateTime.Today;
-        UpdatedDate = DateTime.Today;
-    }
-    public string InitialFenString { get; private set; }
+		if (string.IsNullOrWhiteSpace(gameName))
+		{
+			string gameResultChinese = GameResult switch
+			{
+				GameResult.RedWin => "先勝",
+				GameResult.BlackWin => "先負",
+				GameResult.Draw => "先和",
+				_ => "對"
+			};
 
-    public Side SideToMove { get; private set; }
+			GameName = $"{RedPlayer.Name}{gameResultChinese}{BlackPlayer.Name}";
+		}
+		else
+		{
+			GameName = gameName;
+		}
+	}
 
-    public Player RedPlayer { get; private set; }
-    public Player BlackPlayer { get; private set; }
+	/// <summary>
+	/// Gets the initial FEN string when the game is first created.
+	/// </summary>
+	public string InitialFenString { get; private set; }
 
-    public Competition Competition { get; private set; }
+	/// <summary>
+	/// Gets the side to move.
+	/// </summary>
+	public Side SideToMove { get; private set; }
 
-    public DateTime GameDate { get; private set; }
-    public DateTime CreatedDate { get; private set; }
-    public DateTime UpdatedDate { get; private set; }
+	/// <summary>
+	/// Gets the red player.
+	/// </summary>
+	public Player RedPlayer { get; private set; }
 
-    public Board Board { get; private set; }
+	/// <summary>
+	/// Gets the black player.
+	/// </summary>
+	public Player BlackPlayer { get; private set; }
 
-    public Piece[,] BoardPosition => Board.Position;
+	/// <summary>
+	/// Gets the competition details of the game.
+	/// </summary>
+	public Competition Competition { get; private set; }
 
-    public string CurrentFen => _moveHistory.LastOrDefault()?.FenAfterMove ?? "";
+	/// <summary>
+	/// Gets the name of the game.
+	/// </summary>
+	public string GameName { get; private set; }
 
-    public int NumberOfMovesWithoutCapture { get; private set; } = 0;
-    public int RoundNumber { get; private set; } = 0;
+	/// <summary>
+	/// Gets the game date.
+	/// </summary>
+	public DateTime GameDate => Competition.GameDate;
 
-    private List<MoveHistoryObject> _moveHistory { get; set; } = [];
-    public IReadOnlyList<MoveHistoryObject> MoveHistory => _moveHistory.AsReadOnly();
+	/// <summary>
+	/// Gets the game board.
+	/// </summary>
+	public Board Board { get; private set; }
 
-    public GameResult GameResult { get; private set; } = GameResult.Unknown;
-    public string GameResultString => EnumHelper<GameResult>.GetDisplayName(GameResult);
+	/// <summary>
+	/// Gets the board position.
+	/// </summary>
+	public Piece[,] BoardPosition => Board.Position;
 
-    public static XiangqiGame Create(string initialFenString, Player redPlayer, Player blackPlayer,
-                                     Competition competition, bool useBoardConfig = false, BoardConfig? boardConfig = null, 
-                                     GameResult gameResult = GameResult.Unknown, string moveRecord = "")
-    {
-        bool isFenValid = FenHelper.Validate(initialFenString);
+	/// <summary>
+	/// Gets the current FEN string representing the board position.
+	/// </summary>
+	public string CurrentFen => _moveHistory.LastOrDefault()?.FenAfterMove ?? InitialFenString;
 
-        if (!isFenValid) throw new InvalidFenException(initialFenString);
+	/// <summary>
+	/// Gets the number of moves without capture.
+	/// </summary>
+	public int NumberOfMovesWithoutCapture { get; private set; } = 0;
 
-        Side sideToMoveFromFen = FenHelper.GetSideToMoveFromFen(initialFenString);
+	/// <summary>
+	/// Gets the round number.
+	/// </summary>
+	public int RoundNumber { get; private set; } = 0;
 
-        XiangqiGame createdGameInstance = new(initialFenString, sideToMoveFromFen, redPlayer, blackPlayer, competition, gameResult)
-        {
-            Board = useBoardConfig ? new Board(initialFenString, boardConfig!) : new Board(initialFenString),
-            RoundNumber = FenHelper.GetRoundNumber(initialFenString),
-            NumberOfMovesWithoutCapture = FenHelper.GetNumberOfMovesWithoutCapture(initialFenString),
-        };
+	private List<MoveHistoryObject> _moveHistory { get; set; } = [];
 
-        if (useBoardConfig)
-            createdGameInstance.InitialFenString = FenHelper.GetFenFromPosition(createdGameInstance.Board.Position);
+	/// <summary>
+	/// Gets the move history.
+	/// </summary>
+	public IReadOnlyList<MoveHistoryObject> MoveHistory => _moveHistory.AsReadOnly();
 
-        if (!string.IsNullOrEmpty(moveRecord))
-            createdGameInstance.SaveMoveRecordToHistory(moveRecord);
+	/// <summary>
+	/// Gets the game result.
+	/// </summary>
+	public GameResult GameResult { get; private set; } = GameResult.Unknown;
 
-        return createdGameInstance;
-    }
+	/// <summary>
+	/// Gets the game result string.
+	/// </summary>
+	public string GameResultString => EnumHelper<GameResult>.GetDisplayName(GameResult);
 
-    public bool Move(Coordinate startingPosition, Coordinate destination)
-    {
-        try
-        {
-            MoveHistoryObject moveHistoryObject = Board.MakeMove(startingPosition, destination, SideToMove);
+	/// <summary>
+	/// Creates a new instance of the <see cref="XiangqiGame"/> class.
+	/// </summary>
+	/// <param name="initialFenString">The initial FEN string representing the board position.</param>
+	/// <param name="redPlayer">The red player.</param>
+	/// <param name="blackPlayer">The black player.</param>
+	/// <param name="competition">The competition.</param>
+	/// <param name="useBoardConfig">A flag indicating whether to use a custom board configuration.</param>
+	/// <param name="boardConfig">The custom board configuration.</param>
+	/// <param name="gameResult">The game result.</param>
+	/// <param name="moveRecord">The move record.</param>
+	/// <returns>A new instance of the <see cref="XiangqiGame"/> class.</returns>
+	internal static XiangqiGame Create(
+		string initialFenString,
+		Player redPlayer,
+		Player blackPlayer,
+		Competition competition,
+		bool useBoardConfig = false,
+		BoardConfig? boardConfig = null,
+		GameResult gameResult = GameResult.Unknown,
+		string moveRecord = "",
+		string gameName = "")
+	{
+		bool isFenValid = FenHelper.Validate(initialFenString);
 
-            UpdateGameInfo(moveHistoryObject);
+		if (!isFenValid) throw new InvalidFenException(initialFenString);
 
-            return true;
-        }
-        catch (Exception ex)
-        {
-            Console.WriteLine($"Invalid move: {ex.Message}");
-            return false;
-        }
-    }
+		Side sideToMoveFromFen = FenHelper.GetSideToMoveFromFen(initialFenString);
 
-    public bool Move(string moveNotation, MoveNotationType moveNotationType)
-    {
-        try
-        {
-            IMoveNotationParser parser = MoveNotationParserFactory.GetParser(moveNotationType);
-            ParsedMoveObject parsedMoveObject = parser.Parse(moveNotation);
+		XiangqiGame createdGameInstance = new(
+			initialFenString,
+			sideToMoveFromFen,
+			redPlayer,
+			blackPlayer,
+			competition,
+			gameResult,
+			gameName)
+		{
+			Board = useBoardConfig ? new Board(initialFenString, boardConfig!) : new Board(initialFenString),
+			RoundNumber = FenHelper.GetRoundNumber(initialFenString),
+			NumberOfMovesWithoutCapture = FenHelper.GetNumberOfMovesWithoutCapture(initialFenString),
+		};
 
-            MoveHistoryObject moveHistoryObject = Board.MakeMove(parsedMoveObject, SideToMove);
-            moveHistoryObject.UpdateMoveNotation(moveNotation, moveNotationType);
+		if (useBoardConfig)
+			createdGameInstance.InitialFenString = FenHelper.GetFenFromPosition(createdGameInstance.Board.Position);
 
-            UpdateGameInfo(moveHistoryObject);
+		if (!string.IsNullOrEmpty(moveRecord))
+			createdGameInstance.SaveMoveRecordToHistory(moveRecord);
 
-            return true;
-        }
-        catch (Exception ex)
-        {
-            Console.WriteLine($"Invalid move: {ex.Message}");
-            return false;
-        }
-    }
+		return createdGameInstance;
+	}
 
-    public string ExportMoveHistory(MoveNotationType targetNotationType = MoveNotationType.Chinese)
-    {
-        List<string> movesOfEachRound = [];
+	/// <summary>
+	/// Makes a move on the game board.
+	/// </summary>
+	/// <param name="startingPosition">The starting position of the move.</param>
+	/// <param name="destination">The destination position of the move.</param>
+	/// <returns><c>true</c> if the move is valid and successful; otherwise, <c>false</c>.</returns>
+	public bool MakeMove(Coordinate startingPosition, Coordinate destination)
+	{
+		try
+		{
+			MoveHistoryObject moveHistoryObject = Board.MakeMove(startingPosition, destination, SideToMove);
 
-        var groupedMoveHitories = _moveHistory
-            .Select(moveHistoryItem =>
-                new
-                {
-                    moveHistoryItem.RoundNumber,
-                    moveHistoryItem.MovingSide,
-                    MoveNotation = moveHistoryItem.TransalateNotation(targetNotationType)
-                })
-            .GroupBy(moveHistoryItem => moveHistoryItem.RoundNumber)
-            .OrderBy(roundGroup => roundGroup.Key);
-            
-        foreach (var roundGroup in groupedMoveHitories)
-        {
-            StringBuilder roundMoves = new();
+			UpdateGameInfo(moveHistoryObject);
 
-            string? moveNotationFromRed = roundGroup.SingleOrDefault(move => move.MovingSide == Side.Red)?.MoveNotation ?? "...";
-            string? moveNotationFromBlack = roundGroup.SingleOrDefault(move => move.MovingSide == Side.Black)?.MoveNotation;
+			return true;
+		}
+		catch (Exception ex)
+		{
+			Console.WriteLine($"Invalid move: {ex.Message}");
+			return false;
+		}
+	}
 
-            roundMoves.Append($"{roundGroup.Key}. {moveNotationFromRed}  {moveNotationFromBlack}");
+	/// <summary>
+	/// Makes a move on the game board using the specified move notation.
+	/// </summary>
+	/// <param name="moveNotation">The move notation.</param>
+	/// <param name="moveNotationType">The type of move notation.</param>
+	/// <returns><c>true</c> if the move is valid and successful; otherwise, <c>false</c>.</returns>
+	public bool MakeMove(string moveNotation, MoveNotationType moveNotationType)
+	{
+		try
+		{
+			IMoveNotationParser parser = MoveNotationParserFactory.GetParser(moveNotationType);
+			ParsedMoveObject parsedMoveObject = parser.Parse(moveNotation);
 
-            movesOfEachRound.Add(roundMoves.ToString());
-        };
+			MoveHistoryObject moveHistoryObject = Board.MakeMove(parsedMoveObject, SideToMove);
+			moveHistoryObject.UpdateMoveNotation(moveNotation, moveNotationType);
 
-        return string.Join("\n", movesOfEachRound);
-    }
+			UpdateGameInfo(moveHistoryObject);
 
-    public string ExportGameAsPgn()
-    {
-        StringBuilder pgnBuilder = new();
+			return true;
+		}
+		catch (Exception ex)
+		{
+			Console.WriteLine($"Invalid move: {ex.Message}");
+			return false;
+		}
+	}
 
-        AddPgnTag(pgnBuilder, PgnTagType.Game, "Chinese Chess");
-        AddPgnTag(pgnBuilder, PgnTagType.Event, Competition.Name);
-        AddPgnTag(pgnBuilder, PgnTagType.Site, Competition.Location);
-        AddPgnTag(pgnBuilder, PgnTagType.Date, Competition.GameDate.ToString("yyyy.MM.dd"));
-        AddPgnTag(pgnBuilder, PgnTagType.Red, RedPlayer.Name);
-        AddPgnTag(pgnBuilder, PgnTagType.RedTeam, RedPlayer.Team);
-        AddPgnTag(pgnBuilder, PgnTagType.Black, BlackPlayer.Name);
-        AddPgnTag(pgnBuilder, PgnTagType.BlackTeam, BlackPlayer.Team);
-        AddPgnTag(pgnBuilder, PgnTagType.Result, GameResultString);
-        AddPgnTag(pgnBuilder, PgnTagType.FEN, InitialFenString);
-        
-        pgnBuilder.AppendLine(ExportMoveHistory());
+	/// <summary>
+	/// Exports the move history in the specified notation type.
+	/// </summary>
+	/// <param name="targetNotationType">The target notation type.</param>
+	/// <returns>The move history in the specified notation type.</returns>
+	[BetaMethod("Currently only supports converting MoveNotationType from Chinese/English to UCCI. The translation would not work for Chinese -> English or English -> Chinese")]
+	public string ExportMoveHistory(MoveNotationType targetNotationType = MoveNotationType.Chinese)
+	{
+		List<string> movesOfEachRound = [];
 
-        return pgnBuilder.ToString();
-    }
+		var groupedMoveHitories = _moveHistory
+			.Select(moveHistoryItem =>
+				new
+				{
+					moveHistoryItem.RoundNumber,
+					moveHistoryItem.MovingSide,
+					MoveNotation = moveHistoryItem.TransalateNotation(targetNotationType)
+				})
+			.GroupBy(moveHistoryItem => moveHistoryItem.RoundNumber)
+			.OrderBy(roundGroup => roundGroup.Key);
 
-    private void AddPgnTag(StringBuilder pgnBuilder, PgnTagType pgnTagKey, string pgnTagValue)
-    {
-        string pgnTagDisplayName = EnumHelper<PgnTagType>.GetDisplayName(pgnTagKey);
-        pgnBuilder.AppendLine($"[{pgnTagDisplayName} \"{pgnTagValue}\"]");
-    }
+		foreach (var roundGroup in groupedMoveHitories)
+		{
+			StringBuilder roundMoves = new();
 
-    private void IncrementRoundNumberIfNeeded()
-    {
-        if (SideToMove == Side.Red || RoundNumber == 0)
-            RoundNumber++;
-    }
+			string? moveNotationFromRed = roundGroup.SingleOrDefault(move => move.MovingSide == Side.Red)?.MoveNotation ?? "...";
+			string? moveNotationFromBlack = roundGroup.SingleOrDefault(move => move.MovingSide == Side.Black)?.MoveNotation;
 
-    private void IncrementNumberOfMovesWithoutCapture() => NumberOfMovesWithoutCapture++;
+			roundMoves.Append($"{roundGroup.Key}. {moveNotationFromRed}  {moveNotationFromBlack}");
 
-    private void ResetNumberOfMovesWithoutCapture() => NumberOfMovesWithoutCapture = 0;
+			movesOfEachRound.Add(roundMoves.ToString());
+		};
 
-    private void SwitchSideToMove() => SideToMove = SideToMove.GetOppositeSide();
+		return string.Join("\n", movesOfEachRound);
+	}
 
-    private void AddMoveToHistory(MoveHistoryObject moveHistoryObj) => _moveHistory.Add(moveHistoryObj);
+	/// <summary>
+	/// Exports the game as PGN (Portable Game Notation) format.
+	/// </summary>
+	/// <returns>The PGN string of the game</returns>
+	public string ExportGameAsPgnString()
+	{
+		StringBuilder pgnBuilder = new();
 
-    private void UpdateGameResult(GameResult result) => GameResult = result;
+		AddPgnTag(pgnBuilder, PgnTagType.Game, "Chinese Chess");
+		AddPgnTag(pgnBuilder, PgnTagType.Event, Competition.Name);
+		AddPgnTag(pgnBuilder, PgnTagType.Site, Competition.Location);
+		AddPgnTag(pgnBuilder, PgnTagType.Date, Competition.GameDate.ToString("yyyy.MM.dd"));
+		AddPgnTag(pgnBuilder, PgnTagType.Red, RedPlayer.Name);
+		AddPgnTag(pgnBuilder, PgnTagType.RedTeam, RedPlayer.Team);
+		AddPgnTag(pgnBuilder, PgnTagType.Black, BlackPlayer.Name);
+		AddPgnTag(pgnBuilder, PgnTagType.BlackTeam, BlackPlayer.Team);
+		AddPgnTag(pgnBuilder, PgnTagType.Result, GameResultString);
+		AddPgnTag(pgnBuilder, PgnTagType.FEN, InitialFenString);
 
-    private void UpdateGameInfo(MoveHistoryObject latestMove)
-    {
-        if (latestMove.IsCapture)
-            ResetNumberOfMovesWithoutCapture();
-        else
-            IncrementNumberOfMovesWithoutCapture();
+		pgnBuilder.AppendLine(ExportMoveHistory());
 
-        IncrementRoundNumberIfNeeded();
+		return pgnBuilder.ToString();
+	}
 
-        latestMove.UpdateFenWithGameInfo(RoundNumber, NumberOfMovesWithoutCapture);
+	public async Task ExportGameAsPgnFileAsync(string filePath)
+	{
+		if (!Path.IsPathFullyQualified(filePath) || !Path.Exists(filePath))
+			throw new ArgumentException("The specified file path does not exist.");
 
-        AddMoveToHistory(latestMove);
+		char[] invalidFileCharacters = Path.GetInvalidFileNameChars();
 
-        if (latestMove.IsCheckmate)
-            UpdateGameResult(latestMove.MovingSide == Side.Red ? GameResult.RedWin : GameResult.BlackWin);
-        else
-            SwitchSideToMove();
-    }
+		string pgnString = ExportGameAsPgnString();
+		string sanitizedFileName = string.Concat($"{GameName}.pgn".Select(character =>
+		{
+			return invalidFileCharacters.Contains(character) ? '_' : character;
+		}));
 
-    private void SaveMoveRecordToHistory(string moveRecord)
-    {
-        List<string> moves = GameRecordParser.Parse(moveRecord);
+		string sanitizedFilePath = Path.Combine(filePath, sanitizedFileName);
 
-        foreach (string move in moves)
-            Move(move, MoveNotationType.Chinese);
-    }
+		using FileStream fileStream = new(sanitizedFilePath, FileMode.Create, FileAccess.Write);
+		using StreamWriter streamWriter = new(fileStream);
+		
+		await fileStream.WriteAsync(Encoding.UTF8.GetBytes(pgnString));
+	}
+
+	private void AddPgnTag(StringBuilder pgnBuilder, PgnTagType pgnTagKey, string pgnTagValue)
+	{
+		string pgnTagDisplayName = EnumHelper<PgnTagType>.GetDisplayName(pgnTagKey);
+		pgnBuilder.AppendLine($"[{pgnTagDisplayName} \"{pgnTagValue}\"]");
+	}
+
+	private void IncrementRoundNumberIfNeeded()
+	{
+		if (SideToMove == Side.Red && (MoveHistory.Count != 0 || RoundNumber != 1))
+			RoundNumber++;
+	}
+
+	private void IncrementNumberOfMovesWithoutCapture() => NumberOfMovesWithoutCapture++;
+
+	private void ResetNumberOfMovesWithoutCapture() => NumberOfMovesWithoutCapture = 0;
+
+	private void SwitchSideToMove() => SideToMove = SideToMove.GetOppositeSide();
+
+	private void AddMoveToHistory(MoveHistoryObject moveHistoryObj) => _moveHistory.Add(moveHistoryObj);
+
+	private void UpdateGameResult(GameResult result) => GameResult = result;
+
+	private void UpdateGameInfo(MoveHistoryObject latestMove)
+	{
+		if (latestMove.IsCapture)
+			ResetNumberOfMovesWithoutCapture();
+		else
+			IncrementNumberOfMovesWithoutCapture();
+
+		IncrementRoundNumberIfNeeded();
+
+		latestMove.UpdateFenWithGameInfo(RoundNumber, NumberOfMovesWithoutCapture);
+
+		AddMoveToHistory(latestMove);
+
+		if (latestMove.IsCheckmate)
+			UpdateGameResult(latestMove.MovingSide == Side.Red ? GameResult.RedWin : GameResult.BlackWin);
+		else
+			SwitchSideToMove();
+	}
+
+	private void SaveMoveRecordToHistory(string moveRecord)
+	{
+		List<string> moves = GameRecordParser.Parse(moveRecord);
+
+		foreach (string move in moves)
+		{
+			bool isSuccessful = MakeMove(move, MoveNotationType.Chinese);
+
+			if (!isSuccessful)
+				throw new ParesMoveRecordException($"Unable to add {move} to the game.");
+		}
+	}
 }
