@@ -36,6 +36,7 @@ XiangqiGame game = builder.WithDefaultConfiguration().Build();
 // Make a move
 game.MakeMove("炮二平五", MoveNotationType.Chinese);
 ```
+
 Refer to the tests or documentation below (In progress) for more detailed examples and usage instructions.
 
 ## Documentation
@@ -55,7 +56,10 @@ Default Configuration:
 - Red player: Unknown
 - Black player: Unknown
 - Game result: Unknown
-- Competition: Unknown
+- Competition: 
+	- GameDate : null
+	- Round : Unknown
+	- Name : Unknown
 
 If the above fields are not set when calling the ``Build`` method, these default values will be used by default.
 
@@ -66,6 +70,7 @@ XiangqiBuilder builder = new ();
 
 XiangqiGame game = builder.WithDefaultConfiguration().Build();
 ```
+
 
 ##### `WithStartingFen(string customFen)`
 Sets the starting position according to the provided FEN (Forsyth-Edwards Notation).
@@ -95,7 +100,7 @@ XiangqiGame game = builder
 ```
 
 ##### `Build()`
-Builds an instance of the Xiangqi game hronously.
+Builds an instance of the Xiangqi game.
 
 ##### `WithRedPlayer(Action<Player> action)`
 Sets the configuration for the red player. If the Name or Team is not set for the player, the default value will be "Unknown".
@@ -804,6 +809,17 @@ The maximum column and row are 9 and 10, respectively.
 ```
 
 ## Release Notes
+
+Version 1.2.1
+
+Features:
+- Performance enhancement when building a Xiangqi game from DPXQ or game record
+- Default the game date to null if not provided
+
+Bug Fixes:
+- Handle the exception when the GameDate format in DPXQ record cannot be parsed
+
+
 
 Version 1.2.0
 
