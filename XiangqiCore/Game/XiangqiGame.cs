@@ -95,7 +95,7 @@ public class XiangqiGame
 	/// <summary>
 	/// Gets the game date.
 	/// </summary>
-	public DateTime GameDate => Competition.GameDate;
+	public DateTime? GameDate => Competition.GameDate;
 
 	/// <summary>
 	/// Gets the game board.
@@ -288,7 +288,7 @@ public class XiangqiGame
 		AddPgnTag(pgnBuilder, PgnTagType.Game, "Chinese Chess");
 		AddPgnTag(pgnBuilder, PgnTagType.Event, Competition.Name);
 		AddPgnTag(pgnBuilder, PgnTagType.Site, Competition.Location);
-		AddPgnTag(pgnBuilder, PgnTagType.Date, Competition.GameDate.ToString("yyyy.MM.dd"));
+		AddPgnTag(pgnBuilder, PgnTagType.Date, Competition.GameDate?.ToString("yyyy.MM.dd") ?? string.Empty);
 		AddPgnTag(pgnBuilder, PgnTagType.Red, RedPlayer.Name);
 		AddPgnTag(pgnBuilder, PgnTagType.RedTeam, RedPlayer.Team);
 		AddPgnTag(pgnBuilder, PgnTagType.Black, BlackPlayer.Name);

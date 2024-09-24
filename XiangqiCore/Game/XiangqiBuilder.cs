@@ -261,7 +261,8 @@ public class XiangqiBuilder : IXiangqiBuilder
 					_blackPlayer.Name = value;
 					break;
 				case gameDateKey:
-					competitionBuilder.WithGameDate(DateTime.Parse(value));
+					bool successfulParse = DateTime.TryParse(value, out DateTime competiitonDate);
+					competitionBuilder.WithGameDate(successfulParse ? competiitonDate : DateTime.Today);
 					break;
 				case locationKey:
 					competitionBuilder.WithLocation(value);

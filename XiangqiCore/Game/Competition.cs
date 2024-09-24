@@ -1,10 +1,10 @@
 ﻿namespace XiangqiCore.Game;
 
-public record Competition(DateTime GameDate, string Round, string Name, string Location);
+public record Competition(DateTime? GameDate, string Round, string Name, string Location);
 
-	public class CompetitionBuilder
+public class CompetitionBuilder
 {
-    private DateTime _gameDate { get; set; } = DateTime.Today;
+    private DateTime? _gameDate { get; set; }
     private string _round { get; set; } = "Unknown";
     private string _name { get; set; } = "Unknown";
     private string _location { get; set; } = "Unknown";
