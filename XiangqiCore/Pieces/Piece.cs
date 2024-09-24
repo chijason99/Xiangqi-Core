@@ -44,20 +44,25 @@ public abstract class Piece(Coordinate coordinate, Side side)
 
     public virtual IEnumerable<Coordinate> GeneratePotentialMoves(Piece[,] position)
     {
-        foreach (int row in GetAvailableRows())
+        List<Coordinate> potentialCoordinates = [];
+
+        foreach (int row in ValidationStrategy.GetPossibleRows(Side))
+            potentialCoordinates.Add(new Coordinate(Coordinate.Column, row));
+
+        foreach (int column in ValidationStrategy.GetPossibleColumns())
+			potentialCoordinates.Add(new Coordinate(column, Coordinate.Row));
+
+        foreach (Coordinate destination in potentialCoordinates)
         {
-            foreach (int column in GetAvailableColumns())
-            {
-				Coordinate destination = new(column, row);
+			if (destination.Equals(Coordinate)) 
+                continue;
 
-				if (destination.Equals(Coordinate)) continue;
+			// Skip if the destination is a King as it is not a valid move to capture a king
+			if (position.GetPieceAtPosition(destination) is King) 
+                continue;
 
-				// Skip if the destination is a King as it is not a valid move to capture a king
-				if (position.GetPieceAtPosition(destination) is King) continue;
-
-				if (ValidateMove(position, Coordinate, destination))
-					yield return destination;
-			}
-        }
+			if (ValidateMove(position, Coordinate, destination))
+				yield return destination;
+		}
     }
 }
