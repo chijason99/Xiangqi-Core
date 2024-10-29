@@ -1,4 +1,9 @@
-﻿using XiangqiCore.Misc;
+﻿using System.Drawing;
+using System.Drawing.Imaging;
+using System.Runtime.Versioning;
+using XiangqiCore.Attributes;
+using XiangqiCore.Boards;
+using XiangqiCore.Misc;
 using XiangqiCore.Pieces;
 using XiangqiCore.Pieces.PieceTypes;
 
@@ -308,5 +313,63 @@ public static class PieceExtension
 		}
 
         return deepClonedPosition;
+	}
+
+    [BetaMethod("Only supported on Windows for now")]
+    [SupportedOSPlatform("windows6.1")]
+	public static byte[] GenerateBoardImage(
+        this Piece[,] position, 
+        string targetPath, 
+        bool flipHorizontal = false, 
+        bool flipVertical = false)
+	{
+		const int defaultSquareSize = 50;
+		const int defaultBoardHeight = 500;
+		const int defaultBoardWidth = 450;
+
+		const int columns = 9;
+		const int rows = 10;
+
+		if (!OperatingSystem.IsWindows())
+			throw new PlatformNotSupportedException("Board image generation is only supported on Windows.");
+
+        using Image boardImage = Board.GetBoardImage();
+
+		using Bitmap boardBitmap = new(
+            original: boardImage, 
+            width: defaultBoardWidth, 
+            height: defaultBoardHeight);
+
+		using Graphics boardGraphics = Graphics.FromImage(boardBitmap);
+
+        foreach (Piece piece in position.Cast<Piece>().Where(p => p is not EmptyPiece))
+        {
+            using Image pieceImage = piece.GetPieceImage();
+
+            int xCoordinate = (piece.Coordinate.Column - 1);
+            int yCoordinate = rows - piece.Coordinate.Row;
+
+			// If flipping the board horizontally, both the x-coordinate and y-coordinate should be flipped
+			// If flipping the board vertically, then the x-coordinate should be flipped
+			// If flipping the board vertically and horizontally, then only the y-coordinate should be flipped because the x-coordinate is flipped twice
+			if (flipVertical && flipHorizontal)
+				yCoordinate = piece.Coordinate.Row - 1;
+            else if (flipVertical)
+                xCoordinate = columns - piece.Coordinate.Column;
+            else if (flipHorizontal)
+            {
+                yCoordinate = piece.Coordinate.Row - 1;
+                xCoordinate = columns - piece.Coordinate.Column;
+			}
+
+			boardGraphics.DrawImage(pieceImage, 
+                x: xCoordinate * defaultSquareSize, 
+                y: yCoordinate * defaultSquareSize);
+		}
+        
+        using MemoryStream memoryStream = new();
+		boardBitmap.Save(memoryStream, ImageFormat.Png);
+
+		return memoryStream.ToArray();
 	}
 }

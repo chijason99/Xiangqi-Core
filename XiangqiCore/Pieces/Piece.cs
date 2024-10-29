@@ -1,4 +1,6 @@
-﻿using XiangqiCore.Extension;
+﻿using System.Drawing;
+using System.Reflection;
+using XiangqiCore.Extension;
 using XiangqiCore.Misc;
 using XiangqiCore.Move;
 using XiangqiCore.Pieces.PieceTypes;
@@ -22,7 +24,7 @@ public abstract class Piece(Coordinate coordinate, Side side)
         return HashCode.Combine(Coordinate, Side);
     }
 
-    public Coordinate Coordinate { get; private set; } = coordinate;
+	public Coordinate Coordinate { get; private set; } = coordinate;
     public Side Side { get; init; } = side;
     public abstract IValidationStrategy ValidationStrategy { get; }
     public virtual int[] GetAvailableRows() => [1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
@@ -65,4 +67,15 @@ public abstract class Piece(Coordinate coordinate, Side side)
 				yield return destination;
 		}
     }
+
+	public Image GetPieceImage()
+	{
+		string imageName = $"{Enum.GetName(typeof(Side), Side)}_{GetType().Name}.png".ToLower();
+		string resourcePath = $"XiangqiCore.Assets.Board.Pieces.{imageName}";
+
+		using Stream stream = Assembly.GetExecutingAssembly().GetManifestResourceStream(resourcePath) 
+            ?? throw new FileNotFoundException($"Resource '{resourcePath}' not found.");
+
+		return Image.FromStream(stream);
+	}
 }

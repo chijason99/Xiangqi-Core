@@ -1,4 +1,5 @@
-﻿using System.Text;
+﻿using System.Runtime.Versioning;
+using System.Text;
 using XiangqiCore.Attributes;
 using XiangqiCore.Boards;
 using XiangqiCore.Exceptions;
@@ -209,7 +210,6 @@ public class XiangqiGame
 		}
 		catch (Exception ex)
 		{
-			Console.WriteLine($"Invalid move: {ex.Message}");
 			return false;
 		}
 	}
@@ -236,7 +236,6 @@ public class XiangqiGame
 		}
 		catch (Exception ex)
 		{
-			Console.WriteLine($"Invalid move: {ex.Message}");
 			return false;
 		}
 	}
@@ -320,6 +319,21 @@ public class XiangqiGame
 		using StreamWriter streamWriter = new(fileStream);
 		
 		await fileStream.WriteAsync(Encoding.UTF8.GetBytes(pgnString));
+	}
+
+	[SupportedOSPlatform("windows6.1")]
+	public void GenerateImage(string filePath, int moveCount = 0, bool flipHorizontal = false, bool flipVertical = false)
+	{
+		string targetFen = InitialFenString;
+
+		if (moveCount > 0)
+			targetFen = MoveHistory.Skip(Math.Max(moveCount - 1, 0)).First().FenAfterMove;
+
+		Piece[,] position = FenHelper.CreatePositionFromFen(targetFen);
+
+		byte[] bytes = position.GenerateBoardImage(filePath, flipHorizontal, flipVertical);
+
+		File.WriteAllBytes(filePath, bytes);
 	}
 
 	private void AddPgnTag(StringBuilder pgnBuilder, PgnTagType pgnTagKey, string pgnTagValue)

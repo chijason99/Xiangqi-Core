@@ -1,4 +1,5 @@
-﻿using System.Reflection;
+﻿using System.Drawing;
+using System.Reflection;
 using XiangqiCore.Attributes;
 using XiangqiCore.Extension;
 using XiangqiCore.Misc;
@@ -77,6 +78,17 @@ public class Board
 		Coordinate destination = FindDestination(moveObject, startingPosition);
 
 		return MakeMove(startingPosition, destination, sideToMove);
+	}
+
+	public static Image GetBoardImage()
+	{
+		string imageName = "board.png";
+		string resourcePath = $"XiangqiCore.Assets.Board.{imageName}";
+
+		using Stream stream = Assembly.GetAssembly(typeof(Piece)).GetManifestResourceStream(resourcePath)
+			?? throw new FileNotFoundException($"Resource '{resourcePath}' not found.");
+
+		return Image.FromStream(stream);
 	}
 
 	private Coordinate FindStartingPosition(ParsedMoveObject moveObject, Side sideToMove)
