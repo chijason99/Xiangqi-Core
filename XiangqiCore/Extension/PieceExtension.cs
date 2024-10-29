@@ -317,9 +317,8 @@ public static class PieceExtension
 
     [BetaMethod("Only supported on Windows for now")]
     [SupportedOSPlatform("windows6.1")]
-	public static byte[] GenerateBoardImage(
+    public static byte[] GenerateBoardImage(
         this Piece[,] position, 
-        string targetPath, 
         bool flipHorizontal = false, 
         bool flipVertical = false)
 	{

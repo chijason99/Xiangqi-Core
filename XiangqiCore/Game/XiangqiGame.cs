@@ -1,4 +1,9 @@
-﻿using System.Runtime.Versioning;
+﻿using SixLabors.ImageSharp;
+using SixLabors.ImageSharp.Formats.Gif;
+using SixLabors.ImageSharp.Metadata;
+using SixLabors.ImageSharp.PixelFormats;
+using System.Drawing;
+using System.Runtime.Versioning;
 using System.Text;
 using XiangqiCore.Attributes;
 using XiangqiCore.Boards;
@@ -331,9 +336,46 @@ public class XiangqiGame
 
 		Piece[,] position = FenHelper.CreatePositionFromFen(targetFen);
 
-		byte[] bytes = position.GenerateBoardImage(filePath, flipHorizontal, flipVertical);
+		byte[] bytes = position.GenerateBoardImage(flipHorizontal, flipVertical);
 
 		File.WriteAllBytes(filePath, bytes);
+	}
+
+	[SupportedOSPlatform("windows6.1")]
+	public void GenerateGIF(string filePath, 
+		bool flipHorizontal = false, 
+		bool flipVertical = false,
+		int width = 450,
+		int height = 500,
+		int frameDelay = 100)
+	{
+		List<string> fens = [InitialFenString, ..MoveHistory.Select(x => x.FenAfterMove)];
+
+		using Image<Rgba32> gif = new(width, height);
+		GifMetadata gifMetaData = gif.Metadata.GetGifMetadata();
+
+		// Infinite loop
+		gifMetaData.RepeatCount = 0;
+
+		// Set the delay until the next image is displayed.
+		GifFrameMetadata metadata = gif.Frames.RootFrame.Metadata.GetGifMetadata();
+		metadata.FrameDelay = frameDelay;
+
+		foreach (string fen in fens)
+		{
+			byte[] imageBytes = FenHelper.CreatePositionFromFen(fen).GenerateBoardImage(flipHorizontal, flipVertical);
+
+			using Image<Rgba32> image = SixLabors.ImageSharp.Image.Load<Rgba32>(imageBytes);
+			var frame = image.Frames.CloneFrame(0);
+
+			// Set the delay until the next image is displayed.
+			metadata = image.Frames.RootFrame.Metadata.GetGifMetadata();
+			metadata.FrameDelay = frameDelay;
+
+			gif.Frames.AddFrame(image.Frames.RootFrame);
+		}
+
+		gif.SaveAsGif(filePath);
 	}
 
 	private void AddPgnTag(StringBuilder pgnBuilder, PgnTagType pgnTagKey, string pgnTagValue)
