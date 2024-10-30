@@ -1,8 +1,6 @@
 ﻿using SixLabors.ImageSharp;
 using SixLabors.ImageSharp.Formats.Gif;
-using SixLabors.ImageSharp.Metadata;
 using SixLabors.ImageSharp.PixelFormats;
-using System.Drawing;
 using System.Runtime.Versioning;
 using System.Text;
 using XiangqiCore.Attributes;
@@ -428,7 +426,7 @@ public class XiangqiGame
 			bool isSuccessful = MakeMove(move, MoveNotationType.Chinese);
 
 			if (!isSuccessful)
-				throw new ParesMoveRecordException($"Unable to add {move} to the game.");
+				break;
 		}
 	}
 }
