@@ -19,7 +19,7 @@ public static class PieceFactory
             _ => throw new InvalidPieceTypeException("The given piece Type is invalid")
         };
 
-    public static Piece CreateEmptyPiece() => new EmptyPiece();
+    public static Piece CreateEmptyPiece() => EmptyPiece.Instance;
 
     public static Piece CreateRandomPiece(Coordinate coordinate)
     {
