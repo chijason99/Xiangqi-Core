@@ -14,7 +14,8 @@ public record MoveHistoryObject
 		bool isCapture, 
 		bool isCheck, 
 		bool isCheckMate, 
-		PieceType pieceMoved, 
+		PieceType pieceMoved,
+		PieceType pieceCaptured,
 		Side side, 
 		Coordinate startingPosition, 
 		Coordinate destination)
@@ -25,6 +26,7 @@ public record MoveHistoryObject
 		IsCheck = isCheck;
 		IsCheckmate = isCheckMate;
 		PieceMoved = pieceMoved;
+		PieceCaptured = pieceCaptured;
 		MovingSide = side;
 		StartingPosition = startingPosition;
 		Destination = destination;
@@ -39,6 +41,7 @@ public record MoveHistoryObject
 	public bool IsCheck { get; init; }
 	public bool IsCheckmate { get; init; }
 	public PieceType PieceMoved { get; init; }
+	public PieceType PieceCaptured { get; init; }
 	public MoveDirection MoveDirection { get; private set; }
 
 	public int RoundNumber => FenHelper.GetRoundNumber(FenAfterMove);

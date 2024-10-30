@@ -22,7 +22,7 @@ public abstract class Piece(Coordinate coordinate, Side side)
         return HashCode.Combine(Coordinate, Side);
     }
 
-    public Coordinate Coordinate { get; private set; } = coordinate;
+	public Coordinate Coordinate { get; private set; } = coordinate;
     public Side Side { get; init; } = side;
     public abstract IValidationStrategy ValidationStrategy { get; }
     public virtual int[] GetAvailableRows() => [1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
@@ -65,4 +65,11 @@ public abstract class Piece(Coordinate coordinate, Side side)
 				yield return destination;
 		}
     }
+
+	public string GetImageResourcePath()
+	{
+		string imageName = $"{Enum.GetName(typeof(Side), Side)}_{GetType().Name}.png".ToLower();
+
+		return $"XiangqiCore.Assets.Board.Pieces.{imageName}";
+	}
 }

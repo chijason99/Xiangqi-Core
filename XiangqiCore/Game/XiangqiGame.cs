@@ -1,4 +1,8 @@
-﻿using System.Text;
+﻿using SixLabors.ImageSharp;
+using SixLabors.ImageSharp.Formats.Gif;
+using SixLabors.ImageSharp.PixelFormats;
+using System.Runtime.Versioning;
+using System.Text;
 using XiangqiCore.Attributes;
 using XiangqiCore.Boards;
 using XiangqiCore.Exceptions;
@@ -209,7 +213,6 @@ public class XiangqiGame
 		}
 		catch (Exception ex)
 		{
-			Console.WriteLine($"Invalid move: {ex.Message}");
 			return false;
 		}
 	}
@@ -236,7 +239,6 @@ public class XiangqiGame
 		}
 		catch (Exception ex)
 		{
-			Console.WriteLine($"Invalid move: {ex.Message}");
 			return false;
 		}
 	}
@@ -308,6 +310,9 @@ public class XiangqiGame
 
 		char[] invalidFileCharacters = Path.GetInvalidFileNameChars();
 
+		Encoding gb2312Encoding = CodePagesEncodingProvider.Instance.GetEncoding(936) ?? Encoding.UTF8;
+		XiangqiBuilder xiangqiBuilder = new();
+
 		string pgnString = ExportGameAsPgnString();
 		string sanitizedFileName = string.Concat($"{GameName}.pgn".Select(character =>
 		{
@@ -319,7 +324,57 @@ public class XiangqiGame
 		using FileStream fileStream = new(sanitizedFilePath, FileMode.Create, FileAccess.Write);
 		using StreamWriter streamWriter = new(fileStream);
 		
-		await fileStream.WriteAsync(Encoding.UTF8.GetBytes(pgnString));
+		await fileStream.WriteAsync(gb2312Encoding.GetBytes(ExportGameAsPgnString()));
+	}
+
+	public void GenerateImage(string filePath, int moveCount = 0, bool flipHorizontal = false, bool flipVertical = false)
+	{
+		string targetFen = InitialFenString;
+
+		if (moveCount > 0)
+			targetFen = MoveHistory.Skip(Math.Max(moveCount - 1, 0)).First().FenAfterMove;
+
+		Piece[,] position = FenHelper.CreatePositionFromFen(targetFen);
+
+		byte[] bytes = position.GenerateBoardImage(flipHorizontal, flipVertical);
+
+		File.WriteAllBytes(filePath, bytes);
+	}
+
+	public void GenerateGIF(string filePath, 
+		bool flipHorizontal = false, 
+		bool flipVertical = false,
+		decimal frameDelayInSecond = 1)
+	{
+		List<string> fens = [InitialFenString, ..MoveHistory.Select(x => x.FenAfterMove)];
+
+		using Image<Rgba32> gif = new(width: 450, height: 500);
+		GifMetadata gifMetaData = gif.Metadata.GetGifMetadata();
+
+		// Infinite loop
+		gifMetaData.RepeatCount = 0;
+
+		int frameDelayInCentiSeconds = (int)Math.Ceiling(frameDelayInSecond * 100);
+
+		// Set the delay until the next image is displayed.
+		GifFrameMetadata metadata = gif.Frames.RootFrame.Metadata.GetGifMetadata();
+		metadata.FrameDelay = frameDelayInCentiSeconds;
+
+		foreach (string fen in fens)
+		{
+			byte[] imageBytes = FenHelper.CreatePositionFromFen(fen).GenerateBoardImage(flipHorizontal, flipVertical);
+
+			using Image<Rgba32> image = Image.Load<Rgba32>(imageBytes);
+			var frame = image.Frames.CloneFrame(0);
+
+			// Set the delay until the next image is displayed.
+			metadata = image.Frames.RootFrame.Metadata.GetGifMetadata();
+			metadata.FrameDelay = frameDelayInCentiSeconds;
+
+			gif.Frames.AddFrame(image.Frames.RootFrame);
+		}
+
+		gif.SaveAsGif(filePath);
 	}
 
 	private void AddPgnTag(StringBuilder pgnBuilder, PgnTagType pgnTagKey, string pgnTagValue)
@@ -372,7 +427,7 @@ public class XiangqiGame
 			bool isSuccessful = MakeMove(move, MoveNotationType.Chinese);
 
 			if (!isSuccessful)
-				throw new ParesMoveRecordException($"Unable to add {move} to the game.");
+				break;
 		}
 	}
 }
