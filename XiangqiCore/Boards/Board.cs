@@ -1,5 +1,4 @@
-﻿using System.Drawing;
-using System.Reflection;
+﻿using System.Reflection;
 using XiangqiCore.Attributes;
 using XiangqiCore.Extension;
 using XiangqiCore.Misc;
@@ -188,6 +187,7 @@ public class Board
 
 	private MoveHistoryObject CreateMoveHistory(Side sideToMove, Coordinate startingPosition, Coordinate destination)
 	{
+		Piece pieceCaptured = GetPieceAtPosition(destination);
 		Piece[,] positionAfterTheProposedMove = _position.SimulateMove(startingPosition, destination);
 		bool isCapture = _position.HasPieceAtPosition(destination);
 		bool isCheck = positionAfterTheProposedMove.IsKingInCheck(sideToMove.GetOppositeSide());
@@ -201,6 +201,7 @@ public class Board
 			isCheck,
 			isCheckmate,
 			pieceMoved.PieceType,
+			pieceCaptured.PieceType,
 			sideToMove,
 			startingPosition,
 			destination
