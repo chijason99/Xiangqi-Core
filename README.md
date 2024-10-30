@@ -539,6 +539,42 @@ XiangqiGame game =  builder
  game.ExportGameAsPgnFile("game.pgn");
 ```
 
+#### GenerateImage(string filePath, int moveCount = 0, bool flipHorizontal = false, bool flipVertical = false)
+Generates an image of the a board position for a specified move count and saves it to the specified file path.
+
+```c#
+using XiangqiCore.Game;
+
+XiangqiBuilder builder = new ();
+XiangqiGame game =  builder
+	.WithDefaultConfiguration()
+	.Build();
+
+game.MakeMove("炮二平五", MoveNotationType.Chinese);
+game.MakeMove("馬8進7", MoveNotationType.Chinese);
+game.MakeMove("馬二進三", MoveNotationType.Chinese);
+
+game.GenerateImage("C:\Users\User\Downloads", moveCount: 3);
+```
+
+####  GenerateGIF(string filePath, bool flipHorizontal = false, bool flipVertical = false, decimal frameDelayInSecond = 1)
+Generates a GIF of the game and saves it to the specified file path.
+
+```c#
+using XiangqiCore.Game;
+
+XiangqiBuilder builder = new ();
+XiangqiGame game =  builder
+	.WithDefaultConfiguration()
+	.Build();
+
+game.MakeMove("炮二平五", MoveNotationType.Chinese);
+game.MakeMove("馬8進7", MoveNotationType.Chinese);
+game.MakeMove("馬二進三", MoveNotationType.Chinese);
+
+game.GenerateGIF("C:\Users\User\Downloads", frameDelayInSecond: 2);
+```
+
 ### Public Properties
 
 #### `CurrentFen`
