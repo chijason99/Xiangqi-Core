@@ -352,7 +352,7 @@ public static class PieceExtension
 			}
 
 			boardImage.Mutate(ctx => ctx.DrawImage(pieceImage, 
-                new SixLabors.ImageSharp.Point(xCoordinate * defaultSquareSize, yCoordinate * defaultSquareSize), 1f));
+                new Point(xCoordinate * defaultSquareSize, yCoordinate * defaultSquareSize), 1f));
 		}
         
         using MemoryStream memoryStream = new();
