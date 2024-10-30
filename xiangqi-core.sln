@@ -7,8 +7,6 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "XiangqiCore", "XiangqiCore\
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "XiangqiCoreTests", "XiangqiCoreTests\XiangqiCoreTests.csproj", "{9191A4DE-A362-423F-BE3B-E44014796DE4}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "XiangqiCoreTestConsole", "XiangqiCoreTestConsole\XiangqiCoreTestConsole.csproj", "{83D37AFA-B087-43DB-9D6A-43DCCC3FAA00}"
-EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -23,10 +21,6 @@ Global
 		{9191A4DE-A362-423F-BE3B-E44014796DE4}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{9191A4DE-A362-423F-BE3B-E44014796DE4}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{9191A4DE-A362-423F-BE3B-E44014796DE4}.Release|Any CPU.Build.0 = Release|Any CPU
-		{83D37AFA-B087-43DB-9D6A-43DCCC3FAA00}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{83D37AFA-B087-43DB-9D6A-43DCCC3FAA00}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{83D37AFA-B087-43DB-9D6A-43DCCC3FAA00}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{83D37AFA-B087-43DB-9D6A-43DCCC3FAA00}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
