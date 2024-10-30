@@ -68,14 +68,10 @@ public abstract class Piece(Coordinate coordinate, Side side)
 		}
     }
 
-	public Image GetPieceImage()
+	public string GetImageResourcePath()
 	{
 		string imageName = $"{Enum.GetName(typeof(Side), Side)}_{GetType().Name}.png".ToLower();
-		string resourcePath = $"XiangqiCore.Assets.Board.Pieces.{imageName}";
 
-		using Stream stream = Assembly.GetExecutingAssembly().GetManifestResourceStream(resourcePath) 
-            ?? throw new FileNotFoundException($"Resource '{resourcePath}' not found.");
-
-		return Image.FromStream(stream);
+		return $"XiangqiCore.Assets.Board.Pieces.{imageName}";
 	}
 }

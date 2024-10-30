@@ -43,6 +43,23 @@ public class EnumHelper<T> where T : Enum
         return result;
     }
 
+    public static List<string> GetAllNames()
+    {
+		List<string> result = [];
+
+		foreach (T element in Enum.GetValues(typeof(T)))
+		{
+			MemberInfo memberInfo = typeof(T).GetMember(element.ToString()).First();
+
+			bool shouldBeIgnored = memberInfo.GetCustomAttribute<IgnoreFromRandomPickAttribute>() is not null;
+
+			if (!shouldBeIgnored)
+				result.Add(element.GetType().Name);
+		}
+
+		return result;
+	}
+
     /// <summary>
     /// Gets the display name of the specified target element.
     /// </summary>

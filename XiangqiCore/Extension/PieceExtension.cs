@@ -1,7 +1,7 @@
-﻿using System.Drawing;
-using System.Drawing.Imaging;
-using System.Runtime.Versioning;
-using XiangqiCore.Attributes;
+﻿using SixLabors.ImageSharp;
+using SixLabors.ImageSharp.Formats.Png;
+using SixLabors.ImageSharp.PixelFormats;
+using SixLabors.ImageSharp.Processing;
 using XiangqiCore.Boards;
 using XiangqiCore.Misc;
 using XiangqiCore.Pieces;
@@ -315,8 +315,6 @@ public static class PieceExtension
         return deepClonedPosition;
 	}
 
-    [BetaMethod("Only supported on Windows for now")]
-    [SupportedOSPlatform("windows6.1")]
     public static byte[] GenerateBoardImage(
         this Piece[,] position, 
         bool flipHorizontal = false, 
@@ -329,23 +327,15 @@ public static class PieceExtension
 		const int columns = 9;
 		const int rows = 10;
 
-		if (!OperatingSystem.IsWindows())
-			throw new PlatformNotSupportedException("Board image generation is only supported on Windows.");
-
-        using Image boardImage = Board.GetBoardImage();
-
-		using Bitmap boardBitmap = new(
-            original: boardImage, 
-            width: defaultBoardWidth, 
-            height: defaultBoardHeight);
-
-		using Graphics boardGraphics = Graphics.FromImage(boardBitmap);
+		using Image<Rgba32> boardImage = ImageCache.GetImage(Board.GetImageResourcePath());
+        boardImage.Mutate(x => x.Resize(defaultBoardWidth, defaultBoardHeight));
 
         foreach (Piece piece in position.Cast<Piece>().Where(p => p is not EmptyPiece))
         {
-            using Image pieceImage = piece.GetPieceImage();
+            string pieceResourcePath = piece.GetImageResourcePath();
+			using Image<Rgba32> pieceImage = ImageCache.GetImage(pieceResourcePath);
 
-            int xCoordinate = (piece.Coordinate.Column - 1);
+			int xCoordinate = (piece.Coordinate.Column - 1);
             int yCoordinate = rows - piece.Coordinate.Row;
 
 			// If flipping the board horizontally, both the x-coordinate and y-coordinate should be flipped
@@ -361,13 +351,12 @@ public static class PieceExtension
                 xCoordinate = columns - piece.Coordinate.Column;
 			}
 
-			boardGraphics.DrawImage(pieceImage, 
-                x: xCoordinate * defaultSquareSize, 
-                y: yCoordinate * defaultSquareSize);
+			boardImage.Mutate(ctx => ctx.DrawImage(pieceImage, 
+                new SixLabors.ImageSharp.Point(xCoordinate * defaultSquareSize, yCoordinate * defaultSquareSize), 1f));
 		}
         
         using MemoryStream memoryStream = new();
-		boardBitmap.Save(memoryStream, ImageFormat.Png);
+		boardImage.Save(memoryStream, new PngEncoder());
 
 		return memoryStream.ToArray();
 	}

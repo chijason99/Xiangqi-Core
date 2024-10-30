@@ -80,16 +80,8 @@ public class Board
 		return MakeMove(startingPosition, destination, sideToMove);
 	}
 
-	public static Image GetBoardImage()
-	{
-		string imageName = "board.png";
-		string resourcePath = $"XiangqiCore.Assets.Board.{imageName}";
-
-		using Stream stream = Assembly.GetAssembly(typeof(Piece)).GetManifestResourceStream(resourcePath)
-			?? throw new FileNotFoundException($"Resource '{resourcePath}' not found.");
-
-		return Image.FromStream(stream);
-	}
+	public static string GetImageResourcePath()
+		=> "XiangqiCore.Assets.Board.board.png";
 
 	private Coordinate FindStartingPosition(ParsedMoveObject moveObject, Side sideToMove)
 	{
