@@ -310,6 +310,9 @@ public class XiangqiGame
 
 		char[] invalidFileCharacters = Path.GetInvalidFileNameChars();
 
+		Encoding gb2312Encoding = CodePagesEncodingProvider.Instance.GetEncoding(936) ?? Encoding.UTF8;
+		XiangqiBuilder xiangqiBuilder = new();
+
 		string pgnString = ExportGameAsPgnString();
 		string sanitizedFileName = string.Concat($"{GameName}.pgn".Select(character =>
 		{
@@ -321,10 +324,9 @@ public class XiangqiGame
 		using FileStream fileStream = new(sanitizedFilePath, FileMode.Create, FileAccess.Write);
 		using StreamWriter streamWriter = new(fileStream);
 		
-		await fileStream.WriteAsync(Encoding.UTF8.GetBytes(pgnString));
+		await fileStream.WriteAsync(gb2312Encoding.GetBytes(ExportGameAsPgnString()));
 	}
 
-	[SupportedOSPlatform("windows6.1")]
 	public void GenerateImage(string filePath, int moveCount = 0, bool flipHorizontal = false, bool flipVertical = false)
 	{
 		string targetFen = InitialFenString;
@@ -339,36 +341,35 @@ public class XiangqiGame
 		File.WriteAllBytes(filePath, bytes);
 	}
 
-	[SupportedOSPlatform("windows6.1")]
 	public void GenerateGIF(string filePath, 
 		bool flipHorizontal = false, 
 		bool flipVertical = false,
-		int width = 450,
-		int height = 500,
-		int frameDelay = 100)
+		decimal frameDelayInSecond = 1)
 	{
 		List<string> fens = [InitialFenString, ..MoveHistory.Select(x => x.FenAfterMove)];
 
-		using Image<Rgba32> gif = new(width, height);
+		using Image<Rgba32> gif = new(width: 450, height: 500);
 		GifMetadata gifMetaData = gif.Metadata.GetGifMetadata();
 
 		// Infinite loop
 		gifMetaData.RepeatCount = 0;
 
+		int frameDelayInCentiSeconds = (int)Math.Ceiling(frameDelayInSecond * 100);
+
 		// Set the delay until the next image is displayed.
 		GifFrameMetadata metadata = gif.Frames.RootFrame.Metadata.GetGifMetadata();
-		metadata.FrameDelay = frameDelay;
+		metadata.FrameDelay = frameDelayInCentiSeconds;
 
 		foreach (string fen in fens)
 		{
 			byte[] imageBytes = FenHelper.CreatePositionFromFen(fen).GenerateBoardImage(flipHorizontal, flipVertical);
 
-			using Image<Rgba32> image = SixLabors.ImageSharp.Image.Load<Rgba32>(imageBytes);
+			using Image<Rgba32> image = Image.Load<Rgba32>(imageBytes);
 			var frame = image.Frames.CloneFrame(0);
 
 			// Set the delay until the next image is displayed.
 			metadata = image.Frames.RootFrame.Metadata.GetGifMetadata();
-			metadata.FrameDelay = frameDelay;
+			metadata.FrameDelay = frameDelayInCentiSeconds;
 
 			gif.Frames.AddFrame(image.Frames.RootFrame);
 		}

@@ -810,6 +810,14 @@ The maximum column and row are 9 and 10, respectively.
 
 ## Release Notes
 
+Version 1.3.1
+
+Features:
+- Functionality to create a GIF from the game.
+- Functionality to create an image from a game position.
+
+
+
 Version 1.2.1
 
 Features:
