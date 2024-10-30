@@ -4,6 +4,7 @@ using XiangqiCore.Pieces;
 using XiangqiCore.Pieces.PieceTypes;
 
 namespace xiangqi_core_test.XiangqiCore.FenTest;
+
 public static class FenHelperTests
 {
     [Theory]
