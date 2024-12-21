@@ -2,7 +2,7 @@
 using XiangqiCore.Misc;
 
 namespace XiangqiCore.Pieces.ValidationStrategy;
-public class KnightValidationStrategy : DefaultValidationStrategy
+public class KnightValidationStrategy : DefaultValidationStrategy, IValidationStrategy
 {
     public override bool ValidateMoveLogicForPiece(Piece[,] boardPosition, Coordinate startingPosition, Coordinate destination)
     {

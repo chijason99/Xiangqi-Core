@@ -6,6 +6,7 @@ using XiangqiCore.Move;
 using XiangqiCore.Move.MoveObject;
 using XiangqiCore.Move.MoveObjects;
 using XiangqiCore.Pieces;
+using XiangqiCore.Pieces.PieceTypes;
 
 namespace XiangqiCore.Boards;
 
@@ -27,8 +28,17 @@ public class Board
 	/// Use the BoardConfig to override existing pieces on board
 	/// </summary>
 	/// <param name="config"></param>
-	internal Board(string fenString, BoardConfig config) : this(fenString)
+	[Obsolete("This constructor is no longer in use")]
+	private Board(string fenString, BoardConfig config) : this(fenString)
 	{
+		foreach (var keyValuePair in config.PiecesToAdd)
+			SetPieceAtPosition(keyValuePair.Key, keyValuePair.Value);
+	}
+
+	internal Board(BoardConfig config)
+	{
+		_position = FenHelper.CreatePositionFromFen(_emptyBoardFen);
+
 		foreach (var keyValuePair in config.PiecesToAdd)
 			SetPieceAtPosition(keyValuePair.Key, keyValuePair.Value);
 	}
@@ -110,7 +120,7 @@ public class Board
 					{
 						Coordinate guessedDestination = x.GetDestinationCoordinateFromNotation(moveObject.MoveDirection, moveObject.FourthCharacter);
 
-						return x.ValidateMove(_position.DeepClone(), x.Coordinate, guessedDestination);
+						return x.ValidateMove(Position, x.Coordinate, guessedDestination);
 					}
 					catch (ArgumentOutOfRangeException ex)
 					{
@@ -125,18 +135,15 @@ public class Board
 		return pieceToMove.Coordinate;
 	}
 
-	private Piece[] GetPiecesToMove(Type pieceType, Side sideToMove)
+	private Piece[] GetPiecesToMove(PieceType pieceType, Side sideToMove)
 	{
-		MethodInfo method = typeof(PieceExtension).GetMethod(nameof(PieceExtension.GetPiecesOfType));
-		MethodInfo genericMethod = method.MakeGenericMethod(pieceType);
+		var allPiecesOfType = _position.GetPiecesOfType(pieceType, sideToMove);
 
-		IEnumerable<Piece> allPiecesOfType = ((IEnumerable<Piece>)genericMethod.Invoke(obj: null, parameters: [_position, sideToMove]));
-
-		if (!allPiecesOfType.Any()) throw new InvalidOperationException($"Cannot find any columns containing more than one {EnumHelper<Side>.GetDisplayName(sideToMove)} {pieceType.Name}");
+		if (!allPiecesOfType.Any()) throw new InvalidOperationException($"Cannot find any columns containing more than one {EnumHelper<Side>.GetDisplayName(sideToMove)} {EnumHelper<PieceType>.GetDisplayName(pieceType)}");
 
 		Piece[] piecesToMove = allPiecesOfType
-									.OrderByRowWithSide(sideToMove)
-									.ToArray();
+			.OrderByRowWithSide(sideToMove)
+			.ToArray();
 
 		return piecesToMove;
 	}
@@ -178,7 +185,7 @@ public class Board
 		MoveDirection moveDirection = moveObject.MoveDirection;
 
 		if (pieceToMove.GetType().GetCustomAttribute<MoveInDiagonalsAttribute>() is not null && moveDirection == MoveDirection.Horizontal)
-			throw new ArgumentException($"Piece type {moveObject.PieceType.Name} cannot move horizontally");
+			throw new ArgumentException($"Piece type {EnumHelper<PieceType>.GetDisplayName(pieceToMove.PieceType)} cannot move horizontally");
 
 		Coordinate destination = pieceToMove.GetDestinationCoordinateFromNotation(moveObject.MoveDirection, moveObject.FourthCharacter);
 

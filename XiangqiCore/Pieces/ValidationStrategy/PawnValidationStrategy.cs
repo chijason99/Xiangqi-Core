@@ -4,7 +4,7 @@ using XiangqiCore.Extension;
 using XiangqiCore.Misc;
 
 namespace XiangqiCore.Pieces.ValidationStrategy;
-public class PawnValidationStrategy : DefaultValidationStrategy
+public class PawnValidationStrategy : DefaultValidationStrategy, IValidationStrategy
 {
     public override int[] GetPossibleRows(Side color)
     {

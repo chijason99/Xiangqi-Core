@@ -23,7 +23,7 @@ public class ChineseNotationParser : MoveNotationBase
 		Side notationSide = GetNotationSide(translatedNotation);
 		bool isMultiColumnPawn = IsMultiColumnPawn(translatedNotation);
 
-		Type pieceType = ParsePieceType(translatedNotation);
+		PieceType pieceType = ParsePieceType(translatedNotation);
 		int startingColumn = ParseStartingColumn(translatedNotation, notationSide);
 		MoveDirection moveDirection = ParseMoveDirection(translatedNotation);
 		int foruthCharacter = ParseFourthCharacter(translatedNotation);
@@ -44,20 +44,20 @@ public class ChineseNotationParser : MoveNotationBase
 		return result;
 	}
 
-	private Type ParsePieceType(string notation)
+	private PieceType ParsePieceType(string notation)
 	{
 		char pieceNameToCheck = pieceChineseNames.Contains(notation[0]) ? notation[0] : notation[1];
 
 		return pieceNameToCheck switch
 		{
-			'將' or '帥' => typeof(King),
-			'車' or '俥' => typeof(Rook),
-			'馬' or '傌' => typeof(Knight),
-			'砲' or '炮' => typeof(Cannon),
-			'士' or '仕' => typeof(Advisor),
-			'象' or '相' => typeof(Bishop),
-			'卒' or '兵' => typeof(Pawn),
-			_ => typeof(Pawn)
+			'將' or '帥' => PieceType.King,
+			'車' or '俥' => PieceType.Rook,
+			'馬' or '傌' => PieceType.Knight,
+			'砲' or '炮' => PieceType.Cannon,
+			'士' or '仕' => PieceType.Advisor,
+			'象' or '相' => PieceType.Bishop,
+			'卒' or '兵' => PieceType.Pawn,
+			_ => PieceType.Pawn
 		};
 	}
 
@@ -106,7 +106,7 @@ public class ChineseNotationParser : MoveNotationBase
 
 	// Multi Column Pawn situation
 	// Meaning that there are more than one columns holding two or more pawns of the same color
-	private bool IsMultiColumnPawn(string notation) => ParsePieceType(notation) == typeof(Pawn) &&
+	private bool IsMultiColumnPawn(string notation) => ParsePieceType(notation) == PieceType.Pawn &&
 													   notation.IndexOfAny(pawnsInChinese) != 0;
 
 	private int GetMinNumberOfPawnsOnColumn(string notation)

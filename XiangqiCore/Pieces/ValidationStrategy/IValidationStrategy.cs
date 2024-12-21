@@ -1,6 +1,7 @@
 ﻿using XiangqiCore.Misc;
 
 namespace XiangqiCore.Pieces.ValidationStrategy;
+
 public interface IValidationStrategy
 {
     /// <summary>
@@ -27,4 +28,12 @@ public interface IValidationStrategy
     int[] GetPossibleColumns();
 
     bool IsProposedMoveValid(Piece[,] boardPosition, Coordinate startingPoint, Coordinate destination);
+
+    Coordinate GetRandomCoordinate(Random random, Side side)
+    {
+        int randomRowIndex = random.Next(0, GetPossibleRows(side).Length);
+        int randomColumnIndex = random.Next(0, GetPossibleColumns().Length);
+
+		return new Coordinate(GetPossibleColumns()[randomColumnIndex], GetPossibleRows(side)[randomRowIndex]);
+	}
 }

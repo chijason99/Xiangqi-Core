@@ -3,14 +3,49 @@ using XiangqiCore.Extension;
 using XiangqiCore.Misc;
 
 namespace XiangqiCore.Pieces.ValidationStrategy;
-public class BishopValidationStrategy : DefaultValidationStrategy
+public class BishopValidationStrategy : DefaultValidationStrategy, IHasSpecificPositions, IValidationStrategy
 {
     public override int[] GetPossibleColumns() => [1, 3, 5, 7, 9];
 
     public override int[] GetPossibleRows(Side color)
         => color == Side.Red ? [1, 3, 5] : color == Side.Black ? [6, 8, 10] : throw new InvalidSideException(color);
 
-    public override bool ValidateMoveLogicForPiece(Piece[,] boardPosition , Coordinate startingPosition, Coordinate destination)
+    public Coordinate[] GetSpecificPositions(Side side)
+    {
+        if (side == Side.None)
+            throw new InvalidSideException(side);
+
+        if (side == Side.Red)
+        {
+            return
+            [
+                new Coordinate(1, 3),
+                new Coordinate(3, 1),
+                new Coordinate(3, 5),
+                new Coordinate(5, 3),
+                new Coordinate(7, 1),
+                new Coordinate(7, 5),
+                new Coordinate(9, 3)
+            ];
+        }
+        else
+        {
+            return
+            [
+                new Coordinate(1, 8),
+                new Coordinate(3, 10),
+                new Coordinate(3, 6),
+                new Coordinate(5, 8),
+                new Coordinate(7, 10),
+                new Coordinate(7, 6),
+                new Coordinate(9, 8)
+            ];
+        }
+    }
+
+	public override bool AreCoordinatesValid(Side color, Coordinate destination) => GetSpecificPositions(color).Contains(destination);
+
+	public override bool ValidateMoveLogicForPiece(Piece[,] boardPosition , Coordinate startingPosition, Coordinate destination)
     {
         bool isMovingUp = startingPosition.Row + 2 == destination.Row;
         bool isMovingDown = startingPosition.Row - 2 == destination.Row;
@@ -64,4 +99,11 @@ public class BishopValidationStrategy : DefaultValidationStrategy
         BottomLeft,
         BottomRight
     }
+
+    Coordinate IValidationStrategy.GetRandomCoordinate(Random random, Side side)
+    {
+        int randomIndex = random.Next(0, GetSpecificPositions(side).Length);
+
+		return GetSpecificPositions(side)[randomIndex];
+	}
 }

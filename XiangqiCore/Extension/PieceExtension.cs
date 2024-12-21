@@ -168,14 +168,28 @@ public static class PieceExtension
             .OfType<TPieceType>()
             .Where(piece => piece.Side == side);
 
-    /// <summary>
-    /// Checks if the king is attacked by a piece of the specified type.
-    /// </summary>
-    /// <typeparam name="TPieceType">The type of the attacking piece.</typeparam>
-    /// <param name="boardPosition">The board position array.</param>
-    /// <param name="kingCoordinate">The coordinate of the king.</param>
-    /// <returns>True if the king is attacked by a piece of the specified type, otherwise false.</returns>
-    public static bool IsKingAttackedBy<TPieceType>(this Piece[,] boardPosition, Coordinate kingCoordinate) where TPieceType : Piece
+
+	/// <summary>
+	/// Gets the pieces of the specified type on the board for the specified side.
+	/// </summary>
+	/// <param name="boardPosition">The board position array.</param>
+	/// <param name="pieceType">The type of the pieces to get.</param>
+	/// <param name="side">The side of the pieces. If null, pieces of the specified type from all sides are returned.</param>
+	/// <returns>The pieces of the specified type on the board for the specified side.</returns>
+	public static IEnumerable<Piece> GetPiecesOfType(this Piece[,] boardPosition, PieceType pieceType, Side? side = null)
+		=> boardPosition
+			.Cast<Piece>()
+			.Where(piece => piece.PieceType == pieceType)
+			.WhereIf(side is not null, p => p.Side == side.Value);
+
+	/// <summary>
+	/// Checks if the king is attacked by a piece of the specified type.
+	/// </summary>
+	/// <typeparam name="TPieceType">The type of the attacking piece.</typeparam>
+	/// <param name="boardPosition">The board position array.</param>
+	/// <param name="kingCoordinate">The coordinate of the king.</param>
+	/// <returns>True if the king is attacked by a piece of the specified type, otherwise false.</returns>
+	public static bool IsKingAttackedBy<TPieceType>(this Piece[,] boardPosition, Coordinate kingCoordinate) where TPieceType : Piece
     {
         King kingToCheck = (King)boardPosition.GetPieceAtPosition(kingCoordinate);
         Side enemySide = kingToCheck.Side.GetOppositeSide();
@@ -211,6 +225,17 @@ public static class PieceExtension
 
         return boardPosition.CountPiecesBetweenOnColumn(kingCoordinate, opponentKing.Coordinate) == 0;
     }
+
+    public static bool IsKingExposedDirectlyToEnemyKing(this Piece[,] boardPosition)
+    {
+		King redKing = boardPosition.GetPiecesOfType<King>(Side.Red).Single();
+		King blackKing = boardPosition.GetPiecesOfType<King>(Side.Black).Single();
+
+		if (redKing.Coordinate.Column != blackKing.Coordinate.Column)
+			return false;
+
+		return boardPosition.CountPiecesBetweenOnColumn(redKing.Coordinate, blackKing.Coordinate) == 0;
+	}
 
     /// <summary>
     /// Simulates a move on the board position array.
