@@ -33,6 +33,14 @@ public class Board
 			SetPieceAtPosition(keyValuePair.Key, keyValuePair.Value);
 	}
 
+	internal Board(BoardConfig config)
+	{
+		_position = FenHelper.CreatePositionFromFen(_emptyBoardFen);
+
+		foreach (var keyValuePair in config.PiecesToAdd)
+			SetPieceAtPosition(keyValuePair.Key, keyValuePair.Value);
+	}
+
 	private Piece[,] _position { get; set; }
 
 	public Piece[,] Position => _position.DeepClone();
