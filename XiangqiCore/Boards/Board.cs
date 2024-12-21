@@ -110,7 +110,7 @@ public class Board
 					{
 						Coordinate guessedDestination = x.GetDestinationCoordinateFromNotation(moveObject.MoveDirection, moveObject.FourthCharacter);
 
-						return x.ValidateMove(_position.DeepClone(), x.Coordinate, guessedDestination);
+						return x.ValidateMove(Position, x.Coordinate, guessedDestination);
 					}
 					catch (ArgumentOutOfRangeException ex)
 					{
