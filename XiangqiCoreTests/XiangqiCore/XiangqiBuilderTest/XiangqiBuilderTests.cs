@@ -1,4 +1,5 @@
 ﻿using XiangqiCore.Boards;
+using XiangqiCore.Extension;
 using XiangqiCore.Game;
 using XiangqiCore.Misc;
 using XiangqiCore.Pieces.PieceTypes;
@@ -7,7 +8,47 @@ namespace XiangqiCoreTests.XiangqiCore.XiangqiBuilderTest;
 
 public static class XiangqiBuilderTests
 {
-    [Fact]
+	public static IEnumerable<object[]> RandomisePositionFromFenTestData
+	{
+		get
+		{
+			// Randomise from Fen string
+			yield return new object[] { 
+				new RandomisePositionTestData(
+					initialFen: "4k4/9/9/r8/9/9/9/9/9/5K3 w - - 0 0", 
+					allowCheck: false, 
+					pieceCounts: new(
+						RedPieces: new Dictionary<PieceType, int>()
+						{
+							{ PieceType.King, 1 },
+						},
+						BlackPieces: new Dictionary<PieceType, int>()
+						{
+							{ PieceType.King, 1 },
+							{ PieceType.Rook, 1 },
+						}
+					))};
+
+			yield return new object[] {
+				new RandomisePositionTestData(
+					initialFen: "9/9/5k3/9/9/9/9/5A3/2C1A4/4K4 w - - 0 0",
+					allowCheck: false,
+					pieceCounts: new(
+						RedPieces: new Dictionary<PieceType, int>()
+						{
+							{ PieceType.King, 1 },
+							{ PieceType.Advisor, 2 },
+							{ PieceType.Cannon, 1 },
+						},
+						BlackPieces: new Dictionary<PieceType, int>()
+						{
+							{ PieceType.King, 1 },
+						}
+					))};
+		}
+	}
+
+	[Fact]
     public static async Task ShouldCreateDefaultXiangqiGame_WhenCallingCreateWithDefaultMethodAsync()
     {
         // Arrange
@@ -539,4 +580,54 @@ public static class XiangqiBuilderTests
 		xiangqiGame.GameResult.Should().Be(GameResult.RedWin);
 		xiangqiGame.MoveHistory.Should().HaveCount(40 * 2 + 1);
 	}
+
+	[Theory]
+	[MemberData(nameof(RandomisePositionFromFenTestData))]
+	public static void ShouldRandomizePiecePosition_WhenCallingRandomisePiecePosition(RandomisePositionTestData testData)
+	{
+		// Arrange
+		XiangqiBuilder builder = new();
+
+		// Act
+		XiangqiGame xiangqiGame = builder.WithStartingFen(testData.InitialFen)
+			.RandomisePosition(allowCheck: testData.AllowCheck)
+			.Build();
+
+		// Assert
+		Piece[,] boardPosition = xiangqiGame.BoardPosition;
+
+		Assert.Multiple(() =>
+		{
+			// Verify the number of pieces
+			foreach (var pieceType in Enum.GetValues<PieceType>())
+			{
+				int expectedRedCount = testData.PieceCounts.GetPieceCount(pieceType, Side.Red);
+				int expectedBlackCount = testData.PieceCounts.GetPieceCount(pieceType, Side.Black);
+
+				int actualRedCount = boardPosition.GetPiecesByType(pieceType, Side.Red).Count();
+				int actualBlackCount = boardPosition.GetPiecesByType(pieceType, Side.Black).Count();
+
+				actualBlackCount.Should().Be(expectedBlackCount);
+				actualRedCount.Should().Be(expectedRedCount);
+			}
+		});
+	}
+}
+
+public record RandomisePositionTestData(bool allowCheck, PieceCounts pieceCounts)
+{
+	public RandomisePositionTestData(string initialFen, bool allowCheck, PieceCounts pieceCounts): this(allowCheck, pieceCounts) 
+	{ 
+		InitialFen = initialFen; 
+	}
+
+	public RandomisePositionTestData(BoardConfig boardConfig, bool allowCheck, PieceCounts pieceCounts) : this(allowCheck, pieceCounts) 
+	{ 
+		BoardConfig = boardConfig; 
+	}
+
+	public bool AllowCheck { get; init; } = allowCheck;
+	public PieceCounts PieceCounts { get; init; } = pieceCounts;
+	public string InitialFen { get; init; }
+	public BoardConfig? BoardConfig { get; init; }
 }

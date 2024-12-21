@@ -219,6 +219,28 @@ public class XiangqiBuilder : IXiangqiBuilder
 		return this;
 	}
 
+	/// <summary>
+	/// Randomises the piece position on the board.
+	/// </summary>
+	/// <param name="fromFen">Randomise the pieces from the FEN provided</param>
+	/// <param name="allowCheck">Allow checks on the new position</param>
+	/// <returns></returns>
+	/// <exception cref="InvalidOperationException"></exception>
+	public XiangqiBuilder RandomisePosition(bool fromFen = true, bool allowCheck = true)
+	{
+		if (!fromFen && _boardConfig is null)
+			throw new InvalidOperationException("The board configuration must be set before randomising the piece position if fromFen is set to false.");
+
+		PieceCounts pieceCounts = fromFen ? FenHelper.ExtractPieceCounts(_initialFen) : _boardConfig!.ExtractPieceCounts();
+
+		_boardConfig ??= new();
+
+		_boardConfig.RandomisePiecePositions(pieceCounts, allowCheck = true);
+		_useBoardConfig = true;
+
+		return this;
+	}
+
 	private void ExtractGameInfoFromDpxqRecord(string dpxqGameRecord)
 	{
 		const string competitionNameKey = "赛事";
