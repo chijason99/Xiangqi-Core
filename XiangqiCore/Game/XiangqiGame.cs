@@ -187,7 +187,11 @@ public class XiangqiGame
 		};
 
 		if (useBoardConfig)
-			createdGameInstance.InitialFenString = FenHelper.GetFenFromPosition(createdGameInstance.Board.Position);
+			createdGameInstance.InitialFenString = FenHelper.GetFenFromPosition(createdGameInstance.Board.Position)
+				.AppendGameInfoToFen(
+					createdGameInstance.SideToMove, 
+					createdGameInstance.RoundNumber, 
+					createdGameInstance.NumberOfMovesWithoutCapture);
 
 		if (!string.IsNullOrEmpty(moveRecord))
 			createdGameInstance.SaveMoveRecordToHistory(moveRecord);
