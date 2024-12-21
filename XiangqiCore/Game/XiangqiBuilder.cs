@@ -227,7 +227,7 @@ public class XiangqiBuilder : IXiangqiBuilder
 	/// <param name="allowCheck">Allow checks on the new position</param>
 	/// <returns></returns>
 	/// <exception cref="InvalidOperationException"></exception>
-	public XiangqiBuilder RandomisePosition(bool fromFen = true, bool allowCheck = true)
+	public XiangqiBuilder RandomisePosition(bool fromFen = true, bool allowCheck = false)
 	{
 		if (!fromFen && _boardConfig is null)
 			throw new InvalidOperationException("The board configuration must be set before randomising the piece position if fromFen is set to false.");
@@ -236,7 +236,7 @@ public class XiangqiBuilder : IXiangqiBuilder
 
 		_boardConfig ??= new();
 
-		_boardConfig.RandomisePiecePositions(pieceCounts, allowCheck = true);
+		_boardConfig.RandomisePiecePositions(pieceCounts, allowCheck);
 		_useBoardConfig = true;
 
 		return this;

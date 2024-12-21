@@ -31,18 +31,64 @@ public static class XiangqiBuilderTests
 
 			yield return new object[] {
 				new RandomisePositionTestData(
-					initialFen: "9/9/5k3/9/9/9/9/5A3/2C1A4/4K4 w - - 0 0",
+					initialFen: "4k4/4a4/3a5/9/9/9/9/5A3/2C6/4K4 w - - 0 0",
+					allowCheck: false,
+					pieceCounts: new(
+						RedPieces: new Dictionary<PieceType, int>()
+						{
+							{ PieceType.King, 1 },
+							{ PieceType.Advisor, 1 },
+							{ PieceType.Cannon, 1 },
+						},
+						BlackPieces: new Dictionary<PieceType, int>()
+						{
+							{ PieceType.King, 1 },
+							{ PieceType.Advisor, 2 },
+						}
+					))};
+
+			yield return new object[] {
+				new RandomisePositionTestData(
+					initialFen: "1rbakabr1/9/2n4c1/p1p1p2Rp/1c3np2/1R7/P1P1P1P1P/N1C1C1N2/9/2BAKAB2 b - - 15 8",
 					allowCheck: false,
 					pieceCounts: new(
 						RedPieces: new Dictionary<PieceType, int>()
 						{
 							{ PieceType.King, 1 },
 							{ PieceType.Advisor, 2 },
-							{ PieceType.Cannon, 1 },
+							{ PieceType.Bishop, 2 },
+							{ PieceType.Cannon, 2 },
+							{ PieceType.Knight, 2 },
+							{ PieceType.Rook, 2 },
+							{ PieceType.Pawn, 5 },
 						},
 						BlackPieces: new Dictionary<PieceType, int>()
 						{
 							{ PieceType.King, 1 },
+							{ PieceType.Advisor, 2 },
+							{ PieceType.Bishop, 2 },
+							{ PieceType.Cannon, 2 },
+							{ PieceType.Knight, 2 },
+							{ PieceType.Rook, 2 },
+							{ PieceType.Pawn, 5 },
+						}
+					))};			
+			
+			yield return new object[] {
+				new RandomisePositionTestData(
+					initialFen: "4k4/9/4b4/1n7/6b2/9/9/R8/9/4K4 w - - 0 0",
+					allowCheck: false,
+					pieceCounts: new(
+						RedPieces: new Dictionary<PieceType, int>()
+						{
+							{ PieceType.King, 1 },
+							{ PieceType.Rook, 1 },
+						},
+						BlackPieces: new Dictionary<PieceType, int>()
+						{
+							{ PieceType.King, 1 },
+							{ PieceType.Bishop, 2 },
+							{ PieceType.Knight, 1 },
 						}
 					))};
 		}
@@ -599,7 +645,7 @@ public static class XiangqiBuilderTests
 		Assert.Multiple(() =>
 		{
 			// Verify the number of pieces
-			foreach (var pieceType in Enum.GetValues<PieceType>())
+			foreach (var pieceType in Enum.GetValues<PieceType>().Where(x => x != PieceType.None))
 			{
 				int expectedRedCount = testData.PieceCounts.GetPieceCount(pieceType, Side.Red);
 				int expectedBlackCount = testData.PieceCounts.GetPieceCount(pieceType, Side.Black);
@@ -611,6 +657,17 @@ public static class XiangqiBuilderTests
 				actualRedCount.Should().Be(expectedRedCount);
 			}
 		});
+
+		boardPosition.IsKingExposedDirectlyToEnemyKing().Should().BeFalse();
+
+		if (!testData.AllowCheck)
+		{
+			boardPosition.IsKingInCheck(Side.Red).Should().BeFalse();
+			boardPosition.IsKingInCheck(Side.Black).Should().BeFalse();
+		}
+
+		foreach (Piece piece in boardPosition.Cast<Piece>().Where(x => x is not EmptyPiece))
+			piece.ValidationStrategy.AreCoordinatesValid(piece.Side, piece.Coordinate).Should().BeTrue();
 	}
 }
 
