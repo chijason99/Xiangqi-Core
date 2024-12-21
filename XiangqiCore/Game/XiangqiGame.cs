@@ -181,7 +181,7 @@ public class XiangqiGame
 			gameResult,
 			gameName)
 		{
-			Board = useBoardConfig ? new Board(initialFenString, boardConfig!) : new Board(initialFenString),
+			Board = useBoardConfig ? new Board(boardConfig!) : new Board(initialFenString),
 			RoundNumber = FenHelper.GetRoundNumber(initialFenString),
 			NumberOfMovesWithoutCapture = FenHelper.GetNumberOfMovesWithoutCapture(initialFenString),
 		};

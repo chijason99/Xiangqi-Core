@@ -183,6 +183,7 @@ public class XiangqiBuilder : IXiangqiBuilder
 
 	/// <summary>
 	/// Sets the board configuration for the Xiangqi game using the APIs from the <see cref="BoardConfig"/> class.
+	/// NOTE: calling this method will override the initial FEN string provided by the <see cref="WithStartingFen(string)"/>.
 	/// </summary>
 	/// <param name="action">An action that configures the board configuration.</param>
 	/// <returns>The current instance of the <see cref="XiangqiBuilder"/> class.</returns>
