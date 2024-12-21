@@ -1,4 +1,5 @@
 ﻿using System.Text.RegularExpressions;
+using XiangqiCore.Boards;
 using XiangqiCore.Pieces;
 using XiangqiCore.Pieces.PieceTypes;
 
@@ -196,4 +197,28 @@ public static partial class FenHelper
 
         return $"{boardFen} {sideToMoveFen} - - {numberOfMovesWithoutCapture} {roundNumber}";
     }
+
+	public static PieceCounts ExtractPieceCounts(string fenString)
+	{
+		Piece[,] position = CreatePositionFromFen(fenString);
+
+		Dictionary<PieceType, int> redPieces = [];
+		Dictionary<PieceType, int> blackPieces = [];
+
+		var groupedPieces = position.Cast<Piece>()
+			.Where(x => x is not EmptyPiece)
+			.GroupBy(x => x.PieceType)
+			.Select(x => new { 
+                PieceType = x.Key, 
+                RedCount = x.Count(p => p.Side == Side.Red), 
+                BlackCount = x.Count(p => p.Side == Side.Black) });
+
+		foreach (var piece in groupedPieces)
+		{
+			redPieces[piece.PieceType] = piece.RedCount;
+			blackPieces[piece.PieceType] = piece.BlackCount;
+		}
+
+		return new PieceCounts(redPieces, blackPieces);
+	}
 }
