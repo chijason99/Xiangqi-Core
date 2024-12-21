@@ -333,6 +333,9 @@ public class XiangqiGame
 
 	public void GenerateImage(string filePath, int moveCount = 0, bool flipHorizontal = false, bool flipVertical = false)
 	{
+		if (!Path.IsPathFullyQualified(filePath) || !Path.Exists(filePath))
+			throw new ArgumentException("The specified file path does not exist.");
+
 		string targetFen = InitialFenString;
 
 		if (moveCount > 0)
@@ -350,6 +353,9 @@ public class XiangqiGame
 		bool flipVertical = false,
 		decimal frameDelayInSecond = 1)
 	{
+		if (!Path.IsPathFullyQualified(filePath) || !Path.Exists(filePath))
+			throw new ArgumentException("The specified file path does not exist.");
+
 		List<string> fens = [InitialFenString, ..MoveHistory.Select(x => x.FenAfterMove)];
 
 		using Image<Rgba32> gif = new(width: 450, height: 500);
