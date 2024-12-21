@@ -88,9 +88,7 @@ public class BoardConfig
 
 		bool ShouldRetry(Piece[,] position)
 		{
-			Coordinate redKingCoordinate = position.GetPiecesOfType<King>(Side.Red).Single().Coordinate;
-
-			if (position.IsKingExposedDirectlyToEnemyKing(redKingCoordinate))
+			if (position.IsKingExposedDirectlyToEnemyKing())
 				return true;
 
 			bool isRedKingInCheck = position.IsKingInCheck(Side.Red);

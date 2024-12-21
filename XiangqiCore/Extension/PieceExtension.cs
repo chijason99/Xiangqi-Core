@@ -226,6 +226,17 @@ public static class PieceExtension
         return boardPosition.CountPiecesBetweenOnColumn(kingCoordinate, opponentKing.Coordinate) == 0;
     }
 
+    public static bool IsKingExposedDirectlyToEnemyKing(this Piece[,] boardPosition)
+    {
+		King redKing = boardPosition.GetPiecesOfType<King>(Side.Red).Single();
+		King blackKing = boardPosition.GetPiecesOfType<King>(Side.Black).Single();
+
+		if (redKing.Coordinate.Column != blackKing.Coordinate.Column)
+			return false;
+
+		return boardPosition.CountPiecesBetweenOnColumn(redKing.Coordinate, blackKing.Coordinate) == 0;
+	}
+
     /// <summary>
     /// Simulates a move on the board position array.
     /// </summary>
