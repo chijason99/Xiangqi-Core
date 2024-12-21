@@ -7,6 +7,7 @@ using XiangqiCore.Move.MoveObjects;
 using XiangqiCore.Move.NotationParser;
 using XiangqiCore.Move.NotationParsers;
 using XiangqiCore.Pieces.PieceTypes;
+using XiangqiCore.Pieces.ValidationStrategy;
 
 namespace XiangqiCore.Extension;
 public class EnumHelper<T> where T : Enum 
@@ -123,4 +124,16 @@ public static class EnumExtension
 
         return string.Empty;
     }
+
+	public static IValidationStrategy GetValidationStrategy(this PieceType pieceType) => pieceType switch
+	{
+		PieceType.Advisor => new AdvisorValidationStrategy(),
+		PieceType.Bishop => new BishopValidationStrategy(),
+		PieceType.Cannon => new CannonValidationStrategy(),
+		PieceType.Rook => new RookValidationStrategy(),
+		PieceType.King => new KingValidationStrategy(),
+		PieceType.Knight => new KnightValidationStrategy(),
+		PieceType.Pawn => new PawnValidationStrategy(),
+		_ => throw new InvalidOperationException("Please provide a valid piece type")
+	};
 }
