@@ -6,6 +6,8 @@ using XiangqiCore.Misc;
 namespace XiangqiCore.Pieces.ValidationStrategy;
 public class PawnValidationStrategy : DefaultValidationStrategy, IValidationStrategy
 {
+    public static readonly int[] AvailableColumnsForPawnsNotYetCrossedTheRiver = [1, 3, 5, 7, 9];
+
     public override int[] GetPossibleRows(Side color)
     {
         int[] unavailableRowsForRedPawn = [1, 2, 3];
@@ -19,7 +21,16 @@ public class PawnValidationStrategy : DefaultValidationStrategy, IValidationStra
                 };
     }
 
-    public override bool ValidateMoveLogicForPiece(Piece[,] boardPosition, Coordinate startingPosition, Coordinate destination)
+	public override bool AreCoordinatesValid(Side color, Coordinate destination)
+	{
+		bool hasCrossedTheRiver = color == Side.Red ? destination.Row >= 6 : destination.Row <= 5;
+
+		int[] availableColumns = hasCrossedTheRiver ? GetPossibleColumns() : AvailableColumnsForPawnsNotYetCrossedTheRiver;
+        
+        return availableColumns.Contains(destination.Column) && GetPossibleRows(color).Contains(destination.Row);
+	}
+
+	public override bool ValidateMoveLogicForPiece(Piece[,] boardPosition, Coordinate startingPosition, Coordinate destination)
     {
         Pawn pawn = (Pawn)boardPosition.GetPieceAtPosition(startingPosition);
         const int redRiverRow = 5;
@@ -38,4 +49,20 @@ public class PawnValidationStrategy : DefaultValidationStrategy, IValidationStra
 
         return (isMovingForward && !(isMovingLeft || isMovingRight)) || (pawnHasCrossedTheRiver && ((isMovingLeft || isMovingRight) && !isMovingForward));
     }
+
+    Coordinate IValidationStrategy.GetRandomCoordinate(Random random, Side color)
+	{
+        int randomRowIndex = random.Next(0, GetPossibleRows(color).Length);
+        int row = GetPossibleRows(color)[randomRowIndex];
+
+        bool hasCrossedTheRiver = color == Side.Red ? row >= 6 : row <= 5;
+
+		// Limit the choice of the columns if the pawn has not crossed the river
+        int[] availableColumns = hasCrossedTheRiver ? GetPossibleColumns() : AvailableColumnsForPawnsNotYetCrossedTheRiver;
+		int randomColumnIndex = random.Next(0, availableColumns.Length);
+
+		int column = availableColumns[randomColumnIndex];
+
+        return new Coordinate(column, row);
+	}
 }

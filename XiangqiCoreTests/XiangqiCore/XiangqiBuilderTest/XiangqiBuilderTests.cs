@@ -118,6 +118,25 @@ public static class XiangqiBuilderTests
 							{ PieceType.Knight, 2 },
 						}
 					))};
+
+			yield return new object[] {
+				new RandomisePositionTestData(
+					initialFen: "3aka3/3P2P2/4P4/9/4c4/9/9/9/9/2B1K4 w - - 0 0",
+					allowCheck: false,
+					pieceCounts: new(
+						RedPieces: new Dictionary<PieceType, int>()
+						{
+							{ PieceType.King, 1 },
+							{ PieceType.Bishop, 1 },
+							{ PieceType.Pawn, 3 },
+						},
+						BlackPieces: new Dictionary<PieceType, int>()
+						{
+							{ PieceType.King, 1 },
+							{ PieceType.Cannon, 1 },
+							{ PieceType.Advisor, 2 },
+						}
+					))};
 		}
 	}
 
