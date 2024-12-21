@@ -1,6 +1,7 @@
 ﻿using XiangqiCore.Extension;
 using XiangqiCore.Game;
 using XiangqiCore.Misc;
+using XiangqiCore.Pieces.PieceTypes;
 
 namespace xiangqi_core_test.XiangqiCore.ExtensionTest;
 public static class PieceExtensionTests
@@ -136,6 +137,17 @@ public static class PieceExtensionTests
             yield return new object[] { new IsKingAttackedTestData("3k5/9/9/9/9/9/9/4p4/1C1p1p3/4K2C1 w - - 0 0", new Coordinate(5, 1), ExpectedResult: false) };
         }
     }
+	public static IEnumerable<object[]> GetPiecesOfTypeTestData
+	{
+		get
+		{
+			yield return new object[] { "2R1kab2/4a4/8c/p3n3p/6p2/2PN1RP2/P2rc1r1P/C5N2/9/2BAKAB2 b - - 0 16", PieceType.Rook, Side.Black, 2 };
+			yield return new object[] { "2bak1br1/4a4/2n4c1/p1p5p/4R4/2P4r1/P3P3n/C1N5B/6R2/2BAKA3 w - - 0 20", PieceType.Knight, Side.Red, 1 };
+			yield return new object[] { "2bakabr1/9/2n1c1n2/p1p1p3p/6Pr1/2P6/P3P2cP/C1N1C1N1B/9/1RBAKA1R1 b - - 0 10", PieceType.Cannon, null, 4 };
+			yield return new object[] { "6b2/5k3/4c1N2/R5P1p/9/2P6/P3r4/C3K4/9/2Bc1AB2 w - - 7 33", PieceType.Pawn, Side.Red, 3 };
+			yield return new object[] { "1r2kab2/4aR3/2n1b2rc/p1N1p3p/6p2/2P6/P3P1c1n/2CCB1N2/4A4/R2AK1B2 w - - 2 14", PieceType.King, Side.Red, 1 };
+		}
+	}
 
 	[Theory]
 	[InlineData("rnbakab1r/9/1c4nc1/p1p1p1p1p/9/9/P1P1P1P1P/1C2C4/9/RNBAKABNR w - - 2 1", 1, 9)]
@@ -370,6 +382,30 @@ public static class PieceExtensionTests
 
 		// Assert
 		actualResult.Should().Be(expectedResult);
+	}
+
+	[Theory]
+	[MemberData(nameof(GetPiecesOfTypeTestData))]
+	public static void GetPiecesOfType_ShouldReturnCorrectPieces(string fen, PieceType pieceType, Side? side, int expectedCount)
+	{
+		// Arrange
+		XiangqiBuilder builder = new();
+		XiangqiGame game = builder.WithStartingFen(fen).Build();
+		Piece[,] position = game.BoardPosition;
+
+		// Act
+		IEnumerable<Piece> result = position.GetPiecesOfType(pieceType, side);
+
+		// Assert
+		result.Count().Should().Be(expectedCount);
+		foreach (Piece piece in result)
+		{
+			piece.PieceType.Should().Be(pieceType);
+			if (side.HasValue)
+			{
+				piece.Side.Should().Be(side.Value);
+			}
+		}
 	}
 }
 
