@@ -16,7 +16,7 @@ public static class XiangqiBuilderTests
 			yield return new object[] { 
 				new RandomisePositionTestData(
 					initialFen: "4k4/9/9/r8/9/9/9/9/9/5K3 w - - 0 0", 
-					allowCheck: false, 
+					allowCheck: true, 
 					pieceCounts: new(
 						RedPieces: new Dictionary<PieceType, int>()
 						{
@@ -32,7 +32,7 @@ public static class XiangqiBuilderTests
 			yield return new object[] {
 				new RandomisePositionTestData(
 					initialFen: "4k4/4a4/3a5/9/9/9/9/5A3/2C6/4K4 w - - 0 0",
-					allowCheck: false,
+					allowCheck: true,
 					pieceCounts: new(
 						RedPieces: new Dictionary<PieceType, int>()
 						{
@@ -89,6 +89,33 @@ public static class XiangqiBuilderTests
 							{ PieceType.King, 1 },
 							{ PieceType.Bishop, 2 },
 							{ PieceType.Knight, 1 },
+						}
+					))};			
+			
+			yield return new object[] {
+				new RandomisePositionTestData(
+					initialFen: "3ak4/4a4/2n1b3c/p5N2/2b3n2/P2r5/4R4/2C1B3C/4A4/4KAB2 b - - 0 34",
+					allowCheck: false,
+					pieceCounts: new(
+						RedPieces: new Dictionary<PieceType, int>()
+						{
+							{ PieceType.King, 1 },
+							{ PieceType.Rook, 1 },
+							{ PieceType.Cannon, 2 },
+							{ PieceType.Bishop, 2 },
+							{ PieceType.Advisor, 2 },
+							{ PieceType.Pawn, 1 },
+							{ PieceType.Knight, 1 },
+						},
+						BlackPieces: new Dictionary<PieceType, int>()
+						{
+							{ PieceType.King, 1 },
+							{ PieceType.Rook, 1 },
+							{ PieceType.Cannon, 1 },
+							{ PieceType.Bishop, 2 },
+							{ PieceType.Advisor, 2 },
+							{ PieceType.Pawn, 1 },
+							{ PieceType.Knight, 2 },
 						}
 					))};
 		}
@@ -665,6 +692,8 @@ public static class XiangqiBuilderTests
 			boardPosition.IsKingInCheck(Side.Red).Should().BeFalse();
 			boardPosition.IsKingInCheck(Side.Black).Should().BeFalse();
 		}
+		else
+			(boardPosition.IsKingInCheck(Side.Red) && boardPosition.IsKingInCheck(Side.Black)).Should().BeFalse();
 
 		foreach (Piece piece in boardPosition.Cast<Piece>().Where(x => x is not EmptyPiece))
 			piece.ValidationStrategy.AreCoordinatesValid(piece.Side, piece.Coordinate).Should().BeTrue();
