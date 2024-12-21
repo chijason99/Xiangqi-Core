@@ -429,9 +429,9 @@ public class XiangqiGame
 	}
 
 	public async Task GenerateGIFAsync(string filePath,
-	bool flipHorizontal = false,
-	bool flipVertical = false,
-	decimal frameDelayInSecond = 1)
+		bool flipHorizontal = false,
+		bool flipVertical = false,
+		decimal frameDelayInSecond = 1)
 	{
 		if (!Path.IsPathFullyQualified(filePath) || !Path.Exists(filePath))
 			throw new ArgumentException("The specified file path does not exist.");
