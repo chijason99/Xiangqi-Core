@@ -307,7 +307,31 @@ public class XiangqiGame
 		return pgnBuilder.ToString();
 	}
 
-	public async Task ExportGameAsPgnFileAsync(string filePath)
+	public void GeneratePgnFile(string filePath)
+	{
+		if (!Path.IsPathFullyQualified(filePath) || !Path.Exists(filePath))
+			throw new ArgumentException("The specified file path does not exist.");
+
+		char[] invalidFileCharacters = Path.GetInvalidFileNameChars();
+
+		Encoding gb2312Encoding = CodePagesEncodingProvider.Instance.GetEncoding(936) ?? Encoding.UTF8;
+		XiangqiBuilder xiangqiBuilder = new();
+
+		string pgnString = ExportGameAsPgnString();
+		string sanitizedFileName = string.Concat($"{GameName}.pgn".Select(character =>
+		{
+			return invalidFileCharacters.Contains(character) ? '_' : character;
+		}));
+
+		string sanitizedFilePath = Path.Combine(filePath, sanitizedFileName);
+
+		using FileStream fileStream = new(sanitizedFilePath, FileMode.Create, FileAccess.Write);
+		using StreamWriter streamWriter = new(fileStream);
+
+		fileStream.Write(gb2312Encoding.GetBytes(ExportGameAsPgnString()));
+	}
+
+	public async Task GeneratePgnFileAsync(string filePath)
 	{
 		if (!Path.IsPathFullyQualified(filePath) || !Path.Exists(filePath))
 			throw new ArgumentException("The specified file path does not exist.");
@@ -333,6 +357,9 @@ public class XiangqiGame
 
 	public void GenerateImage(string filePath, int moveCount = 0, bool flipHorizontal = false, bool flipVertical = false)
 	{
+		if (!Path.IsPathFullyQualified(filePath) || !Path.Exists(filePath))
+			throw new ArgumentException("The specified file path does not exist.");
+
 		string targetFen = InitialFenString;
 
 		if (moveCount > 0)
@@ -345,11 +372,31 @@ public class XiangqiGame
 		File.WriteAllBytes(filePath, bytes);
 	}
 
-	public void GenerateGIF(string filePath, 
+	public async Task GenerateImageAsync(string filePath, int moveCount = 0, bool flipHorizontal = false, bool flipVertical = false)
+	{
+		if (!Path.IsPathFullyQualified(filePath) || !Path.Exists(filePath))
+			throw new ArgumentException("The specified file path does not exist.");
+
+		string targetFen = InitialFenString;
+
+		if (moveCount > 0)
+			targetFen = MoveHistory.Skip(Math.Max(moveCount - 1, 0)).First().FenAfterMove;
+
+		Piece[,] position = FenHelper.CreatePositionFromFen(targetFen);
+
+		byte[] bytes = position.GenerateBoardImage(flipHorizontal, flipVertical);
+
+		await File.WriteAllBytesAsync(filePath, bytes, cancellationToken: default);
+	}
+
+	public void GenerateGif(string filePath, 
 		bool flipHorizontal = false, 
 		bool flipVertical = false,
 		decimal frameDelayInSecond = 1)
 	{
+		if (!Path.IsPathFullyQualified(filePath) || !Path.Exists(filePath))
+			throw new ArgumentException("The specified file path does not exist.");
+
 		List<string> fens = [InitialFenString, ..MoveHistory.Select(x => x.FenAfterMove)];
 
 		using Image<Rgba32> gif = new(width: 450, height: 500);
@@ -379,6 +426,45 @@ public class XiangqiGame
 		}
 
 		gif.SaveAsGif(filePath);
+	}
+
+	public async Task GenerateGifAsync(string filePath,
+		bool flipHorizontal = false,
+		bool flipVertical = false,
+		decimal frameDelayInSecond = 1)
+	{
+		if (!Path.IsPathFullyQualified(filePath) || !Path.Exists(filePath))
+			throw new ArgumentException("The specified file path does not exist.");
+
+		List<string> fens = [InitialFenString, .. MoveHistory.Select(x => x.FenAfterMove)];
+
+		using Image<Rgba32> gif = new(width: 450, height: 500);
+		GifMetadata gifMetaData = gif.Metadata.GetGifMetadata();
+
+		// Infinite loop
+		gifMetaData.RepeatCount = 0;
+
+		int frameDelayInCentiSeconds = (int)Math.Ceiling(frameDelayInSecond * 100);
+
+		// Set the delay until the next image is displayed.
+		GifFrameMetadata metadata = gif.Frames.RootFrame.Metadata.GetGifMetadata();
+		metadata.FrameDelay = frameDelayInCentiSeconds;
+
+		foreach (string fen in fens)
+		{
+			byte[] imageBytes = FenHelper.CreatePositionFromFen(fen).GenerateBoardImage(flipHorizontal, flipVertical);
+
+			using Image<Rgba32> image = Image.Load<Rgba32>(imageBytes);
+			var frame = image.Frames.CloneFrame(0);
+
+			// Set the delay until the next image is displayed.
+			metadata = image.Frames.RootFrame.Metadata.GetGifMetadata();
+			metadata.FrameDelay = frameDelayInCentiSeconds;
+
+			gif.Frames.AddFrame(image.Frames.RootFrame);
+		}
+
+		await gif.SaveAsGifAsync(filePath, cancellationToken: default);
 	}
 
 	private void AddPgnTag(StringBuilder pgnBuilder, PgnTagType pgnTagKey, string pgnTagValue)
