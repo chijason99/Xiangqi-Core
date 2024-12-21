@@ -176,7 +176,7 @@ public static class PieceExtension
 	/// <param name="pieceType">The type of the pieces to get.</param>
 	/// <param name="side">The side of the pieces. If null, pieces of the specified type from all sides are returned.</param>
 	/// <returns>The pieces of the specified type on the board for the specified side.</returns>
-	public static IEnumerable<Piece> GetPiecesOfType(this Piece[,] boardPosition, PieceType pieceType, Side? side = null)
+	public static IEnumerable<Piece> GetPiecesByType(this Piece[,] boardPosition, PieceType pieceType, Side? side = null)
 		=> boardPosition
 			.Cast<Piece>()
 			.Where(piece => piece.PieceType == pieceType)
