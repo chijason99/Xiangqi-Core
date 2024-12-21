@@ -2,6 +2,7 @@
 using XiangqiCore.Misc;
 using XiangqiCore.Pieces;
 using XiangqiCore.Pieces.PieceTypes;
+using XiangqiCore.Game;
 
 namespace XiangqiCore.Boards;
 
@@ -13,7 +14,9 @@ public class BoardConfig
 	/// <summary>
 	/// Gets the dictionary of pieces to add to the board.
 	/// </summary>
-	public Dictionary<Coordinate, Piece> PiecesToAdd { get; } = new Dictionary<Coordinate, Piece>();
+	public Dictionary<Coordinate, Piece> PiecesToAdd { get; } = [];
+
+	public PieceCounts PieceCounts { get; private set; } = new PieceCounts(RedPieces: [], BlackPieces: []);
 
 	/// <summary>
 	/// Adds a piece of the specified type and color to the specified coordinate.
@@ -22,6 +25,13 @@ public class BoardConfig
 	/// <param name="targetColor">The color of the piece to add.</param>
 	/// <param name="targetCoordinate">The coordinate where the piece should be added.</param>
 	public void AddPiece(PieceType targetPieceType, Side targetColor, Coordinate targetCoordinate)
+	{
+		PiecesToAdd[targetCoordinate] = PieceFactory.Create(targetPieceType, targetColor, targetCoordinate);
+
+		PieceCounts.IncrementPieceCount(targetPieceType, targetColor);
+	}
+
+	private void AddPieceWithoutIncrementingPieceCount(PieceType targetPieceType, Side targetColor, Coordinate targetCoordinate)
 	{
 		PiecesToAdd[targetCoordinate] = PieceFactory.Create(targetPieceType, targetColor, targetCoordinate);
 	}
@@ -33,37 +43,28 @@ public class BoardConfig
 	public void AddRandomPiece(Coordinate targetCoordinate)
 	{
 		PiecesToAdd[targetCoordinate] = PieceFactory.CreateRandomPiece(targetCoordinate);
+
+		Piece newPiece = PiecesToAdd[targetCoordinate];
+
+		PieceCounts.IncrementPieceCount(newPiece.PieceType, newPiece.Side); 
 	}
 
 	/// <summary>
-	/// Get the piece counts of the pieces to add.
+	/// Sets the piece counts for the board configuration. This is used for <see cref="XiangqiBuilder.RandomisePiecePositions"/>, and it will remove all the previous PiecesToAdd in the board config.
 	/// </summary>
-	/// <returns><see cref="PieceCounts"/></returns>
-	public PieceCounts ExtractPieceCounts()
+	/// <param name="pieceCounts">The piece counts to set.</param>
+	public void SetPieceCounts(PieceCounts pieceCounts)
 	{
-		Dictionary<PieceType, int> redPiecesCount = [];
-		Dictionary<PieceType, int> blackPiecesCount = [];
-
-		foreach ((_, Piece piece) in PiecesToAdd)
-		{
-			PieceType pieceType = piece.PieceType;
-			var target = piece.Side == Side.Red ? redPiecesCount : blackPiecesCount;
-
-			if (target.TryGetValue(pieceType, out int value))
-				target[pieceType] = ++value;
-			else
-				target[pieceType] = 1;
-		}
-		
-		return new PieceCounts(redPiecesCount, blackPiecesCount);
+		PiecesToAdd.Clear();
+		PieceCounts = pieceCounts;
 	}
 
-	public void RandomisePiecePositions(PieceCounts pieceCounts, bool allowCheck = false)
+	public void RandomisePiecePositions(bool allowCheck = false)
 	{
 		Random random = new();
 		HashSet<Coordinate> occupiedCoordinates = [];
 
-		if (!pieceCounts.BlackPieces.ContainsKey(PieceType.King) || !pieceCounts.RedPieces.ContainsKey(PieceType.King))
+		if (!PieceCounts.BlackPieces.ContainsKey(PieceType.King) || !PieceCounts.RedPieces.ContainsKey(PieceType.King))
 			throw new ArgumentException("Both sides must have a king.");
 
 		AddPiecesForSide(Side.Red);
@@ -106,7 +107,7 @@ public class BoardConfig
 
 		void AddPiecesForSide(Side side)
 		{
-			var pieceCountsForSide = side == Side.Red ? pieceCounts.RedPieces : pieceCounts.BlackPieces;
+			var pieceCountsForSide = side == Side.Red ? PieceCounts.RedPieces : PieceCounts.BlackPieces;
 
 			foreach ((PieceType pieceType, int count) in pieceCountsForSide)
 			{
@@ -118,7 +119,7 @@ public class BoardConfig
 						randomCoordinate = GetRandomCoordinateForPiece(pieceType, side);
 
 					occupiedCoordinates.Add(randomCoordinate);
-					AddPiece(pieceType, side, randomCoordinate);
+					AddPieceWithoutIncrementingPieceCount(pieceType, side, randomCoordinate);
 				}
 			}
 		}

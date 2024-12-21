@@ -121,8 +121,245 @@ public static class XiangqiBuilderTests
 		}
 	}
 
+	public static IEnumerable<object[]> RandomisePositionFromBoardConfigTestData
+	{
+		get
+		{
+			// Randomise from Board Config
+			yield return new object[] {
+				new RandomisePositionTestData(
+					actions: (boardConfig) =>
+					{
+						boardConfig.AddPiece(PieceType.King, Side.Red, new(5, 1));
+						boardConfig.AddPiece(PieceType.Bishop, Side.Red, new(3, 1));
+						boardConfig.AddPiece(PieceType.Bishop, Side.Red, new(7, 1));
+						boardConfig.AddPiece(PieceType.Advisor, Side.Red, new(4, 1));
+						boardConfig.AddPiece(PieceType.Advisor, Side.Red, new(6, 1));
+						boardConfig.AddPiece(PieceType.Rook, Side.Red, new(1, 1));
+						boardConfig.AddPiece(PieceType.Rook, Side.Red, new(9, 1));
+						boardConfig.AddPiece(PieceType.Cannon, Side.Red, new(2, 3));
+						boardConfig.AddPiece(PieceType.Cannon, Side.Red, new(8, 3));
+						boardConfig.AddPiece(PieceType.Knight, Side.Red, new(2, 1));
+						boardConfig.AddPiece(PieceType.Knight, Side.Red, new(8, 1));
+						boardConfig.AddPiece(PieceType.Pawn, Side.Red, new(1, 4));
+						boardConfig.AddPiece(PieceType.Pawn, Side.Red, new(3, 4));
+						boardConfig.AddPiece(PieceType.Pawn, Side.Red, new(5, 4));
+						boardConfig.AddPiece(PieceType.Pawn, Side.Red, new(7, 4));
+						boardConfig.AddPiece(PieceType.Pawn, Side.Red, new(9, 4));
+
+						boardConfig.AddPiece(PieceType.King, Side.Black, new(5, 10));
+						boardConfig.AddPiece(PieceType.Bishop, Side.Black, new(3, 10));
+						boardConfig.AddPiece(PieceType.Bishop, Side.Black, new(7, 10));
+						boardConfig.AddPiece(PieceType.Advisor, Side.Black, new(4, 10));
+						boardConfig.AddPiece(PieceType.Advisor, Side.Black, new(6, 10));
+						boardConfig.AddPiece(PieceType.Rook, Side.Black, new(1, 10));
+						boardConfig.AddPiece(PieceType.Rook, Side.Black, new(9, 10));
+						boardConfig.AddPiece(PieceType.Cannon, Side.Black, new(2, 8));
+						boardConfig.AddPiece(PieceType.Cannon, Side.Black, new(8, 8));
+						boardConfig.AddPiece(PieceType.Knight, Side.Black, new(2, 10));
+						boardConfig.AddPiece(PieceType.Knight, Side.Black, new(8, 10));
+						boardConfig.AddPiece(PieceType.Pawn, Side.Black, new(1, 7));
+						boardConfig.AddPiece(PieceType.Pawn, Side.Black, new(3, 7));
+						boardConfig.AddPiece(PieceType.Pawn, Side.Black, new(5, 7));
+						boardConfig.AddPiece(PieceType.Pawn, Side.Black, new(7, 7));
+						boardConfig.AddPiece(PieceType.Pawn, Side.Black, new(9, 7));
+					},
+					allowCheck: false,
+					pieceCounts: new(
+						RedPieces: new Dictionary<PieceType, int>()
+						{
+							{ PieceType.King, 1 },
+							{ PieceType.Advisor, 2 },
+							{ PieceType.Bishop, 2 },
+							{ PieceType.Cannon, 2 },
+							{ PieceType.Knight, 2 },
+							{ PieceType.Rook, 2 },
+							{ PieceType.Pawn, 5 },
+						},
+						BlackPieces: new Dictionary<PieceType, int>()
+						{
+							{ PieceType.King, 1 },
+							{ PieceType.Advisor, 2 },
+							{ PieceType.Bishop, 2 },
+							{ PieceType.Cannon, 2 },
+							{ PieceType.Knight, 2 },
+							{ PieceType.Rook, 2 },
+							{ PieceType.Pawn, 5 },
+						}
+					))};
+
+			yield return new object[] {
+				new RandomisePositionTestData(
+					actions: (boardConfig) =>
+					{
+						boardConfig.AddPiece(PieceType.King, Side.Red, new(5, 1));
+						boardConfig.AddPiece(PieceType.Bishop, Side.Red, new(5, 3));
+						boardConfig.AddPiece(PieceType.Bishop, Side.Red, new(3, 1));
+						boardConfig.AddPiece(PieceType.Advisor, Side.Red, new(4, 1));
+						boardConfig.AddPiece(PieceType.Advisor, Side.Red, new(4, 3));
+
+						boardConfig.AddPiece(PieceType.King, Side.Black, new(5, 10));
+						boardConfig.AddPiece(PieceType.Rook, Side.Black, new(2, 4));
+					},
+					allowCheck: true,
+					pieceCounts: new(
+						RedPieces: new Dictionary<PieceType, int>()
+						{
+							{ PieceType.King, 1 },
+							{ PieceType.Advisor, 2 },
+							{ PieceType.Bishop, 2 },
+						},
+						BlackPieces: new Dictionary<PieceType, int>()
+						{
+							{ PieceType.King, 1 },
+							{ PieceType.Rook, 1 },
+						}
+					))};
+		}
+	}
+
+	public static IEnumerable<object[]> RandomisePositionWithPieceCountsTestData
+	{
+		get
+		{
+			yield return new object[] {
+				new RandomisePositionTestData(
+					userPieceCounts: new(
+						RedPieces: new Dictionary<PieceType, int>()
+						{
+							{ PieceType.King, 1 },
+						},
+						BlackPieces: new Dictionary<PieceType, int>()
+						{
+							{ PieceType.King, 1 },
+							{ PieceType.Rook, 1 },
+						}),
+					allowCheck: true,
+					pieceCounts: new(
+						RedPieces: new Dictionary<PieceType, int>()
+						{
+							{ PieceType.King, 1 },
+						},
+						BlackPieces: new Dictionary<PieceType, int>()
+						{
+							{ PieceType.King, 1 },
+							{ PieceType.Rook, 1 },
+						}
+					))};
+
+			yield return new object[] {
+				new RandomisePositionTestData(
+					userPieceCounts: new(
+						RedPieces: new Dictionary<PieceType, int>()
+						{
+							{ PieceType.King, 1 },
+							{ PieceType.Advisor, 1 },
+							{ PieceType.Cannon, 1 },
+						},
+						BlackPieces: new Dictionary<PieceType, int>()
+						{
+							{ PieceType.King, 1 },
+							{ PieceType.Advisor, 2 },
+						}
+					),
+					allowCheck: true,
+					pieceCounts: new(
+						RedPieces: new Dictionary<PieceType, int>()
+						{
+							{ PieceType.King, 1 },
+							{ PieceType.Advisor, 1 },
+							{ PieceType.Cannon, 1 },
+						},
+						BlackPieces: new Dictionary<PieceType, int>()
+						{
+							{ PieceType.King, 1 },
+							{ PieceType.Advisor, 2 },
+						}
+					))};
+
+			yield return new object[] {
+				new RandomisePositionTestData(
+					userPieceCounts: new(
+						RedPieces: new Dictionary<PieceType, int>()
+						{
+							{ PieceType.King, 1 },
+							{ PieceType.Advisor, 2 },
+							{ PieceType.Bishop, 2 },
+							{ PieceType.Cannon, 2 },
+							{ PieceType.Knight, 2 },
+							{ PieceType.Rook, 2 },
+							{ PieceType.Pawn, 5 },
+						},
+						BlackPieces: new Dictionary<PieceType, int>()
+						{
+							{ PieceType.King, 1 },
+							{ PieceType.Advisor, 2 },
+							{ PieceType.Bishop, 2 },
+							{ PieceType.Cannon, 2 },
+							{ PieceType.Knight, 2 },
+							{ PieceType.Rook, 2 },
+							{ PieceType.Pawn, 5 },
+						}
+					),
+					allowCheck: false,
+					pieceCounts: new(
+						RedPieces: new Dictionary<PieceType, int>()
+						{
+							{ PieceType.King, 1 },
+							{ PieceType.Advisor, 2 },
+							{ PieceType.Bishop, 2 },
+							{ PieceType.Cannon, 2 },
+							{ PieceType.Knight, 2 },
+							{ PieceType.Rook, 2 },
+							{ PieceType.Pawn, 5 },
+						},
+						BlackPieces: new Dictionary<PieceType, int>()
+						{
+							{ PieceType.King, 1 },
+							{ PieceType.Advisor, 2 },
+							{ PieceType.Bishop, 2 },
+							{ PieceType.Cannon, 2 },
+							{ PieceType.Knight, 2 },
+							{ PieceType.Rook, 2 },
+							{ PieceType.Pawn, 5 },
+						}
+					))};
+
+			yield return new object[] {
+				new RandomisePositionTestData(
+					userPieceCounts: new(
+						RedPieces: new Dictionary<PieceType, int>()
+						{
+							{ PieceType.King, 1 },
+							{ PieceType.Rook, 1 },
+						},
+						BlackPieces: new Dictionary<PieceType, int>()
+						{
+							{ PieceType.King, 1 },
+							{ PieceType.Bishop, 2 },
+							{ PieceType.Knight, 1 },
+						}
+					),
+					allowCheck: false,
+					pieceCounts: new(
+						RedPieces: new Dictionary<PieceType, int>()
+						{
+							{ PieceType.King, 1 },
+							{ PieceType.Rook, 1 },
+						},
+						BlackPieces: new Dictionary<PieceType, int>()
+						{
+							{ PieceType.King, 1 },
+							{ PieceType.Bishop, 2 },
+							{ PieceType.Knight, 1 },
+						}
+					))};
+		}
+	}
+
+
 	[Fact]
-    public static async Task ShouldCreateDefaultXiangqiGame_WhenCallingCreateWithDefaultMethodAsync()
+    public static void ShouldCreateDefaultXiangqiGame_WhenCallingCreateWithDefaultMethod()
     {
         // Arrange
         XiangqiBuilder builder = new();
@@ -669,6 +906,50 @@ public static class XiangqiBuilderTests
 		// Assert
 		Piece[,] boardPosition = xiangqiGame.BoardPosition;
 
+		ValidateRandomizedPosition(boardPosition, testData);
+	}
+
+	[Theory]
+	[MemberData(nameof(RandomisePositionFromBoardConfigTestData))]
+	public static void ShouldRandomizePiecePosition_WhenCallingRandomisePiecePositionFromBoardConfig(RandomisePositionTestData testData)
+	{
+		// Arrange
+		XiangqiBuilder builder = new();
+
+		// Act
+		XiangqiGame xiangqiGame = builder.WithBoardConfig(testData.BoardConfig!)
+			.RandomisePosition(fromFen: false, allowCheck: testData.AllowCheck)
+			.Build();
+
+		// Assert
+		Piece[,] boardPosition = xiangqiGame.BoardPosition;
+
+		ValidateRandomizedPosition(boardPosition, testData);
+	}
+
+	[Theory]
+	[MemberData(nameof(RandomisePositionWithPieceCountsTestData))]
+	public static void ShouldRandomizePiecePosition_WhenCallingRandomisePiecePosition_WithPieceCounts(RandomisePositionTestData testData)
+	{
+		// Arrange
+		XiangqiBuilder builder = new();
+
+		// Act
+		XiangqiGame xiangqiGame = builder.WithBoardConfig(config =>
+			{
+				config.SetPieceCounts(testData.UserPieceCounts);
+			})
+			.RandomisePosition(fromFen: false, allowCheck: testData.AllowCheck)
+			.Build();
+
+		// Assert
+		Piece[,] boardPosition = xiangqiGame.BoardPosition;
+
+		ValidateRandomizedPosition(boardPosition, testData);
+	}
+
+	private static void ValidateRandomizedPosition(Piece[,] boardPosition, RandomisePositionTestData testData)
+	{
 		Assert.Multiple(() =>
 		{
 			// Verify the number of pieces
@@ -693,10 +974,14 @@ public static class XiangqiBuilderTests
 			boardPosition.IsKingInCheck(Side.Black).Should().BeFalse();
 		}
 		else
+		{
 			(boardPosition.IsKingInCheck(Side.Red) && boardPosition.IsKingInCheck(Side.Black)).Should().BeFalse();
+		}
 
 		foreach (Piece piece in boardPosition.Cast<Piece>().Where(x => x is not EmptyPiece))
+		{
 			piece.ValidationStrategy.AreCoordinatesValid(piece.Side, piece.Coordinate).Should().BeTrue();
+		}
 	}
 }
 
@@ -707,13 +992,23 @@ public record RandomisePositionTestData(bool allowCheck, PieceCounts pieceCounts
 		InitialFen = initialFen; 
 	}
 
-	public RandomisePositionTestData(BoardConfig boardConfig, bool allowCheck, PieceCounts pieceCounts) : this(allowCheck, pieceCounts) 
+	public RandomisePositionTestData(Action<BoardConfig> actions, bool allowCheck, PieceCounts pieceCounts) : this(allowCheck, pieceCounts) 
 	{ 
-		BoardConfig = boardConfig; 
+		BoardConfig = new();
+
+		actions.Invoke(BoardConfig);
+	}
+
+	public RandomisePositionTestData(PieceCounts userPieceCounts, bool allowCheck, PieceCounts pieceCounts) : this(allowCheck, pieceCounts)
+	{
+		BoardConfig = new();
+
+		UserPieceCounts = userPieceCounts;
 	}
 
 	public bool AllowCheck { get; init; } = allowCheck;
 	public PieceCounts PieceCounts { get; init; } = pieceCounts;
 	public string InitialFen { get; init; }
 	public BoardConfig? BoardConfig { get; init; }
+	public PieceCounts UserPieceCounts { get; init; }
 }

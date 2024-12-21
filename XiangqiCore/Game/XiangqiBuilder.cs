@@ -221,7 +221,7 @@ public class XiangqiBuilder : IXiangqiBuilder
 	}
 
 	/// <summary>
-	/// Randomises the piece position on the board.
+	/// Randomises the piece position on the board. This will try to randomise the pieces based on the FEN provided, or the boardConfig you have used in the fluent API if fromFen is set to false.
 	/// </summary>
 	/// <param name="fromFen">Randomise the pieces from the FEN provided</param>
 	/// <param name="allowCheck">Allow checks on the new position</param>
@@ -232,11 +232,31 @@ public class XiangqiBuilder : IXiangqiBuilder
 		if (!fromFen && _boardConfig is null)
 			throw new InvalidOperationException("The board configuration must be set before randomising the piece position if fromFen is set to false.");
 
-		PieceCounts pieceCounts = fromFen ? FenHelper.ExtractPieceCounts(_initialFen) : _boardConfig!.ExtractPieceCounts();
+		PieceCounts pieceCounts = fromFen ? FenHelper.ExtractPieceCounts(_initialFen) : _boardConfig!.PieceCounts;
 
 		_boardConfig ??= new();
+		_boardConfig.SetPieceCounts(pieceCounts);
 
-		_boardConfig.RandomisePiecePositions(pieceCounts, allowCheck);
+		_boardConfig.RandomisePiecePositions(allowCheck);
+		_useBoardConfig = true;
+
+		return this;
+	}
+
+	/// <summary>
+	/// Randomises the piece position on the board with the <see cref="PieceCounts"/> object.
+	/// </summary>
+	/// <param name="pieceCounts"></param>
+	/// <param name="allowCheck"></param>
+	/// <returns></returns>
+	public XiangqiBuilder RandomisePosition(PieceCounts pieceCounts, bool allowCheck = false)
+	{
+		ArgumentNullException.ThrowIfNull(pieceCounts, nameof(pieceCounts));
+
+		_boardConfig ??= new();
+		_boardConfig.SetPieceCounts(pieceCounts);
+
+		_boardConfig.RandomisePiecePositions(allowCheck);
 		_useBoardConfig = true;
 
 		return this;
