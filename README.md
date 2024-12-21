@@ -324,7 +324,52 @@ XiangqiGame game =  builder
 棋谱由 http://www.dpxq.com/ 生成")
 	.Build();
 ```
- 
+
+##### `RandomisePosition(bool fromFen = true, bool allowCheck = false)`
+Randomises the board position. 
+If fromFen is set to true, the board will be randomised based on the current FEN. 
+If fromFen is set to false, the board will be randomised based on the board config. 
+If allowCheck is set to false, the randomised position will be checked to ensure that the king is not in check.
+
+```c#
+using XiangqiCore.Game;
+
+XiangqiBuilder builder = new ();
+
+XiangqiGame game =  builder
+	.WithDefaultConfiguration()
+	.RandomisePosition(fromFen: true, allowCheck: false)
+	.Build();
+```
+
+##### `RandomisePosition(PieceCounts pieceCounts, bool allowCheck = false)`
+Randomises the board position based on the `PieceCounts` class. 
+If allowCheck is set to false, the randomised position will be checked to ensure that the king is not in check.
+
+```c#
+using XiangqiCore.Game;
+
+XiangqiBuilder builder = new ();
+
+PieceCounts pieceCounts =  new(
+	RedPieces: new Dictionary<PieceType, int>()
+	{
+		{ PieceType.King, 1 },
+		{ PieceType.Advisor, 1 },
+		{ PieceType.Cannon, 1 },
+	},
+	BlackPieces: new Dictionary<PieceType, int>()
+	{
+		{ PieceType.King, 1 },
+		{ PieceType.Advisor, 2 },
+	}
+);
+
+XiangqiGame game = builder
+	.RandomisePosition(pieceCounts, allowCheck: false)
+	.Build();
+```
+
 ### `BoardConfig`
 
 The `BoardConfig` class is used to set up the board configuration for the Xiangqi game in ``XiangqiBuilder`` without the use of FEN. 
@@ -355,6 +400,30 @@ using XiangqiCore.Boards;
 BoardConfig config = new ();
 
 config.AddRandomPiece(new Coordinate(column: 5, row: 5));
+```
+
+##### `SetPieceCounts(PieceCounts pieceCounts)`
+Sets the piece counts for the board configuration. This is for the ``RandomisePosition`` method in the ``XiangqiBuilder``.
+```c#
+using XiangqiCore.Boards;
+
+BoardConfig config = new ();
+
+PieceCounts pieceCounts =  new(
+	RedPieces: new Dictionary<PieceType, int>()
+	{
+		{ PieceType.King, 1 },
+		{ PieceType.Advisor, 1 },
+		{ PieceType.Cannon, 1 },
+	},
+	BlackPieces: new Dictionary<PieceType, int>()
+	{
+		{ PieceType.King, 1 },
+		{ PieceType.Advisor, 2 },
+	}
+);
+
+config.SetPieceCounts(pieceCounts);
 ```
 
 ### XiangqiGame
@@ -846,7 +915,18 @@ The maximum column and row are 9 and 10, respectively.
 
 ## Release Notes
 
-Version 1.3.1
+Version 1.4.0
+Features:
+- Functionality to randomise the board position using the `RandomisePiecePosition` method in the `XiangqiBuilder` class.
+- Add the overriding behaviour of the `WithBoardConfig` method in the `XiangqiBuilder` class. Now it will overwrite the existing FEN/Board Config if it is called multiple times.
+
+
+- Bug Fixes:
+- Fix the issue where the `WithBoardConfig` method in the `XiangqiBuilder` class does not append the game info to the FEN string when initializing the game.
+- New extension methods `GetPiecesOfType` to reduce the use of reflection in the process of getting the pieces of a specific type on the board.
+
+
+Version 1.3.0
 
 Features:
 - Functionality to create a GIF from the game.

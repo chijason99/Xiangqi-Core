@@ -23,6 +23,7 @@ public interface IXiangqiBuilder
     XiangqiBuilder WithGameName(string gameName);
 
     XiangqiBuilder RandomisePosition(bool fromFen = true, bool allowCheck = true);
+    XiangqiBuilder RandomisePosition(PieceCounts pieceCounts, bool allowCheck = true);
 
 	XiangqiGame Build();
 }
