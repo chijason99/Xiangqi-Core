@@ -958,8 +958,8 @@ public static class XiangqiBuilderTests
 				int expectedRedCount = testData.PieceCounts.GetPieceCount(pieceType, Side.Red);
 				int expectedBlackCount = testData.PieceCounts.GetPieceCount(pieceType, Side.Black);
 
-				int actualRedCount = boardPosition.GetPiecesByType(pieceType, Side.Red).Count();
-				int actualBlackCount = boardPosition.GetPiecesByType(pieceType, Side.Black).Count();
+				int actualRedCount = boardPosition.GetPiecesOfType(pieceType, Side.Red).Count();
+				int actualBlackCount = boardPosition.GetPiecesOfType(pieceType, Side.Black).Count();
 
 				actualBlackCount.Should().Be(expectedBlackCount);
 				actualRedCount.Should().Be(expectedRedCount);

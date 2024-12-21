@@ -394,7 +394,7 @@ public static class PieceExtensionTests
 		Piece[,] position = game.BoardPosition;
 
 		// Act
-		IEnumerable<Piece> result = position.GetPiecesByType(pieceType, side);
+		IEnumerable<Piece> result = position.GetPiecesOfType(pieceType, side);
 
 		// Assert
 		result.Count().Should().Be(expectedCount);

@@ -137,7 +137,7 @@ public class Board
 
 	private Piece[] GetPiecesToMove(PieceType pieceType, Side sideToMove)
 	{
-		var allPiecesOfType = _position.GetPiecesByType(pieceType, sideToMove);
+		var allPiecesOfType = _position.GetPiecesOfType(pieceType, sideToMove);
 
 		if (!allPiecesOfType.Any()) throw new InvalidOperationException($"Cannot find any columns containing more than one {EnumHelper<Side>.GetDisplayName(sideToMove)} {EnumHelper<PieceType>.GetDisplayName(pieceType)}");
 
