@@ -1,4 +1,5 @@
 ﻿using XiangqiCore.Misc;
+using XiangqiCore.Pieces.PieceTypes;
 
 namespace XiangqiCore.Move.MoveObject;
 public record ParsedMoveObject
@@ -18,7 +19,7 @@ public record ParsedMoveObject
 
     // For Chinese/English Notation
     public ParsedMoveObject(
-        Type pieceType, 
+        PieceType pieceType, 
         int startingColumn, 
         MoveDirection moveDirection, 
         int foruthCharacter, 
@@ -31,7 +32,7 @@ public record ParsedMoveObject
         PieceOrderIndex = pieceOrderIndex;
     }
 
-    public Type PieceType { get; set; }
+    public PieceType PieceType { get; set; }
     public int StartingColumn { get; set; }
     public int FourthCharacter { get; set; }
     public int PieceOrderIndex { get; set; }

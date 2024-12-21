@@ -135,18 +135,15 @@ public class Board
 		return pieceToMove.Coordinate;
 	}
 
-	private Piece[] GetPiecesToMove(Type pieceType, Side sideToMove)
+	private Piece[] GetPiecesToMove(PieceType pieceType, Side sideToMove)
 	{
-		MethodInfo method = typeof(PieceExtension).GetMethod(nameof(PieceExtension.GetPiecesOfType));
-		MethodInfo genericMethod = method.MakeGenericMethod(pieceType);
+		var allPiecesOfType = _position.GetPiecesByType(pieceType, sideToMove);
 
-		IEnumerable<Piece> allPiecesOfType = ((IEnumerable<Piece>)genericMethod.Invoke(obj: null, parameters: [_position, sideToMove]));
-
-		if (!allPiecesOfType.Any()) throw new InvalidOperationException($"Cannot find any columns containing more than one {EnumHelper<Side>.GetDisplayName(sideToMove)} {pieceType.Name}");
+		if (!allPiecesOfType.Any()) throw new InvalidOperationException($"Cannot find any columns containing more than one {EnumHelper<Side>.GetDisplayName(sideToMove)} {EnumHelper<PieceType>.GetDisplayName(pieceType)}");
 
 		Piece[] piecesToMove = allPiecesOfType
-									.OrderByRowWithSide(sideToMove)
-									.ToArray();
+			.OrderByRowWithSide(sideToMove)
+			.ToArray();
 
 		return piecesToMove;
 	}
@@ -188,7 +185,7 @@ public class Board
 		MoveDirection moveDirection = moveObject.MoveDirection;
 
 		if (pieceToMove.GetType().GetCustomAttribute<MoveInDiagonalsAttribute>() is not null && moveDirection == MoveDirection.Horizontal)
-			throw new ArgumentException($"Piece type {moveObject.PieceType.Name} cannot move horizontally");
+			throw new ArgumentException($"Piece type {EnumHelper<PieceType>.GetDisplayName(pieceToMove.PieceType)} cannot move horizontally");
 
 		Coordinate destination = pieceToMove.GetDestinationCoordinateFromNotation(moveObject.MoveDirection, moveObject.FourthCharacter);
 

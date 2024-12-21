@@ -10,20 +10,20 @@ public class EnglishNotationParser : MoveNotationBase
     private static char[] pawnsInEnglish => ['p', 'P'];
     public EnglishNotationParser() { }
 
-    public Type ParsePieceType(string notation)
+    public PieceType ParsePieceType(string notation)
     {
         char pieceNameToCheck = pieceEnglishNames.Contains(char.ToLower(notation[0])) ? notation[0] : notation[1];
 
         return char.ToLower(pieceNameToCheck) switch
         {
-            'k' => typeof(King),
-            'r' => typeof(Rook),
-            'h' => typeof(Knight),
-            'c' => typeof(Cannon),
-            'a' => typeof(Advisor),
-            'e' => typeof(Bishop),
-            'p' => typeof(Pawn),
-            _ => typeof(Pawn)
+            'k' => PieceType.King,
+            'r' => PieceType.Rook,
+            'h' => PieceType.Knight,
+            'c' => PieceType.Cannon,
+            'a' => PieceType.Advisor,
+            'e' => PieceType.Bishop,
+            'p' => PieceType.Pawn,
+            _ => PieceType.Pawn
         };
     }
 
@@ -74,7 +74,7 @@ public class EnglishNotationParser : MoveNotationBase
 
     public override ParsedMoveObject Parse(string notation)
     {
-        Type pieceType = ParsePieceType(notation);
+        PieceType pieceType = ParsePieceType(notation);
         int startingColumn = ParseStartingColumn(notation);
         MoveDirection moveDirection = ParseMoveDirection(notation);
         int fourthCharacter = GetFourthCharacter(notation);
@@ -86,7 +86,7 @@ public class EnglishNotationParser : MoveNotationBase
                                              parsedMoveObject;
     }
 
-    private bool IsMultiColumnPawn(string notation) => ParsePieceType(notation) == typeof(Pawn) && notation.IndexOfAny(pawnsInEnglish) == -1;
+    private bool IsMultiColumnPawn(string notation) => ParsePieceType(notation) == PieceType.Pawn && notation.IndexOfAny(pawnsInEnglish) == -1;
 
     private int GetMinNumberOfPawnsOnColumn(string notation)
     {
