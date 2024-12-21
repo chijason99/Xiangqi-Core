@@ -584,9 +584,10 @@ Console.WriteLine(pgnString);
 ```
 
 #### `GeneratePgnFile(string filePath)`
-#### `GeneratePgnFileAsync(string filePath)`
+#### `GeneratePgnFileAsync(string filePath, CancellationToken cancellationToken = default)`
 
 Exports the game as a PGN file to the specified filePath.
+If the file name is provided in the file path, please make sure you are using the PGN extension. If not provided, the PGN file would be default to use the GameName in the XiangqiGame class
 
 ```c#
 using XiangqiCore.Game;
@@ -611,8 +612,9 @@ XiangqiGame game =  builder
 ```
 
 #### GenerateImage(string filePath, int moveCount = 0, bool flipHorizontal = false, bool flipVertical = false)
-#### GenerateImageAsync(string filePath, int moveCount = 0, bool flipHorizontal = false, bool flipVertical = false)
+#### GenerateImageAsync(string filePath, int moveCount = 0, bool flipHorizontal = false, bool flipVertical = false, CancellationToken cancellationToken = default)
 Generates an image of the a board position for a specified move count and saves it to the specified file path.
+If the image name is provided in the file path, please make sure you are using the JPG extension. If not provided, the image would be default to use the GameName in the XiangqiGame class
 
 ```c#
 using XiangqiCore.Game;
@@ -630,8 +632,9 @@ game.GenerateImage("C:\Users\User\Downloads", moveCount: 3);
 ```
 
 ####  GenerateGif(string filePath, bool flipHorizontal = false, bool flipVertical = false, decimal frameDelayInSecond = 1)
-####  GenerateGifAsync(string filePath, bool flipHorizontal = false, bool flipVertical = false, decimal frameDelayInSecond = 1)
+####  GenerateGifAsync(string filePath, bool flipHorizontal = false, bool flipVertical = false, decimal frameDelayInSecond = 1, CancellationToken cancellationToken = default)
 Generates a GIF of the game and saves it to the specified file path.
+If the image name is provided in the file path, please make sure you are using the GIF extension. If not provided, the image would be default to use the GameName in the XiangqiGame class
 
 ```c#
 using XiangqiCore.Game;

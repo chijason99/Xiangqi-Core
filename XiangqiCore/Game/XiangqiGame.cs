@@ -309,56 +309,37 @@ public class XiangqiGame
 
 	public void GeneratePgnFile(string filePath)
 	{
-		if (!Path.IsPathFullyQualified(filePath) || !Path.Exists(filePath))
-			throw new ArgumentException("The specified file path does not exist.");
-
-		char[] invalidFileCharacters = Path.GetInvalidFileNameChars();
+		string preparedFilePath = PrepareFilePath(filePath, "pgn");
 
 		Encoding gb2312Encoding = CodePagesEncodingProvider.Instance.GetEncoding(936) ?? Encoding.UTF8;
 		XiangqiBuilder xiangqiBuilder = new();
 
 		string pgnString = ExportGameAsPgnString();
-		string sanitizedFileName = string.Concat($"{GameName}.pgn".Select(character =>
-		{
-			return invalidFileCharacters.Contains(character) ? '_' : character;
-		}));
 
-		string sanitizedFilePath = Path.Combine(filePath, sanitizedFileName);
-
-		using FileStream fileStream = new(sanitizedFilePath, FileMode.Create, FileAccess.Write);
+		using FileStream fileStream = new(preparedFilePath, FileMode.Create, FileAccess.Write);
 		using StreamWriter streamWriter = new(fileStream);
 
 		fileStream.Write(gb2312Encoding.GetBytes(ExportGameAsPgnString()));
 	}
 
-	public async Task GeneratePgnFileAsync(string filePath)
+	public async Task GeneratePgnFileAsync(string filePath, CancellationToken cancellationToken = default)
 	{
-		if (!Path.IsPathFullyQualified(filePath) || !Path.Exists(filePath))
-			throw new ArgumentException("The specified file path does not exist.");
-
-		char[] invalidFileCharacters = Path.GetInvalidFileNameChars();
+		string preparedFilePath = PrepareFilePath(filePath, "pgn");
 
 		Encoding gb2312Encoding = CodePagesEncodingProvider.Instance.GetEncoding(936) ?? Encoding.UTF8;
 		XiangqiBuilder xiangqiBuilder = new();
 
 		string pgnString = ExportGameAsPgnString();
-		string sanitizedFileName = string.Concat($"{GameName}.pgn".Select(character =>
-		{
-			return invalidFileCharacters.Contains(character) ? '_' : character;
-		}));
 
-		string sanitizedFilePath = Path.Combine(filePath, sanitizedFileName);
-
-		using FileStream fileStream = new(sanitizedFilePath, FileMode.Create, FileAccess.Write);
+		using FileStream fileStream = new(preparedFilePath, FileMode.Create, FileAccess.Write);
 		using StreamWriter streamWriter = new(fileStream);
 		
-		await fileStream.WriteAsync(gb2312Encoding.GetBytes(ExportGameAsPgnString()));
+		await fileStream.WriteAsync(gb2312Encoding.GetBytes(ExportGameAsPgnString()), cancellationToken);
 	}
 
 	public void GenerateImage(string filePath, int moveCount = 0, bool flipHorizontal = false, bool flipVertical = false)
 	{
-		if (!Path.IsPathFullyQualified(filePath) || !Path.Exists(filePath))
-			throw new ArgumentException("The specified file path does not exist.");
+		string preparedFilePath = PrepareFilePath(filePath, "jpg");
 
 		string targetFen = InitialFenString;
 
@@ -372,10 +353,14 @@ public class XiangqiGame
 		File.WriteAllBytes(filePath, bytes);
 	}
 
-	public async Task GenerateImageAsync(string filePath, int moveCount = 0, bool flipHorizontal = false, bool flipVertical = false)
+	public async Task GenerateImageAsync(
+		string filePath, 
+		int moveCount = 0, 
+		bool flipHorizontal = false, 
+		bool flipVertical = false,
+		CancellationToken cancellationToken = default)
 	{
-		if (!Path.IsPathFullyQualified(filePath) || !Path.Exists(filePath))
-			throw new ArgumentException("The specified file path does not exist.");
+		string preparedFilePath = PrepareFilePath(filePath, "jpg");
 
 		string targetFen = InitialFenString;
 
@@ -386,7 +371,7 @@ public class XiangqiGame
 
 		byte[] bytes = position.GenerateBoardImage(flipHorizontal, flipVertical);
 
-		await File.WriteAllBytesAsync(filePath, bytes, cancellationToken: default);
+		await File.WriteAllBytesAsync(filePath, bytes, cancellationToken);
 	}
 
 	public void GenerateGif(string filePath, 
@@ -394,8 +379,7 @@ public class XiangqiGame
 		bool flipVertical = false,
 		decimal frameDelayInSecond = 1)
 	{
-		if (!Path.IsPathFullyQualified(filePath) || !Path.Exists(filePath))
-			throw new ArgumentException("The specified file path does not exist.");
+		string preparedFilePath = PrepareFilePath(filePath, "gif");
 
 		List<string> fens = [InitialFenString, ..MoveHistory.Select(x => x.FenAfterMove)];
 
@@ -431,10 +415,10 @@ public class XiangqiGame
 	public async Task GenerateGifAsync(string filePath,
 		bool flipHorizontal = false,
 		bool flipVertical = false,
-		decimal frameDelayInSecond = 1)
+		decimal frameDelayInSecond = 1, 
+		CancellationToken cancellationToken = default)
 	{
-		if (!Path.IsPathFullyQualified(filePath) || !Path.Exists(filePath))
-			throw new ArgumentException("The specified file path does not exist.");
+		string preparedFilePath = PrepareFilePath(filePath, "gif");
 
 		List<string> fens = [InitialFenString, .. MoveHistory.Select(x => x.FenAfterMove)];
 
@@ -464,7 +448,7 @@ public class XiangqiGame
 			gif.Frames.AddFrame(image.Frames.RootFrame);
 		}
 
-		await gif.SaveAsGifAsync(filePath, cancellationToken: default);
+		await gif.SaveAsGifAsync(filePath, cancellationToken);
 	}
 
 	private void AddPgnTag(StringBuilder pgnBuilder, PgnTagType pgnTagKey, string pgnTagValue)
@@ -519,5 +503,38 @@ public class XiangqiGame
 			if (!isSuccessful)
 				break;
 		}
+	}
+
+	private string PrepareFilePath(string filePath, string fileExtension)
+	{
+		ArgumentException.ThrowIfNullOrWhiteSpace(fileExtension, nameof(fileExtension));
+
+		if (!Path.IsPathFullyQualified(filePath))
+			throw new ArgumentException("The specified file path is not fully qualified.");
+
+		string directoryPath = Path.GetDirectoryName(filePath);
+		string fileName = Path.GetFileName(filePath);
+
+		if (string.IsNullOrWhiteSpace(fileName))
+			fileName = $"{GameName}.{fileExtension}";
+		else
+		{
+			string providedExtension = Path.GetExtension(fileName);
+
+			if (!string.Equals(providedExtension, $".{fileExtension}", StringComparison.OrdinalIgnoreCase))
+				throw new ArgumentException($"The file extension '{providedExtension}' does not match the expected extension '.{fileExtension}'.");
+		}
+
+		if (!Directory.Exists(directoryPath))
+			Directory.CreateDirectory(directoryPath);
+
+		char[] invalidFileCharacters = Path.GetInvalidFileNameChars();
+
+		string sanitizedFileName = string.Concat(fileName.Select(character =>
+		{
+			return invalidFileCharacters.Contains(character) ? '_' : character;
+		}));
+
+		return Path.Combine(directoryPath, sanitizedFileName);
 	}
 }
