@@ -389,7 +389,7 @@ public class XiangqiGame
 		await File.WriteAllBytesAsync(filePath, bytes, cancellationToken: default);
 	}
 
-	public void GenerateGIF(string filePath, 
+	public void GenerateGif(string filePath, 
 		bool flipHorizontal = false, 
 		bool flipVertical = false,
 		decimal frameDelayInSecond = 1)
@@ -428,7 +428,7 @@ public class XiangqiGame
 		gif.SaveAsGif(filePath);
 	}
 
-	public async Task GenerateGIFAsync(string filePath,
+	public async Task GenerateGifAsync(string filePath,
 		bool flipHorizontal = false,
 		bool flipVertical = false,
 		decimal frameDelayInSecond = 1)

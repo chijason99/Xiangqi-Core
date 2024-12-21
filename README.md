@@ -583,7 +583,9 @@ Console.WriteLine(pgnString);
 // 41. 兵六進一
 ```
 
-#### `ExportGameAsPgnFile(string filePath)`
+#### `GeneratePgnFile(string filePath)`
+#### `GeneratePgnFileAsync(string filePath)`
+
 Exports the game as a PGN file to the specified filePath.
 
 ```c#
@@ -609,6 +611,7 @@ XiangqiGame game =  builder
 ```
 
 #### GenerateImage(string filePath, int moveCount = 0, bool flipHorizontal = false, bool flipVertical = false)
+#### GenerateImageAsync(string filePath, int moveCount = 0, bool flipHorizontal = false, bool flipVertical = false)
 Generates an image of the a board position for a specified move count and saves it to the specified file path.
 
 ```c#
@@ -626,7 +629,8 @@ game.MakeMove("馬二進三", MoveNotationType.Chinese);
 game.GenerateImage("C:\Users\User\Downloads", moveCount: 3);
 ```
 
-####  GenerateGIF(string filePath, bool flipHorizontal = false, bool flipVertical = false, decimal frameDelayInSecond = 1)
+####  GenerateGif(string filePath, bool flipHorizontal = false, bool flipVertical = false, decimal frameDelayInSecond = 1)
+####  GenerateGifAsync(string filePath, bool flipHorizontal = false, bool flipVertical = false, decimal frameDelayInSecond = 1)
 Generates a GIF of the game and saves it to the specified file path.
 
 ```c#
@@ -641,7 +645,7 @@ game.MakeMove("炮二平五", MoveNotationType.Chinese);
 game.MakeMove("馬8進7", MoveNotationType.Chinese);
 game.MakeMove("馬二進三", MoveNotationType.Chinese);
 
-game.GenerateGIF("C:\Users\User\Downloads", frameDelayInSecond: 2);
+game.GenerateGif("C:\Users\User\Downloads", frameDelayInSecond: 2);
 ```
 
 ### Public Properties
@@ -914,6 +918,15 @@ The maximum column and row are 9 and 10, respectively.
 ```
 
 ## Release Notes
+
+Version 1.4.1
+Features:
+- Rename the ``ExportGameAsPgnFile`` to ``GeneratePgnFile`` to follow naming convention
+- Add ``GenerateImageAsync``, ``GenerateGifAsync``, and ``GeneratePgnFileAsync`` for asynchronous generation of image, GIF, and PGN file
+
+Bug Fixes:
+- Fix the position validation for pawns not accounting for the pawns that have not yet crossed the river
+
 
 Version 1.4.0
 Features:
