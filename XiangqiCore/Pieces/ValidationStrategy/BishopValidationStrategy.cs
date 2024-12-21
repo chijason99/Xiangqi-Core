@@ -3,7 +3,7 @@ using XiangqiCore.Extension;
 using XiangqiCore.Misc;
 
 namespace XiangqiCore.Pieces.ValidationStrategy;
-public class BishopValidationStrategy : DefaultValidationStrategy, IHasSpecificPositions
+public class BishopValidationStrategy : DefaultValidationStrategy, IHasSpecificPositions, IValidationStrategy
 {
     public override int[] GetPossibleColumns() => [1, 3, 5, 7, 9];
 
@@ -99,4 +99,11 @@ public class BishopValidationStrategy : DefaultValidationStrategy, IHasSpecificP
         BottomLeft,
         BottomRight
     }
+
+    Coordinate IValidationStrategy.GetRandomCoordinate(Random random, Side side)
+    {
+        int randomIndex = random.Next(0, GetSpecificPositions(side).Length);
+
+		return GetSpecificPositions(side)[randomIndex];
+	}
 }
