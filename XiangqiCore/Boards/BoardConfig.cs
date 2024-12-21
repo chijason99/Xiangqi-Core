@@ -83,7 +83,7 @@ public class BoardConfig
 			AddPiecesForSide(Side.Black);
 			
 			board = new(this);
-			shouldRetry = board.Position.IsKingInCheck(Side.Red) || board.Position.IsKingInCheck(Side.Black);
+			shouldRetry = ShouldRetry(board.Position);
 		}
 
 		bool ShouldRetry(Piece[,] position)

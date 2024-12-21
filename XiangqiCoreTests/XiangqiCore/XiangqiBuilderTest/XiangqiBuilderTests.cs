@@ -629,7 +629,7 @@ public static class XiangqiBuilderTests
 
 	[Theory]
 	[MemberData(nameof(RandomisePositionFromFenTestData))]
-	public static void ShouldRandomizePiecePosition_WhenCallingRandomisePiecePosition(RandomisePositionTestData testData)
+	public static void ShouldRandomizePiecePosition_WhenCallingRandomisePiecePositionFromFen(RandomisePositionTestData testData)
 	{
 		// Arrange
 		XiangqiBuilder builder = new();
