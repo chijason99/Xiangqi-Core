@@ -6,6 +6,7 @@ using XiangqiCore.Move;
 using XiangqiCore.Move.MoveObject;
 using XiangqiCore.Move.MoveObjects;
 using XiangqiCore.Pieces;
+using XiangqiCore.Pieces.PieceTypes;
 
 namespace XiangqiCore.Boards;
 
@@ -27,7 +28,8 @@ public class Board
 	/// Use the BoardConfig to override existing pieces on board
 	/// </summary>
 	/// <param name="config"></param>
-	internal Board(string fenString, BoardConfig config) : this(fenString)
+	[Obsolete("This constructor is no longer in use")]
+	private Board(string fenString, BoardConfig config) : this(fenString)
 	{
 		foreach (var keyValuePair in config.PiecesToAdd)
 			SetPieceAtPosition(keyValuePair.Key, keyValuePair.Value);
