@@ -65,11 +65,4 @@ public abstract class Piece(Coordinate coordinate, Side side)
 				yield return destination;
 		}
     }
-
-	public string GetImageResourcePath()
-	{
-		string imageName = $"{Enum.GetName(typeof(Side), Side)}_{GetType().Name}.png".ToLower();
-
-		return $"XiangqiCore.Assets.Board.Pieces.{imageName}";
-	}
 }

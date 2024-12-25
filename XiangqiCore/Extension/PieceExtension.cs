@@ -1,9 +1,13 @@
-﻿using SixLabors.ImageSharp;
+﻿using SixLabors.Fonts;
+using SixLabors.ImageSharp;
+using SixLabors.ImageSharp.Drawing.Processing;
 using SixLabors.ImageSharp.Formats.Png;
 using SixLabors.ImageSharp.PixelFormats;
 using SixLabors.ImageSharp.Processing;
+using System.Net.Http.Headers;
 using XiangqiCore.Boards;
 using XiangqiCore.Misc;
+using XiangqiCore.Misc.Images;
 using XiangqiCore.Pieces;
 using XiangqiCore.Pieces.PieceTypes;
 
@@ -228,8 +232,8 @@ public static class PieceExtension
 
     public static bool IsKingExposedDirectlyToEnemyKing(this Piece[,] boardPosition)
     {
-		King redKing = boardPosition.GetPiecesOfType<King>(Side.Red).Single();
-		King blackKing = boardPosition.GetPiecesOfType<King>(Side.Black).Single();
+		King redKing = (King)boardPosition.GetPiecesOfType(PieceType.King, Side.Red).Single();
+		King blackKing = (King)boardPosition.GetPiecesOfType(PieceType.King, Side.Black).Single();
 
 		if (redKing.Coordinate.Column != blackKing.Coordinate.Column)
 			return false;
@@ -250,9 +254,7 @@ public static class PieceExtension
         if (!boardPosition.HasPieceAtPosition(startingPosition))
             throw new ArgumentException("There must be a piece at the starting position on the board");
 
-        //Piece[,] boardPositionClone = boardPosition.DeepClone();
-
-        Piece[,] boardPositionClone = (Piece[,])boardPosition.Clone();
+        Piece[,] boardPositionClone = boardPosition.DeepClone();
         boardPositionClone.MakeMove(startingPosition, destination);
 
         return boardPositionClone;
@@ -344,45 +346,51 @@ public static class PieceExtension
 
     public static byte[] GenerateBoardImage(
         this Piece[,] position, 
-        bool flipHorizontal = false, 
-        bool flipVertical = false)
+        ImageConfig? config = null,
+        Coordinate? previousPosition = null,
+        Coordinate? currentPosition = null)
 	{
-		const int defaultSquareSize = 50;
-		const int defaultBoardHeight = 500;
-		const int defaultBoardWidth = 450;
+        config ??= new ImageConfig();
 
-		const int columns = 9;
-		const int rows = 10;
+        config.PreloadImages();
 
-		using Image<Rgba32> boardImage = ImageCache.GetImage(Board.GetImageResourcePath());
-        boardImage.Mutate(x => x.Resize(defaultBoardWidth, defaultBoardHeight));
+		using Image<Rgba32> boardImage = config.GetBoardImage();
+        boardImage.Mutate(x => x.Resize(ImageConfig.DefaultBoardWidth, ImageConfig.DefaultBoardHeight));
 
         foreach (Piece piece in position.Cast<Piece>().Where(p => p is not EmptyPiece))
         {
-            string pieceResourcePath = piece.GetImageResourcePath();
-			using Image<Rgba32> pieceImage = ImageCache.GetImage(pieceResourcePath);
+			using Image<Rgba32> pieceImage = config.GetPieceImage(piece.PieceType, piece.Side);
 
-			int xCoordinate = (piece.Coordinate.Column - 1);
-            int yCoordinate = rows - piece.Coordinate.Row;
-
-			// If flipping the board horizontally, both the x-coordinate and y-coordinate should be flipped
-			// If flipping the board vertically, then the x-coordinate should be flipped
-			// If flipping the board vertically and horizontally, then only the y-coordinate should be flipped because the x-coordinate is flipped twice
-			if (flipVertical && flipHorizontal)
-				yCoordinate = piece.Coordinate.Row - 1;
-            else if (flipVertical)
-                xCoordinate = columns - piece.Coordinate.Column;
-            else if (flipHorizontal)
-            {
-                yCoordinate = piece.Coordinate.Row - 1;
-                xCoordinate = columns - piece.Coordinate.Column;
-			}
+            (int xCoordinate, int yCoordinate) = config.GetCoordinatesAfterRotation(piece.Coordinate);
 
 			boardImage.Mutate(ctx => ctx.DrawImage(pieceImage, 
-                new Point(xCoordinate * defaultSquareSize, yCoordinate * defaultSquareSize), 1f));
+                new Point(xCoordinate * ImageConfig.DefaultSquareSize, yCoordinate * ImageConfig.DefaultSquareSize), 1f));
 		}
-        
-        using MemoryStream memoryStream = new();
+
+        if (config.UseMoveIndicator)
+        {
+            if (previousPosition is not null)
+            {
+                using Image<Rgba32> moveIndicatorImage = config.GetMoveIndicatorImage();
+
+				(int xCoordinate, int yCoordinate) = config.GetCoordinatesAfterRotation(previousPosition.Value);
+
+				boardImage.Mutate(ctx => ctx.DrawImage(moveIndicatorImage,
+                    new Point(xCoordinate * ImageConfig.DefaultSquareSize, yCoordinate * ImageConfig.DefaultSquareSize), 1f));
+            }
+
+            if (currentPosition is not null)
+            {
+                using Image<Rgba32> moveIndicatorImage = config.GetMoveIndicatorImage();
+
+				(int xCoordinate, int yCoordinate) = config.GetCoordinatesAfterRotation(currentPosition.Value);
+
+				boardImage.Mutate(ctx => ctx.DrawImage(moveIndicatorImage,
+                    new Point(xCoordinate * ImageConfig.DefaultSquareSize, yCoordinate * ImageConfig.DefaultSquareSize), 1f));
+            }
+        }
+
+		using MemoryStream memoryStream = new();
 		boardImage.Save(memoryStream, new PngEncoder());
 
 		return memoryStream.ToArray();

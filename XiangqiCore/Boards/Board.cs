@@ -24,17 +24,6 @@ public class Board
 		_position = FenHelper.CreatePositionFromFen(fenString);
 	}
 
-	/// <summary>
-	/// Use the BoardConfig to override existing pieces on board
-	/// </summary>
-	/// <param name="config"></param>
-	[Obsolete("This constructor is no longer in use")]
-	private Board(string fenString, BoardConfig config) : this(fenString)
-	{
-		foreach (var keyValuePair in config.PiecesToAdd)
-			SetPieceAtPosition(keyValuePair.Key, keyValuePair.Value);
-	}
-
 	internal Board(BoardConfig config)
 	{
 		_position = FenHelper.CreatePositionFromFen(_emptyBoardFen);
@@ -88,9 +77,6 @@ public class Board
 
 		return MakeMove(startingPosition, destination, sideToMove);
 	}
-
-	public static string GetImageResourcePath()
-		=> "XiangqiCore.Assets.Board.board.png";
 
 	private Coordinate FindStartingPosition(ParsedMoveObject moveObject, Side sideToMove)
 	{
