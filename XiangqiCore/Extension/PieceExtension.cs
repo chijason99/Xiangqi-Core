@@ -350,15 +350,17 @@ public static class PieceExtension
 	{
         config ??= new ImageConfig();
 
+        config.PreloadImages();
+
 		const int columns = 9;
 		const int rows = 10;
 
-		using Image<Rgba32> boardImage = ImageCache.GetImage(Board.GetImageResourcePath());
+		using Image<Rgba32> boardImage = config.GetImage(config.GetBoardResourcePath());
         boardImage.Mutate(x => x.Resize(ImageConfig.DefaultBoardWidth, ImageConfig.DefaultBoardHeight));
 
         foreach (Piece piece in position.Cast<Piece>().Where(p => p is not EmptyPiece))
         {
-            string pieceResourcePath = piece.GetImageResourcePath();
+            string pieceResourcePath = config.GetPieceResourcePath(piece.PieceType, piece.Side);
 			using Image<Rgba32> pieceImage = ImageCache.GetImage(pieceResourcePath);
 
 			int xCoordinate = (piece.Coordinate.Column - 1);

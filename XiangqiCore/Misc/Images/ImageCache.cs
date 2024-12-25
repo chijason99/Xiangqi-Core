@@ -2,8 +2,6 @@
 using SixLabors.ImageSharp.PixelFormats;
 using System.Collections.Concurrent;
 using System.Reflection;
-using XiangqiCore.Extension;
-using XiangqiCore.Pieces.PieceTypes;
 
 namespace XiangqiCore.Misc.Images;
 
@@ -23,24 +21,5 @@ public static class ImageCache
 		}
 
 		return image.Clone();
-	}
-
-	public static void PreloadImages()
-	{
-		List<string> pieceTypes = EnumHelper<PieceType>.GetAllNames();
-		List<string> sides = EnumHelper<Side>.GetAllNames();
-
-		foreach (string side in sides)
-		{
-			foreach (string pieceType in pieceTypes)
-			{
-				string imageName = $"{side}_{pieceType}.png".ToLower();
-				string resourcePath = $"XiangqiCore.Assets.Board.Pieces.{imageName}";
-				GetImage(resourcePath);
-			}
-		}
-
-		// Preload board image
-		GetImage("XiangqiCore.Assets.Board.board.png");
 	}
 }

@@ -1,4 +1,5 @@
 ﻿using System.Collections.Concurrent;
+using System.Reflection;
 using System.Text;
 using XiangqiCore.Game;
 
@@ -12,6 +13,8 @@ public static class ImageGenerationTests
 	[InlineData(101, 100)]
 	public static async Task GenerateImagesAsync_ShouldNotThrowAnyError(int toIndex, int expectedImageCount)
 	{
+		var test = Assembly.GetAssembly(typeof(XiangqiBuilder)).GetManifestResourceNames();
+
 		// Arrange
 		string tempDirectory = Path.Combine(Path.GetTempPath(), "XiangqiImageTests");
 		Directory.CreateDirectory(tempDirectory);
