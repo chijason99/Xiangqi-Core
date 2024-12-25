@@ -611,10 +611,19 @@ XiangqiGame game =  builder
  game.ExportGameAsPgnFile("game.pgn");
 ```
 
-#### GenerateImage(string filePath, int moveCount = 0, bool flipHorizontal = false, bool flipVertical = false)
-#### GenerateImageAsync(string filePath, int moveCount = 0, bool flipHorizontal = false, bool flipVertical = false, CancellationToken cancellationToken = default)
+#### GenerateImage(string filePath, int moveCount = 0, ImageConfig? config = null,)
+#### GenerateImageAsync(string filePath, int moveCount = 0, ImageConfig? config = null, CancellationToken cancellationToken = default)
 Generates an image of the a board position for a specified move count and saves it to the specified file path.
 If the image name is provided in the file path, please make sure you are using the JPG extension. If not provided, the image would be default to use the GameName in the XiangqiGame class
+
+The `ImageConfig` class is used to set the configuration for the image generation. Below are the properties you can configure and they are all defualt to false:
+
+- FlipVertical : Flip the board vertically across the 5th column;
+- FlipHorizontal: Flip the board horizontally across the river;
+- UseBlackAndWhitePieces: Use black and white pieces instead of the coloured pieces;
+- UseMoveIndicator: Show the move indicator on the image to display where the piece moves from/to;
+- UseWesternPieces: Use pieces with a logo instead of traditonal pieces with a Chinese character;
+- UseBlackAndWhiteBoard: Use a black and white board instead of the coloured board;
 
 ```c#
 using XiangqiCore.Game;
@@ -628,11 +637,18 @@ game.MakeMove("炮二平五", MoveNotationType.Chinese);
 game.MakeMove("馬8進7", MoveNotationType.Chinese);
 game.MakeMove("馬二進三", MoveNotationType.Chinese);
 
+ImageConfig config = new()
+{
+	UseBlackAndWhitePieces = true,
+	UseMoveIndicator = true,
+	UseWesternPieces = true,
+};
+
 game.GenerateImage("C:\Users\User\Downloads", moveCount: 3);
 ```
 
-####  GenerateGif(string filePath, bool flipHorizontal = false, bool flipVertical = false, decimal frameDelayInSecond = 1)
-####  GenerateGifAsync(string filePath, bool flipHorizontal = false, bool flipVertical = false, decimal frameDelayInSecond = 1, CancellationToken cancellationToken = default)
+####  `GenerateGif(string filePath, ImageConfig? config = null, decimal frameDelayInSecond = 1)`
+####  `GenerateGifAsync(string filePath, ImageConfig? config = null, decimal frameDelayInSecond = 1, CancellationToken cancellationToken = default)`
 Generates a GIF of the game and saves it to the specified file path.
 If the image name is provided in the file path, please make sure you are using the GIF extension. If not provided, the image would be default to use the GameName in the XiangqiGame class
 
@@ -921,6 +937,16 @@ The maximum column and row are 9 and 10, respectively.
 ```
 
 ## Release Notes
+
+Version 1.5.0
+Features:
+- Add the ImageConfig class to set different options for the image/GIF generation
+- Add Western pieces (black and white + coloured), Chinese pieces (coloured), and board (coloured) for the image generation
+- Add some unit tests for the file generation (PGN, GIF, JPG)
+
+Bug Fixes:
+- Fix the potential concurrency issue when accessing the ImageCache
+
 
 Version 1.4.1
 Features:
