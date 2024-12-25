@@ -2,6 +2,7 @@
 using SixLabors.ImageSharp.Formats.Png;
 using SixLabors.ImageSharp.PixelFormats;
 using SixLabors.ImageSharp.Processing;
+using System.Net.Http.Headers;
 using XiangqiCore.Boards;
 using XiangqiCore.Misc;
 using XiangqiCore.Misc.Images;
@@ -345,18 +346,15 @@ public static class PieceExtension
 
     public static byte[] GenerateBoardImage(
         this Piece[,] position, 
-        bool flipHorizontal = false, 
-        bool flipVertical = false)
+        ImageConfig? config = null)
 	{
-		const int defaultSquareSize = 50;
-		const int defaultBoardHeight = 500;
-		const int defaultBoardWidth = 450;
+        config ??= new ImageConfig();
 
 		const int columns = 9;
 		const int rows = 10;
 
 		using Image<Rgba32> boardImage = ImageCache.GetImage(Board.GetImageResourcePath());
-        boardImage.Mutate(x => x.Resize(defaultBoardWidth, defaultBoardHeight));
+        boardImage.Mutate(x => x.Resize(ImageConfig.DefaultBoardWidth, ImageConfig.DefaultBoardHeight));
 
         foreach (Piece piece in position.Cast<Piece>().Where(p => p is not EmptyPiece))
         {
@@ -369,18 +367,18 @@ public static class PieceExtension
 			// If flipping the board horizontally, both the x-coordinate and y-coordinate should be flipped
 			// If flipping the board vertically, then the x-coordinate should be flipped
 			// If flipping the board vertically and horizontally, then only the y-coordinate should be flipped because the x-coordinate is flipped twice
-			if (flipVertical && flipHorizontal)
+			if (config.FlipVertical && config.FlipHorizontal)
 				yCoordinate = piece.Coordinate.Row - 1;
-            else if (flipVertical)
+            else if (config.FlipVertical)
                 xCoordinate = columns - piece.Coordinate.Column;
-            else if (flipHorizontal)
+            else if (config.FlipHorizontal)
             {
                 yCoordinate = piece.Coordinate.Row - 1;
                 xCoordinate = columns - piece.Coordinate.Column;
 			}
 
 			boardImage.Mutate(ctx => ctx.DrawImage(pieceImage, 
-                new Point(xCoordinate * defaultSquareSize, yCoordinate * defaultSquareSize), 1f));
+                new Point(xCoordinate * ImageConfig.DefaultSquareSize, yCoordinate * ImageConfig.DefaultSquareSize), 1f));
 		}
         
         using MemoryStream memoryStream = new();

@@ -8,6 +8,7 @@ using XiangqiCore.Boards;
 using XiangqiCore.Exceptions;
 using XiangqiCore.Extension;
 using XiangqiCore.Misc;
+using XiangqiCore.Misc.Images;
 using XiangqiCore.Move;
 using XiangqiCore.Move.MoveObject;
 using XiangqiCore.Move.MoveObjects;
@@ -337,7 +338,7 @@ public class XiangqiGame
 		await fileStream.WriteAsync(gb2312Encoding.GetBytes(ExportGameAsPgnString()), cancellationToken);
 	}
 
-	public void GenerateImage(string filePath, int moveCount = 0, bool flipHorizontal = false, bool flipVertical = false)
+	public void GenerateImage(string filePath, int moveCount = 0, ImageConfig? config = null)
 	{
 		string preparedFilePath = PrepareFilePath(filePath, "jpg");
 
@@ -348,16 +349,15 @@ public class XiangqiGame
 
 		Piece[,] position = FenHelper.CreatePositionFromFen(targetFen);
 
-		byte[] bytes = position.GenerateBoardImage(flipHorizontal, flipVertical);
+		byte[] bytes = position.GenerateBoardImage(config);
 
 		File.WriteAllBytes(filePath, bytes);
 	}
 
 	public async Task GenerateImageAsync(
 		string filePath, 
-		int moveCount = 0, 
-		bool flipHorizontal = false, 
-		bool flipVertical = false,
+		int moveCount = 0,
+		ImageConfig? imageConfig = null,
 		CancellationToken cancellationToken = default)
 	{
 		string preparedFilePath = PrepareFilePath(filePath, "jpg");
@@ -369,14 +369,13 @@ public class XiangqiGame
 
 		Piece[,] position = FenHelper.CreatePositionFromFen(targetFen);
 
-		byte[] bytes = position.GenerateBoardImage(flipHorizontal, flipVertical);
+		byte[] bytes = position.GenerateBoardImage(imageConfig);
 
 		await File.WriteAllBytesAsync(filePath, bytes, cancellationToken);
 	}
 
 	public void GenerateGif(string filePath, 
-		bool flipHorizontal = false, 
-		bool flipVertical = false,
+		ImageConfig? config = null,
 		decimal frameDelayInSecond = 1)
 	{
 		string preparedFilePath = PrepareFilePath(filePath, "gif");
@@ -397,7 +396,7 @@ public class XiangqiGame
 
 		foreach (string fen in fens)
 		{
-			byte[] imageBytes = FenHelper.CreatePositionFromFen(fen).GenerateBoardImage(flipHorizontal, flipVertical);
+			byte[] imageBytes = FenHelper.CreatePositionFromFen(fen).GenerateBoardImage(config);
 
 			using Image<Rgba32> image = Image.Load<Rgba32>(imageBytes);
 			var frame = image.Frames.CloneFrame(0);
@@ -413,8 +412,7 @@ public class XiangqiGame
 	}
 
 	public async Task GenerateGifAsync(string filePath,
-		bool flipHorizontal = false,
-		bool flipVertical = false,
+		ImageConfig? config = null,
 		decimal frameDelayInSecond = 1, 
 		CancellationToken cancellationToken = default)
 	{
@@ -436,7 +434,7 @@ public class XiangqiGame
 
 		foreach (string fen in fens)
 		{
-			byte[] imageBytes = FenHelper.CreatePositionFromFen(fen).GenerateBoardImage(flipHorizontal, flipVertical);
+			byte[] imageBytes = FenHelper.CreatePositionFromFen(fen).GenerateBoardImage(config);
 
 			using Image<Rgba32> image = Image.Load<Rgba32>(imageBytes);
 			var frame = image.Frames.CloneFrame(0);
