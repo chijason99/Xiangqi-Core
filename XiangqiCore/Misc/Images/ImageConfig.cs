@@ -3,6 +3,7 @@ using SixLabors.ImageSharp.PixelFormats;
 using System.Collections.Concurrent;
 using System.Reflection;
 using XiangqiCore.Game;
+using XiangqiCore.Pieces;
 using XiangqiCore.Pieces.PieceTypes;
 
 namespace XiangqiCore.Misc.Images;
@@ -11,6 +12,11 @@ public class ImageConfig
 {
 	private static readonly ConcurrentDictionary<string, Image<Rgba32>> _imageCache = [];
 	
+	private const string BLACK_AND_WHITE_PATH = ".black_and_white";
+	private const string COLOURED_PATH = ".coloured";
+	private const string CHINESE_PATH = ".chinese";
+	private const string WESTERN_PATH = ".western";
+
 	public static int DefaultBoardWidth => 450;
 	public static int DefaultBoardHeight => 500;
 	public static int DefaultSquareSize => 50;
@@ -36,19 +42,19 @@ public class ImageConfig
 
 		string path = "XiangqiCore.Assets.Pieces";
 
-		string defaultStyle = ".chinese";
+		string stylePath = CHINESE_PATH;
 
 		if (UseWesternPieces)
-			defaultStyle = ".western";
+			stylePath = WESTERN_PATH;
 
-		path += defaultStyle;
+		path += stylePath;
 
-		string defaultColour = ".coloured";
+		string colourPath = COLOURED_PATH;
 
 		if (UseBlackAndWhitePieces)
-			defaultColour = ".black_and_white";
+			colourPath = BLACK_AND_WHITE_PATH;
 
-		path += defaultColour;
+		path += colourPath;
 
 		string pieceName = pieceType.ToString().ToLower();
 		string sideName = side.ToString().ToLower();
@@ -62,15 +68,30 @@ public class ImageConfig
 	{
 		string path = "XiangqiCore.Assets.Boards";
 
-		string defaultColour = ".coloured";
+		string colouorPath = COLOURED_PATH;
 
 		if (UseBlackAndWhiteBoard)
-			defaultColour = ".black_and_white";
+			colouorPath = BLACK_AND_WHITE_PATH;
 
-		path += defaultColour;
+		path += colouorPath;
 
 		path += $".board.png";
 
+		return path;
+	}
+
+	public string GetMoveIndicatorResourcePath()
+	{
+		string path = "XiangqiCore.Assets.MoveIndicators";
+
+		string colourPath = COLOURED_PATH;
+
+		if (UseBlackAndWhiteBoard)
+			colourPath = BLACK_AND_WHITE_PATH;
+
+		path += colourPath;
+
+		path += ".move_indicator.png";
 		return path;
 	}
 
@@ -106,5 +127,41 @@ public class ImageConfig
 
 		// Preload board image
 		GetImage(GetBoardResourcePath());
+
+		// Preload move indicator image
+		GetImage(GetMoveIndicatorResourcePath());
+	}
+
+	public Image<Rgba32> GetPieceImage(PieceType pieceType, Side side)
+		=> GetImage(GetPieceResourcePath(pieceType, side));
+
+	public Image<Rgba32> GetBoardImage()
+		=> GetImage(GetBoardResourcePath());
+
+	public Image<Rgba32> GetMoveIndicatorImage()
+		=> GetImage(GetMoveIndicatorResourcePath());
+
+	public (int xCoordinate, int yCoordinate) GetCoordinatesAfterRotation(Coordinate originalCoordinate)
+	{
+		const int NUMBER_OF_ROWS = 10;
+		const int NUMBER_OF_COLUMNS = 9;
+
+		int xCoordinate = originalCoordinate.Column - 1;
+		int yCoordinate = NUMBER_OF_ROWS - originalCoordinate.Row;
+
+		// If flipping the board horizontally, both the x-coordinate and y-coordinate should be flipped
+		// If flipping the board vertically, then the x-coordinate should be flipped
+		// If flipping the board vertically and horizontally, then only the y-coordinate should be flipped because the x-coordinate is flipped twice
+		if (FlipVertical && FlipHorizontal)
+			yCoordinate = originalCoordinate.Row - 1;
+		else if (FlipVertical)
+			xCoordinate = NUMBER_OF_COLUMNS - originalCoordinate.Column;
+		else if (FlipHorizontal)
+		{
+			yCoordinate = originalCoordinate.Row - 1;
+			xCoordinate = NUMBER_OF_COLUMNS - originalCoordinate.Column;
+		}
+
+		return (xCoordinate, yCoordinate);
 	}
 }

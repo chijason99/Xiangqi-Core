@@ -416,6 +416,8 @@ public class XiangqiGame
 		decimal frameDelayInSecond = 1, 
 		CancellationToken cancellationToken = default)
 	{
+		config ??= new ImageConfig();
+
 		string preparedFilePath = PrepareFilePath(filePath, "gif");
 
 		List<string> fens = [InitialFenString, .. MoveHistory.Select(x => x.FenAfterMove)];
@@ -432,9 +434,24 @@ public class XiangqiGame
 		GifFrameMetadata metadata = gif.Frames.RootFrame.Metadata.GetGifMetadata();
 		metadata.FrameDelay = frameDelayInCentiSeconds;
 
-		foreach (string fen in fens)
+		for (int i = 0; i < fens.Count; i++)
 		{
-			byte[] imageBytes = FenHelper.CreatePositionFromFen(fen).GenerateBoardImage(config);
+			string fen = fens[i];
+
+			Coordinate? previousPosition = null;
+			Coordinate? currentPosition = null;
+
+			// If the move indicator is enabled and it is not the initial FEN
+			if (config.UseMoveIndicator && i > 0)
+			{
+				previousPosition = MoveHistory[i - 1].StartingPosition;
+				currentPosition = MoveHistory[i - 1].Destination;
+			}
+
+			byte[] imageBytes = FenHelper.CreatePositionFromFen(fen).GenerateBoardImage(
+				config, 
+				previousPosition: previousPosition, 
+				currentPosition: currentPosition);
 
 			using Image<Rgba32> image = Image.Load<Rgba32>(imageBytes);
 			var frame = image.Frames.CloneFrame(0);

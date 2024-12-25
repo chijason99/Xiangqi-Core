@@ -39,6 +39,8 @@
     <ItemGroup>
       <Content Remove="Assets\Boards\black_and_white\board.png" />
       <Content Remove="Assets\Boards\coloured\board.png" />
+      <Content Remove="Assets\MoveIndicators\black_and_white\move_indicator.png" />
+      <Content Remove="Assets\MoveIndicators\coloured\move_indicator.png" />
       <Content Remove="Assets\Pieces\chinese\black_and_white\black_advisor.png" />
       <Content Remove="Assets\Pieces\chinese\black_and_white\black_bishop.png" />
       <Content Remove="Assets\Pieces\chinese\black_and_white\black_cannon.png" />
@@ -100,6 +102,8 @@
     <ItemGroup>
       <EmbeddedResource Include="Assets\Boards\black_and_white\board.png" />
       <EmbeddedResource Include="Assets\Boards\coloured\board.png" />
+      <EmbeddedResource Include="Assets\MoveIndicators\black_and_white\move_indicator.png" />
+      <EmbeddedResource Include="Assets\MoveIndicators\coloured\move_indicator.png" />
       <EmbeddedResource Include="Assets\Pieces\chinese\black_and_white\black_advisor.png" />
       <EmbeddedResource Include="Assets\Pieces\chinese\black_and_white\black_cannon.png" />
       <EmbeddedResource Include="Assets\Pieces\chinese\black_and_white\black_bishop.png" />
