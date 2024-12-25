@@ -1,4 +1,6 @@
-﻿using SixLabors.ImageSharp;
+﻿using SixLabors.Fonts;
+using SixLabors.ImageSharp;
+using SixLabors.ImageSharp.Drawing.Processing;
 using SixLabors.ImageSharp.Formats.Png;
 using SixLabors.ImageSharp.PixelFormats;
 using SixLabors.ImageSharp.Processing;
@@ -353,9 +355,6 @@ public static class PieceExtension
         config ??= new ImageConfig();
 
         config.PreloadImages();
-
-		const int columns = 9;
-		const int rows = 10;
 
 		using Image<Rgba32> boardImage = config.GetBoardImage();
         boardImage.Mutate(x => x.Resize(ImageConfig.DefaultBoardWidth, ImageConfig.DefaultBoardHeight));

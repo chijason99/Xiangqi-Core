@@ -2,6 +2,7 @@
 using SixLabors.ImageSharp.PixelFormats;
 using System.Collections.Concurrent;
 using System.Reflection;
+using System.Runtime.InteropServices;
 using XiangqiCore.Game;
 using XiangqiCore.Pieces;
 using XiangqiCore.Pieces.PieceTypes;

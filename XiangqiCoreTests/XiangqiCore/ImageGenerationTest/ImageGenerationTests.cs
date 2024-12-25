@@ -44,7 +44,7 @@ public static class ImageGenerationTests
 
 				await game.GenerateImageAsync(
 					Path.Combine(tempDirectory, $"{gameName}_{i}.jpg"), 
-					imageConfig: config,
+					config: config,
 					cancellationToken: cancellationToken);
 				fens.Add($"{i},{game.InitialFenString}");
 			});
@@ -121,7 +121,7 @@ public static class ImageGenerationTests
 
 			ImageConfig config = new()
 			{
-				UseMoveIndicator = true
+				UseMoveIndicator = true,
 			};
 
 			await game.GenerateGifAsync(
