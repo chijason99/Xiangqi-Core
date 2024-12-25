@@ -94,66 +94,186 @@
     </ItemGroup>
 
     <ItemGroup>
-      <EmbeddedResource Include="Assets\Boards\black_and_white\board.png" />
-      <EmbeddedResource Include="Assets\Boards\coloured\board.png" />
-      <EmbeddedResource Include="Assets\MoveIndicators\black_and_white\move_indicator.png" />
-      <EmbeddedResource Include="Assets\MoveIndicators\coloured\move_indicator.png" />
-      <EmbeddedResource Include="Assets\Pieces\chinese\black_and_white\black_advisor.png" />
-      <EmbeddedResource Include="Assets\Pieces\chinese\black_and_white\black_cannon.png" />
-      <EmbeddedResource Include="Assets\Pieces\chinese\black_and_white\black_bishop.png" />
-      <EmbeddedResource Include="Assets\Pieces\chinese\black_and_white\black_king.png" />
-      <EmbeddedResource Include="Assets\Pieces\chinese\black_and_white\black_knight.png" />
-      <EmbeddedResource Include="Assets\Pieces\chinese\black_and_white\black_pawn.png" />
-      <EmbeddedResource Include="Assets\Pieces\chinese\black_and_white\black_rook.png" />
-      <EmbeddedResource Include="Assets\Pieces\chinese\black_and_white\red_advisor.png" />
-      <EmbeddedResource Include="Assets\Pieces\chinese\black_and_white\red_cannon.png" />
-      <EmbeddedResource Include="Assets\Pieces\chinese\black_and_white\red_bishop.png" />
-      <EmbeddedResource Include="Assets\Pieces\chinese\black_and_white\red_king.png" />
-      <EmbeddedResource Include="Assets\Pieces\chinese\black_and_white\red_knight.png" />
-      <EmbeddedResource Include="Assets\Pieces\chinese\black_and_white\red_pawn.png" />
-      <EmbeddedResource Include="Assets\Pieces\chinese\black_and_white\red_rook.png" />
-      <EmbeddedResource Include="Assets\Pieces\chinese\coloured\black_advisor.png" />
-      <EmbeddedResource Include="Assets\Pieces\chinese\coloured\black_cannon.png" />
-      <EmbeddedResource Include="Assets\Pieces\chinese\coloured\black_bishop.png" />
-      <EmbeddedResource Include="Assets\Pieces\chinese\coloured\black_king.png" />
-      <EmbeddedResource Include="Assets\Pieces\chinese\coloured\black_knight.png" />
-      <EmbeddedResource Include="Assets\Pieces\chinese\coloured\black_pawn.png" />
-      <EmbeddedResource Include="Assets\Pieces\chinese\coloured\black_rook.png" />
-      <EmbeddedResource Include="Assets\Pieces\chinese\coloured\red_advisor.png" />
-      <EmbeddedResource Include="Assets\Pieces\chinese\coloured\red_cannon.png" />
-      <EmbeddedResource Include="Assets\Pieces\chinese\coloured\red_bishop.png" />
-      <EmbeddedResource Include="Assets\Pieces\chinese\coloured\red_king.png" />
-      <EmbeddedResource Include="Assets\Pieces\chinese\coloured\red_knight.png" />
-      <EmbeddedResource Include="Assets\Pieces\chinese\coloured\red_pawn.png" />
-      <EmbeddedResource Include="Assets\Pieces\chinese\coloured\red_rook.png" />
-      <EmbeddedResource Include="Assets\Pieces\western\black_and_white\black_advisor.png" />
-      <EmbeddedResource Include="Assets\Pieces\western\black_and_white\black_cannon.png" />
-      <EmbeddedResource Include="Assets\Pieces\western\black_and_white\black_bishop.png" />
-      <EmbeddedResource Include="Assets\Pieces\western\black_and_white\black_king.png" />
-      <EmbeddedResource Include="Assets\Pieces\western\black_and_white\black_knight.png" />
-      <EmbeddedResource Include="Assets\Pieces\western\black_and_white\black_pawn.png" />
-      <EmbeddedResource Include="Assets\Pieces\western\black_and_white\black_rook.png" />
-      <EmbeddedResource Include="Assets\Pieces\western\black_and_white\red_advisor.png" />
-      <EmbeddedResource Include="Assets\Pieces\western\black_and_white\red_cannon.png" />
-      <EmbeddedResource Include="Assets\Pieces\western\black_and_white\red_bishop.png" />
-      <EmbeddedResource Include="Assets\Pieces\western\black_and_white\red_king.png" />
-      <EmbeddedResource Include="Assets\Pieces\western\black_and_white\red_knight.png" />
-      <EmbeddedResource Include="Assets\Pieces\western\black_and_white\red_pawn.png" />
-      <EmbeddedResource Include="Assets\Pieces\western\black_and_white\red_rook.png" />
-      <EmbeddedResource Include="Assets\Pieces\western\coloured\black_advisor.png" />
-      <EmbeddedResource Include="Assets\Pieces\western\coloured\black_cannon.png" />
-      <EmbeddedResource Include="Assets\Pieces\western\coloured\black_bishop.png" />
-      <EmbeddedResource Include="Assets\Pieces\western\coloured\black_king.png" />
-      <EmbeddedResource Include="Assets\Pieces\western\coloured\black_knight.png" />
-      <EmbeddedResource Include="Assets\Pieces\western\coloured\black_pawn.png" />
-      <EmbeddedResource Include="Assets\Pieces\western\coloured\black_rook.png" />
-      <EmbeddedResource Include="Assets\Pieces\western\coloured\red_advisor.png" />
-      <EmbeddedResource Include="Assets\Pieces\western\coloured\red_cannon.png" />
-      <EmbeddedResource Include="Assets\Pieces\western\coloured\red_bishop.png" />
-      <EmbeddedResource Include="Assets\Pieces\western\coloured\red_king.png" />
-      <EmbeddedResource Include="Assets\Pieces\western\coloured\red_knight.png" />
-      <EmbeddedResource Include="Assets\Pieces\western\coloured\red_pawn.png" />
-      <EmbeddedResource Include="Assets\Pieces\western\coloured\red_rook.png" />
+      <EmbeddedResource Include="Assets\Boards\black_and_white\board.png">
+        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      </EmbeddedResource>
+      <EmbeddedResource Include="Assets\Boards\coloured\board.png">
+        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      </EmbeddedResource>
+      <EmbeddedResource Include="Assets\MoveIndicators\black_and_white\move_indicator.png">
+        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      </EmbeddedResource>
+      <EmbeddedResource Include="Assets\MoveIndicators\coloured\move_indicator.png">
+        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      </EmbeddedResource>
+      <EmbeddedResource Include="Assets\Pieces\chinese\black_and_white\black_advisor.png">
+        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      </EmbeddedResource>
+      <EmbeddedResource Include="Assets\Pieces\chinese\black_and_white\black_cannon.png">
+        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      </EmbeddedResource>
+      <EmbeddedResource Include="Assets\Pieces\chinese\black_and_white\black_bishop.png">
+        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      </EmbeddedResource>
+      <EmbeddedResource Include="Assets\Pieces\chinese\black_and_white\black_king.png">
+        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      </EmbeddedResource>
+      <EmbeddedResource Include="Assets\Pieces\chinese\black_and_white\black_knight.png">
+        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      </EmbeddedResource>
+      <EmbeddedResource Include="Assets\Pieces\chinese\black_and_white\black_pawn.png">
+        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      </EmbeddedResource>
+      <EmbeddedResource Include="Assets\Pieces\chinese\black_and_white\black_rook.png">
+        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      </EmbeddedResource>
+      <EmbeddedResource Include="Assets\Pieces\chinese\black_and_white\red_advisor.png">
+        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      </EmbeddedResource>
+      <EmbeddedResource Include="Assets\Pieces\chinese\black_and_white\red_cannon.png">
+        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      </EmbeddedResource>
+      <EmbeddedResource Include="Assets\Pieces\chinese\black_and_white\red_bishop.png">
+        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      </EmbeddedResource>
+      <EmbeddedResource Include="Assets\Pieces\chinese\black_and_white\red_king.png">
+        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      </EmbeddedResource>
+      <EmbeddedResource Include="Assets\Pieces\chinese\black_and_white\red_knight.png">
+        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      </EmbeddedResource>
+      <EmbeddedResource Include="Assets\Pieces\chinese\black_and_white\red_pawn.png">
+        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      </EmbeddedResource>
+      <EmbeddedResource Include="Assets\Pieces\chinese\black_and_white\red_rook.png">
+        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      </EmbeddedResource>
+      <EmbeddedResource Include="Assets\Pieces\chinese\coloured\black_advisor.png">
+        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      </EmbeddedResource>
+      <EmbeddedResource Include="Assets\Pieces\chinese\coloured\black_cannon.png">
+        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      </EmbeddedResource>
+      <EmbeddedResource Include="Assets\Pieces\chinese\coloured\black_bishop.png">
+        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      </EmbeddedResource>
+      <EmbeddedResource Include="Assets\Pieces\chinese\coloured\black_king.png">
+        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      </EmbeddedResource>
+      <EmbeddedResource Include="Assets\Pieces\chinese\coloured\black_knight.png">
+        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      </EmbeddedResource>
+      <EmbeddedResource Include="Assets\Pieces\chinese\coloured\black_pawn.png">
+        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      </EmbeddedResource>
+      <EmbeddedResource Include="Assets\Pieces\chinese\coloured\black_rook.png">
+        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      </EmbeddedResource>
+      <EmbeddedResource Include="Assets\Pieces\chinese\coloured\red_advisor.png">
+        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      </EmbeddedResource>
+      <EmbeddedResource Include="Assets\Pieces\chinese\coloured\red_cannon.png">
+        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      </EmbeddedResource>
+      <EmbeddedResource Include="Assets\Pieces\chinese\coloured\red_bishop.png">
+        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      </EmbeddedResource>
+      <EmbeddedResource Include="Assets\Pieces\chinese\coloured\red_king.png">
+        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      </EmbeddedResource>
+      <EmbeddedResource Include="Assets\Pieces\chinese\coloured\red_knight.png">
+        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      </EmbeddedResource>
+      <EmbeddedResource Include="Assets\Pieces\chinese\coloured\red_pawn.png">
+        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      </EmbeddedResource>
+      <EmbeddedResource Include="Assets\Pieces\chinese\coloured\red_rook.png">
+        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      </EmbeddedResource>
+      <EmbeddedResource Include="Assets\Pieces\western\black_and_white\black_advisor.png">
+        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      </EmbeddedResource>
+      <EmbeddedResource Include="Assets\Pieces\western\black_and_white\black_cannon.png">
+        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      </EmbeddedResource>
+      <EmbeddedResource Include="Assets\Pieces\western\black_and_white\black_bishop.png">
+        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      </EmbeddedResource>
+      <EmbeddedResource Include="Assets\Pieces\western\black_and_white\black_king.png">
+        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      </EmbeddedResource>
+      <EmbeddedResource Include="Assets\Pieces\western\black_and_white\black_knight.png">
+        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      </EmbeddedResource>
+      <EmbeddedResource Include="Assets\Pieces\western\black_and_white\black_pawn.png">
+        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      </EmbeddedResource>
+      <EmbeddedResource Include="Assets\Pieces\western\black_and_white\black_rook.png">
+        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      </EmbeddedResource>
+      <EmbeddedResource Include="Assets\Pieces\western\black_and_white\red_advisor.png">
+        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      </EmbeddedResource>
+      <EmbeddedResource Include="Assets\Pieces\western\black_and_white\red_cannon.png">
+        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      </EmbeddedResource>
+      <EmbeddedResource Include="Assets\Pieces\western\black_and_white\red_bishop.png">
+        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      </EmbeddedResource>
+      <EmbeddedResource Include="Assets\Pieces\western\black_and_white\red_king.png">
+        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      </EmbeddedResource>
+      <EmbeddedResource Include="Assets\Pieces\western\black_and_white\red_knight.png">
+        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      </EmbeddedResource>
+      <EmbeddedResource Include="Assets\Pieces\western\black_and_white\red_pawn.png">
+        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      </EmbeddedResource>
+      <EmbeddedResource Include="Assets\Pieces\western\black_and_white\red_rook.png">
+        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      </EmbeddedResource>
+      <EmbeddedResource Include="Assets\Pieces\western\coloured\black_advisor.png">
+        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      </EmbeddedResource>
+      <EmbeddedResource Include="Assets\Pieces\western\coloured\black_cannon.png">
+        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      </EmbeddedResource>
+      <EmbeddedResource Include="Assets\Pieces\western\coloured\black_bishop.png">
+        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      </EmbeddedResource>
+      <EmbeddedResource Include="Assets\Pieces\western\coloured\black_king.png">
+        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      </EmbeddedResource>
+      <EmbeddedResource Include="Assets\Pieces\western\coloured\black_knight.png">
+        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      </EmbeddedResource>
+      <EmbeddedResource Include="Assets\Pieces\western\coloured\black_pawn.png">
+        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      </EmbeddedResource>
+      <EmbeddedResource Include="Assets\Pieces\western\coloured\black_rook.png">
+        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      </EmbeddedResource>
+      <EmbeddedResource Include="Assets\Pieces\western\coloured\red_advisor.png">
+        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      </EmbeddedResource>
+      <EmbeddedResource Include="Assets\Pieces\western\coloured\red_cannon.png">
+        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      </EmbeddedResource>
+      <EmbeddedResource Include="Assets\Pieces\western\coloured\red_bishop.png">
+        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      </EmbeddedResource>
+      <EmbeddedResource Include="Assets\Pieces\western\coloured\red_king.png">
+        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      </EmbeddedResource>
+      <EmbeddedResource Include="Assets\Pieces\western\coloured\red_knight.png">
+        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      </EmbeddedResource>
+      <EmbeddedResource Include="Assets\Pieces\western\coloured\red_pawn.png">
+        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      </EmbeddedResource>
+      <EmbeddedResource Include="Assets\Pieces\western\coloured\red_rook.png">
+        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      </EmbeddedResource>
     </ItemGroup>
 
   <ItemGroup>
