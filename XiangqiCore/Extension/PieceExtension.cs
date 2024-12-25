@@ -4,6 +4,7 @@ using SixLabors.ImageSharp.PixelFormats;
 using SixLabors.ImageSharp.Processing;
 using XiangqiCore.Boards;
 using XiangqiCore.Misc;
+using XiangqiCore.Misc.Images;
 using XiangqiCore.Pieces;
 using XiangqiCore.Pieces.PieceTypes;
 

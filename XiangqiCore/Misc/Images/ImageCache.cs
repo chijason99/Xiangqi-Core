@@ -1,14 +1,15 @@
 ﻿using SixLabors.ImageSharp;
 using SixLabors.ImageSharp.PixelFormats;
+using System.Collections.Concurrent;
 using System.Reflection;
 using XiangqiCore.Extension;
 using XiangqiCore.Pieces.PieceTypes;
 
-namespace XiangqiCore.Misc;
+namespace XiangqiCore.Misc.Images;
 
 public static class ImageCache
 {
-	private static readonly Dictionary<string, Image<Rgba32>> _imageCache = [];
+	private static readonly ConcurrentDictionary<string, Image<Rgba32>> _imageCache = [];
 
 	public static Image<Rgba32> GetImage(string resourceName)
 	{
@@ -16,6 +17,7 @@ public static class ImageCache
 		{
 			using Stream stream = Assembly.GetExecutingAssembly().GetManifestResourceStream(resourceName)
 				?? throw new FileNotFoundException($"Resource '{resourceName}' not found.");
+
 			image = Image.Load<Rgba32>(stream);
 			_imageCache[resourceName] = image;
 		}
