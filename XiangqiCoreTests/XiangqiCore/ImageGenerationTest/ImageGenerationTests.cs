@@ -42,11 +42,15 @@ public static class ImageGenerationTests
 					UseBlackAndWhiteBoard = true,
 				};
 
+				string filePath = Path.Combine(tempDirectory, $"{game.GameName}_{i}.jpg");
+
 				await game.GenerateImageAsync(
-					Path.Combine(tempDirectory, $"{gameName}_{i}.jpg"), 
+					filePath,
 					config: config,
 					cancellationToken: cancellationToken);
 				fens.Add($"{i},{game.InitialFenString}");
+
+				Assert.True(File.Exists(filePath), "Image file was not created.");
 			});
 
 			StringBuilder csvContent = new();
@@ -76,7 +80,7 @@ public static class ImageGenerationTests
 	public static async Task GenerateGifAsync_ShouldNotThrowAnyError()
 	{
 		// Arrange
-		string tempDirectory = Path.Combine(Path.GetTempPath(), "XiangqiImageTests");
+		string tempDirectory = Path.Combine(Path.GetTempPath(), "XiangqiImageTests2");
 		Directory.CreateDirectory(tempDirectory);
 
 		try
@@ -85,21 +89,7 @@ public static class ImageGenerationTests
 			XiangqiBuilder builder = new();
 
 			XiangqiGame game = builder
-				.WithGameName("五六炮进三兵对屏风马进3卒")
-				.WithRedPlayer(config =>
-				{
-					config.Name = "东北王嘉良";
-				})
-				.WithBlackPlayer(config =>
-				{
-					config.Name = "上海胡荣华";
-				})
-				.WithCompetition(config =>
-				{
-					config.WithName("东北联队、上海队象棋友谊赛");
-					config.WithLocation("上海");
-					config.WithGameDate(DateTime.Parse("1962-7-7"));
-				})
+				.WithGameName("王嘉良先負胡榮華")
 				.WithMoveRecord(@"
   1. 炮二平五  馬８進７    2. 兵三進一  卒３進１
   3. 馬二進三  馬２進３    4. 馬八進九  象７進５
@@ -132,6 +122,120 @@ public static class ImageGenerationTests
 
 			// Assert
 			Assert.True(File.Exists(filePath), "GIF file was not created.");
+		}
+		catch (Exception ex)
+		{
+			Console.WriteLine(ex.Message);
+			throw;
+		}
+		finally
+		{
+			Directory.Delete(tempDirectory, true);
+		}
+	}
+
+	[Fact]
+	public static void GenerateGif_ShouldCreateFilesCorrectly() 
+	{ 
+		// Arrange
+		string tempDirectory = Path.Combine(Path.GetTempPath(), "XiangqiImageTests4");
+		Directory.CreateDirectory(tempDirectory);
+
+		try
+		{
+			// Act
+			XiangqiBuilder builder = new();
+
+			XiangqiGame game = builder
+				.WithGameName("許銀川先和陶漢明")
+				.WithMoveRecord(@"
+1. 炮二平五  馬８進７    2. 兵三進一  車９平８
+  3. 馬二進三  卒３進１    4. 車一平二  馬２進３
+  5. 炮八平七  馬３進２    6. 馬三進四  象３進５
+  7. 馬四進五  炮８平９    8. 車二進九  馬７退８
+  9. 馬五退七  士４進５   10. 馬七退五  車１平４
+ 11. 兵七進一  車４進５   12. 炮七退一  車４平３
+ 13. 馬八進九  車３平４   14. 炮七平三  炮９進４
+ 15. 兵九進一  馬８進９   16. 車九進一  炮９進２
+ 17. 仕六進五  車４平３   18. 車九平七  車３進３
+ 19. 馬九退七  卒９進１   20. 馬七進六  卒９進１
+ 21. 炮五平九  卒９平８   22. 相七進五  卒８平７
+ 23. 相五進三  炮９退２   24. 馬六進五  炮２平１
+ 25. 炮九進四  炮１進３   26. 相三退五  馬９進８
+ 27. 前馬進三  馬８進６   28. 馬三退四  炮１平６
+ 29. 馬五進四  炮６平４   30. 仕五進六  炮４退４
+ 31. 兵五進一  士５進６   32. 仕四進五  炮９退５
+ 33. 馬四退三  馬２進４   34. 炮九平一  炮９平５
+ 35. 馬三進四  馬４退２   36. 炮三進二  馬２進３
+ 37. 炮三平六  馬３退４   38. 馬四退六  炮４進５
+ 39. 馬六進四  將５平４   40. 炮一退一  炮４退５
+ 41. 炮一平六  將４平５   42. 兵五進一  炮５進３
+ 43. 馬四進六  士６退５   44. 馬六退五  炮４進２
+ 45. 炮六退二  炮４退２   46. 炮六平五  將５平４
+ 47. 馬五進七  炮４進２   48. 仕五進四  將４平５
+ 49. 仕六退五  將５平４
+")
+				.Build();
+
+			string filePath = Path.Combine(tempDirectory, $"{game.GameName}.gif");
+
+			ImageConfig config = new()
+			{
+				UseMoveIndicator = true,
+			};
+
+			game.GenerateGif(
+				filePath,
+				config,
+				frameDelayInSecond: 1);
+
+			// Assert
+			Assert.True(File.Exists(filePath), "GIF file was not created.");
+		}
+		catch (Exception ex)
+		{
+			Console.WriteLine(ex.Message);
+			throw;
+		}
+		finally
+		{
+			Directory.Delete(tempDirectory, true);
+		}
+	}
+
+	[Fact]
+	public static void GenerateImage_ShouldNotThrowAnyError()
+	{
+		// Arrange
+		string tempDirectory = Path.Combine(Path.GetTempPath(), "XiangqiImageTests3");
+		Directory.CreateDirectory(tempDirectory);
+
+		try
+		{
+			// Act
+			XiangqiBuilder builder = new();
+
+			Parallel.For(1, 21, i =>
+			{
+				XiangqiGame game = builder
+				.WithGameName("三兵巧勝炮雙士")
+				.WithStartingFen("3k5/2P1a4/3c1a3/4P4/3P5/9/9/9/9/4K4 w - - 0 0")
+				.RandomisePosition()
+				.Build();
+
+				string filePath = Path.Combine(tempDirectory, $"{game.GameName}.jpg");
+
+				ImageConfig config = new()
+				{
+					UseBlackAndWhitePieces = true,
+					UseBlackAndWhiteBoard = true,
+				};
+
+				game.GenerateImage(filePath, config: config);
+
+				// Assert
+				Assert.True(File.Exists(filePath), "Image file was not created.");
+			});
 		}
 		catch (Exception ex)
 		{
