@@ -31,12 +31,6 @@
   </ItemGroup>
 
     <ItemGroup>
-	    <Content Include="Assets\**\*.*">
-		    <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-	    </Content>
-    </ItemGroup>
-
-    <ItemGroup>
       <Content Remove="Assets\Boards\black_and_white\board.png" />
       <Content Remove="Assets\Boards\coloured\board.png" />
       <Content Remove="Assets\MoveIndicators\black_and_white\move_indicator.png" />
