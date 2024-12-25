@@ -254,8 +254,6 @@ public static class PieceExtension
         if (!boardPosition.HasPieceAtPosition(startingPosition))
             throw new ArgumentException("There must be a piece at the starting position on the board");
 
-        //Piece[,] boardPositionClone = boardPosition.DeepClone();
-
         Piece[,] boardPositionClone = boardPosition.DeepClone();
         boardPositionClone.MakeMove(startingPosition, destination);
 
