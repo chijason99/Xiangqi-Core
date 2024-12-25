@@ -2,6 +2,7 @@
 using System.Reflection;
 using System.Text;
 using XiangqiCore.Game;
+using XiangqiCore.Misc.Images;
 
 namespace xiangqi_core_test.XiangqiCore.ImageGenerationTest;
 
@@ -13,8 +14,6 @@ public static class ImageGenerationTests
 	[InlineData(101, 100)]
 	public static async Task GenerateImagesAsync_ShouldNotThrowAnyError(int toIndex, int expectedImageCount)
 	{
-		var test = Assembly.GetAssembly(typeof(XiangqiBuilder)).GetManifestResourceNames();
-
 		// Arrange
 		string tempDirectory = Path.Combine(Path.GetTempPath(), "XiangqiImageTests");
 		Directory.CreateDirectory(tempDirectory);
@@ -37,7 +36,17 @@ public static class ImageGenerationTests
 					.RandomisePosition()
 					.Build();
 
-				await game.GenerateImageAsync(Path.Combine(tempDirectory, $"{gameName}_{i}.jpg"), cancellationToken: cancellationToken);
+				ImageConfig config = new()
+				{
+					UseWesternPieces = true,
+					UseBlackAndWhitePieces = true,
+					UseBlackAndWhiteBoard = true,
+				};
+
+				await game.GenerateImageAsync(
+					Path.Combine(tempDirectory, $"{gameName}_{i}.jpg"), 
+					imageConfig: config,
+					cancellationToken: cancellationToken);
 				fens.Add($"{i},{game.InitialFenString}");
 			});
 

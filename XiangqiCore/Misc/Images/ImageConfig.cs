@@ -46,7 +46,7 @@ public class ImageConfig
 		string defaultColour = ".coloured";
 
 		if (UseBlackAndWhitePieces)
-			defaultColour += ".black_and_white";
+			defaultColour = ".black_and_white";
 
 		path += defaultColour;
 
@@ -65,7 +65,7 @@ public class ImageConfig
 		string defaultColour = ".coloured";
 
 		if (UseBlackAndWhiteBoard)
-			defaultColour += ".black_and_white";
+			defaultColour = ".black_and_white";
 
 		path += defaultColour;
 
