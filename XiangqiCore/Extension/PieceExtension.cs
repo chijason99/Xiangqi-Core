@@ -232,8 +232,8 @@ public static class PieceExtension
 
     public static bool IsKingExposedDirectlyToEnemyKing(this Piece[,] boardPosition)
     {
-		King redKing = boardPosition.GetPiecesOfType<King>(Side.Red).Single();
-		King blackKing = boardPosition.GetPiecesOfType<King>(Side.Black).Single();
+		King redKing = (King)boardPosition.GetPiecesOfType(PieceType.King, Side.Red).Single();
+		King blackKing = (King)boardPosition.GetPiecesOfType(PieceType.King, Side.Black).Single();
 
 		if (redKing.Coordinate.Column != blackKing.Coordinate.Column)
 			return false;
@@ -256,7 +256,7 @@ public static class PieceExtension
 
         //Piece[,] boardPositionClone = boardPosition.DeepClone();
 
-        Piece[,] boardPositionClone = (Piece[,])boardPosition.Clone();
+        Piece[,] boardPositionClone = boardPosition.DeepClone();
         boardPositionClone.MakeMove(startingPosition, destination);
 
         return boardPositionClone;

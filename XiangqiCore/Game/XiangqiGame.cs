@@ -308,34 +308,37 @@ public class XiangqiGame
 		return pgnBuilder.ToString();
 	}
 
+	private byte[] GeneratePgnFileCore()
+	{
+		Encoding gb2312Encoding = CodePagesEncodingProvider.Instance.GetEncoding(936) ?? Encoding.UTF8;
+
+		string pgnString = ExportGameAsPgnString();
+
+		return gb2312Encoding.GetBytes(pgnString);
+	}
+
 	public void GeneratePgnFile(string filePath)
 	{
 		string preparedFilePath = PrepareFilePath(filePath, "pgn");
-
-		Encoding gb2312Encoding = CodePagesEncodingProvider.Instance.GetEncoding(936) ?? Encoding.UTF8;
-		XiangqiBuilder xiangqiBuilder = new();
-
-		string pgnString = ExportGameAsPgnString();
+		
+		byte[] pgnBytes = GeneratePgnFileCore();
 
 		using FileStream fileStream = new(preparedFilePath, FileMode.Create, FileAccess.Write);
 		using StreamWriter streamWriter = new(fileStream);
 
-		fileStream.Write(gb2312Encoding.GetBytes(ExportGameAsPgnString()));
+		fileStream.Write(pgnBytes);
 	}
 
 	public async Task GeneratePgnFileAsync(string filePath, CancellationToken cancellationToken = default)
 	{
 		string preparedFilePath = PrepareFilePath(filePath, "pgn");
 
-		Encoding gb2312Encoding = CodePagesEncodingProvider.Instance.GetEncoding(936) ?? Encoding.UTF8;
-		XiangqiBuilder xiangqiBuilder = new();
-
-		string pgnString = ExportGameAsPgnString();
+		byte[] pgnBytes = GeneratePgnFileCore();
 
 		using FileStream fileStream = new(preparedFilePath, FileMode.Create, FileAccess.Write);
 		using StreamWriter streamWriter = new(fileStream);
 		
-		await fileStream.WriteAsync(gb2312Encoding.GetBytes(ExportGameAsPgnString()), cancellationToken);
+		await fileStream.WriteAsync(pgnBytes, cancellationToken);
 	}
 
 	/// <summary>
