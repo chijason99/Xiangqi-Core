@@ -10,6 +10,7 @@ using XiangqiCore.Pieces.PieceTypes;
 using XiangqiCore.Pieces.ValidationStrategy;
 
 namespace XiangqiCore.Extension;
+
 public class EnumHelper<T> where T : Enum 
 {
     /// <summary>
@@ -75,14 +76,26 @@ public class EnumHelper<T> where T : Enum
         return descriptionAttribute is not null ? descriptionAttribute.Description : targetMember.Name;
     }
 
-	public static string GetChineseDisplayName(T targetElement, Side side = Side.Red)
+	/// <summary>
+	/// Gets the symbol for the specified target element, language, and side.
+	/// If the specified language is not found, it falls back to Traditional Chinese.
+	/// </summary>
+	/// <typeparam name="T">The enum type.</typeparam>
+	/// <param name="targetElement">The target element.</param>
+	/// <param name="language">The language.</param>
+	/// <param name="side">The side (default is Red).</param>
+	/// <returns>The symbol for the target element.</returns>
+	/// <exception cref="InvalidOperationException">Thrown if no symbol attribute is found.</exception>
+	public static string GetSymbol(T targetElement, Language language, Side side = Side.Red)
 	{
 		MemberInfo memberInfo = typeof(T).GetMember(targetElement.ToString()).First();
 
-		ChineseNameAttribute chineseNameAttribute = memberInfo.GetCustomAttribute<ChineseNameAttribute>() ??
-			throw new InvalidOperationException("Please use the Chinese Name attribute to set the corresponding Chinese name");
+		SymbolAttribute symbolAttribute = memberInfo.GetCustomAttributes<SymbolAttribute>().SingleOrDefault(x => x.Language == language) ??
+			memberInfo.GetCustomAttributes<SymbolAttribute>().SingleOrDefault(x => x.Language == Language.TraditionalChinese) ??
+			throw new InvalidOperationException($"Please use the Symbol attribute to set the corresponding symbol for {language}");
 
-		return side == Side.Red ? chineseNameAttribute.NameForRed : chineseNameAttribute.NameForBlack;
+
+        return side == Side.Red ? symbolAttribute.RedSymbol : symbolAttribute.BlackSymbol;
 	}
 }
 
@@ -136,4 +149,7 @@ public static class EnumExtension
 		PieceType.Pawn => new PawnValidationStrategy(),
 		_ => throw new InvalidOperationException("Please provide a valid piece type")
 	};
+
+    public static bool IsMovingInDiagonals(this PieceType pieceType)
+        => pieceType == PieceType.Bishop || pieceType == PieceType.Advisor || pieceType == PieceType.Knight;
 }
