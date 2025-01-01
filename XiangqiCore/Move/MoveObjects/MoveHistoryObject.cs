@@ -19,7 +19,7 @@ public record MoveHistoryObject
 		Side side, 
 		Coordinate startingPosition, 
 		Coordinate destination,
-		int pieceOrderIndex)
+		PieceOrder pieceOrderIndex)
 	{
 		FenAfterMove = fenAfterMove;
 		FenBeforeMove = fenBeforeMove;
@@ -47,7 +47,7 @@ public record MoveHistoryObject
 	public bool IsCheck { get; init; }
 	public bool IsCheckmate { get; init; }
 
-	public int PieceOrderIndex { get; init; }
+	public PieceOrder PieceOrderIndex { get; init; }
 	
 	public PieceType PieceMoved { get; init; }
 	public PieceType PieceCaptured { get; init; }
@@ -70,9 +70,6 @@ public record MoveHistoryObject
 		MoveNotation = moveNotation;
 		MoveNotationType = moveNotationType;
 	}
-
-	public string TransalateNotation(MoveNotationType targetNotationType)
-		=> MoveNotationType.TranslateTo(this, targetNotationType);
 
 	private void InitializeMoveDirection()
 	{

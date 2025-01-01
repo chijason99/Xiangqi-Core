@@ -24,7 +24,7 @@ public enum PieceType
 	[Symbol(Language.English, "C", "c")]
 	Cannon,
 
-	[Symbol(Language.TraditionalChinese, "士")]
+	[Symbol(Language.TraditionalChinese, "仕", "士")]
 	[Symbol(Language.English, "A", "a")]
 	Advisor,
 

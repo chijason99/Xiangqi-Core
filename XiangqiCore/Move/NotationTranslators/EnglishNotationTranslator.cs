@@ -5,7 +5,7 @@ namespace XiangqiCore.Move.NotationTranslators;
 
 public class EnglishNotationTranslator : BaseNotationTranslator
 {
-	protected EnglishNotationTranslator() : base(Language.English)
+	public EnglishNotationTranslator() : base(Language.English)
 	{
 	}
 

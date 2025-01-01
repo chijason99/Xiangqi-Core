@@ -6,7 +6,7 @@ namespace XiangqiCore.Move.NotationTranslators;
 
 public class TraditionalChineseNotationTranslator : BaseNotationTranslator
 {
-	protected TraditionalChineseNotationTranslator() : base(Language.TraditionalChinese)
+	public TraditionalChineseNotationTranslator() : base(Language.TraditionalChinese)
 	{
 	}
 
@@ -19,10 +19,10 @@ public class TraditionalChineseNotationTranslator : BaseNotationTranslator
 		int fourthCharacter = GetFourthCharacter(moveHistoryObject);
 
 		string startingColumnString = moveHistoryObject.MovingSide == Side.Red ? 
-			startingColumn.ToChineseNumeral() : startingColumn.ToString();
+			startingColumn.ToChineseNumeral() : startingColumn.ToString().ToFullWidth();
 
 		string fourthCharacterString = moveHistoryObject.MovingSide == Side.Red ? 
-			fourthCharacter.ToChineseNumeral() : fourthCharacter.ToString();
+			fourthCharacter.ToChineseNumeral() : fourthCharacter.ToString().ToFullWidth();
 
 		return $"{pieceType}{startingColumnString}{direction}{fourthCharacterString}";
 	}

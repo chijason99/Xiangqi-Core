@@ -1,7 +1,6 @@
 ﻿using SixLabors.ImageSharp;
 using SixLabors.ImageSharp.Formats.Gif;
 using SixLabors.ImageSharp.PixelFormats;
-using System.Runtime.Versioning;
 using System.Text;
 using XiangqiCore.Attributes;
 using XiangqiCore.Boards;
@@ -254,7 +253,7 @@ public class XiangqiGame
 	/// <param name="targetNotationType">The target notation type.</param>
 	/// <returns>The move history in the specified notation type.</returns>
 	[BetaMethod("Currently only supports converting MoveNotationType from Chinese/English to UCCI. The translation would not work for Chinese -> English or English -> Chinese")]
-	public string ExportMoveHistory(MoveNotationType targetNotationType = MoveNotationType.Chinese)
+	public string ExportMoveHistory(MoveNotationType targetNotationType = MoveNotationType.Chinese, Language language = Language.TraditionalChinese)
 	{
 		List<string> movesOfEachRound = [];
 
@@ -264,7 +263,7 @@ public class XiangqiGame
 				{
 					moveHistoryItem.RoundNumber,
 					moveHistoryItem.MovingSide,
-					MoveNotation = moveHistoryItem.TransalateNotation(targetNotationType)
+					MoveNotation = moveHistoryItem.TranslateTo(targetNotationType, language)
 				})
 			.GroupBy(moveHistoryItem => moveHistoryItem.RoundNumber)
 			.OrderBy(roundGroup => roundGroup.Key);

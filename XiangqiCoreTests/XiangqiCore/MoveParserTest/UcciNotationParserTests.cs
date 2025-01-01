@@ -1,4 +1,5 @@
-﻿using XiangqiCore.Game;
+﻿using XiangqiCore.Extension;
+using XiangqiCore.Game;
 using XiangqiCore.Move;
 using XiangqiCore.Move.MoveObjects;
 using XiangqiCore.Pieces.PieceTypes;
@@ -55,7 +56,7 @@ public static class UcciNotationParserTests
 		MoveHistoryObject latestMoveHistoryObject = game.MoveHistory.Last();
 
 		// Act
-		string result = latestMoveHistoryObject.TransalateNotation(MoveNotationType.UCCI);
+		string result = latestMoveHistoryObject.TranslateTo(MoveNotationType.UCCI);
 
 		// Assert
 		result.Should().Be(expectedResult);

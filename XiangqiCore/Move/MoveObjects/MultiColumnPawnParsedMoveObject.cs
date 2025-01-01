@@ -1,4 +1,5 @@
 ﻿namespace XiangqiCore.Move.MoveObject;
+
 public record MultiColumnPawnParsedMoveObject : ParsedMoveObject
 {
     public MultiColumnPawnParsedMoveObject(ParsedMoveObject parsedMoveObject, int minNumberOfPawnsOnColumn)
@@ -6,7 +7,7 @@ public record MultiColumnPawnParsedMoveObject : ParsedMoveObject
                parsedMoveObject.StartingColumn,
                parsedMoveObject.MoveDirection,
                parsedMoveObject.FourthCharacter,
-               parsedMoveObject.PieceOrderIndex)
+               parsedMoveObject.PieceOrder)
     {
         MinNumberOfPawnsOnColumn = minNumberOfPawnsOnColumn;
     }

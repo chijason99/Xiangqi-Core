@@ -56,7 +56,7 @@ public class EnglishNotationParser : MoveNotationBase
 
     public int GetFourthCharacter(string notation) => int.Parse(notation.Last().ToString());
 
-    public int GetPieceOrderIndex(string notation)
+    public PieceOrder GetPieceOrder(string notation)
     {
         const int pieceOrderCharacterIndex = 0;
         const int defaultPieceOrderIndex = 0;
@@ -65,9 +65,9 @@ public class EnglishNotationParser : MoveNotationBase
 
         // Multi column pawn scenario
         if (char.IsDigit(pieceOrderCharacter))
-            return int.Parse(pieceOrderCharacter.ToString()) - 1;
+            return (PieceOrder)int.Parse(pieceOrderCharacter.ToString()) - 1;
         else if (pieceOrderIndexSymbol.Contains(pieceOrderCharacter))
-            return pieceOrderCharacter == '+' ? 0 : IsMultiColumnPawn(notation) ? MultiColumnPawnParsedMoveObject.LastPawnIndex : 1;
+            return pieceOrderCharacter == '+' ? PieceOrder.First : IsMultiColumnPawn(notation) ? PieceOrder.Last : PieceOrder.Second;
         else
             return defaultPieceOrderIndex;
     }
@@ -78,9 +78,9 @@ public class EnglishNotationParser : MoveNotationBase
         int startingColumn = ParseStartingColumn(notation);
         MoveDirection moveDirection = ParseMoveDirection(notation);
         int fourthCharacter = GetFourthCharacter(notation);
-        int pieceOrderIndex = GetPieceOrderIndex(notation);
+        PieceOrder pieceOrder = GetPieceOrder(notation);
 
-        ParsedMoveObject parsedMoveObject = new(pieceType, startingColumn, moveDirection, fourthCharacter, pieceOrderIndex);
+        ParsedMoveObject parsedMoveObject = new(pieceType, startingColumn, moveDirection, fourthCharacter, pieceOrder);
 
         return IsMultiColumnPawn(notation) ? new MultiColumnPawnParsedMoveObject(parsedMoveObject, GetMinNumberOfPawnsOnColumn(notation)) :
                                              parsedMoveObject;

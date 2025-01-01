@@ -6,6 +6,7 @@ using XiangqiCore.Move;
 using XiangqiCore.Move.MoveObjects;
 using XiangqiCore.Move.NotationParser;
 using XiangqiCore.Move.NotationParsers;
+using XiangqiCore.Move.NotationTranslators;
 using XiangqiCore.Pieces.PieceTypes;
 using XiangqiCore.Pieces.ValidationStrategy;
 
@@ -111,31 +112,6 @@ public static class EnumExtension
         if (side == Side.None) throw new ArgumentException("Please use either Side.Red or Side.Black as the parameter");
 
         return side == Side.Black ? Side.Red : Side.Black;
-    }
-
-    public static string TranslateTo(this MoveNotationType originalNotationType, MoveHistoryObject moveObject, MoveNotationType targetNotationType)
-    {
-        if (originalNotationType == targetNotationType)
-            return moveObject.MoveNotation;
-
-		IMoveNotationParser moveNotationParser = targetNotationType switch
-		{
-			MoveNotationType.Chinese => MoveNotationBase.GetMoveNotationParserInstance<ChineseNotationParser>(),
-			MoveNotationType.English => MoveNotationBase.GetMoveNotationParserInstance<EnglishNotationParser>(),
-			MoveNotationType.UCCI => MoveNotationBase.GetMoveNotationParserInstance<UcciNotationParser>(),
-			_ => null
-		};
-
-		if (targetNotationType == MoveNotationType.Chinese)
-			return moveNotationParser.TranslateToChinese(moveObject);
-
-		if (targetNotationType == MoveNotationType.English)
-			return moveNotationParser.TranslateToEnglish(moveObject);
-
-		if (targetNotationType == MoveNotationType.UCCI)
-		    return moveNotationParser.TranslateToUcci(moveObject);
-
-        return string.Empty;
     }
 
 	public static IValidationStrategy GetValidationStrategy(this PieceType pieceType) => pieceType switch

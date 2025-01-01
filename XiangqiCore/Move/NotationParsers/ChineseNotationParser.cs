@@ -29,7 +29,7 @@ public class ChineseNotationParser : MoveNotationBase
 
 		ParsedMoveObject result = new(pieceType, startingColumn, moveDirection, foruthCharacter)
 		{
-			PieceOrderIndex = isMultiColumnPawn ? ParsePieceOrderIndexForMultiColumnPawn(translatedNotation) : ParsePieceOrderIndex(translatedNotation)
+			PieceOrder = isMultiColumnPawn ? ParsePieceOrderIndexForMultiColumnPawn(translatedNotation) : ParsePieceOrderIndex(translatedNotation)
 		};
 
 		if (isMultiColumnPawn)
@@ -100,8 +100,8 @@ public class ChineseNotationParser : MoveNotationBase
 			return chineseNumbers.Contains(notation[fourthCharacterIndex]) ? ChineseNumberParser.Parse(notation[fourthCharacterIndex]) : ParsedMoveObject.UnknownStartingColumn;
 	}
 
-	private int ParsePieceOrderIndex(string notation)
-		=> notation[0] == '後' ? 1 : notation[0] == '前' ? 0 : ParsedMoveObject.UnknownPieceOrderIndex;
+	private PieceOrder ParsePieceOrderIndex(string notation)
+		=> notation[0] == '後' ? PieceOrder.Second : notation[0] == '前' ? PieceOrder.First : PieceOrder.Unknown;
 
 	// Multi Column Pawn situation
 	// Meaning that there are more than one columns holding two or more pawns of the same color
@@ -116,16 +116,16 @@ public class ChineseNotationParser : MoveNotationBase
 			_ => ChineseNumberParser.Parse(notation[0])
 		};
 
-	private int ParsePieceOrderIndexForMultiColumnPawn(string notation)
+	private PieceOrder ParsePieceOrderIndexForMultiColumnPawn(string notation)
 	{
 		char firstCharacter = notation[0];
 
 		return firstCharacter switch
 		{
-			'前' => 0,
-			'中' => 1,
-			'後' => MultiColumnPawnParsedMoveObject.LastPawnIndex,
-			_ => ChineseNumberParser.Parse(firstCharacter) - 1
+			'前' => PieceOrder.First,
+			'中' => PieceOrder.Second,
+			'後' => PieceOrder.Last,
+			_ => (PieceOrder)ChineseNumberParser.Parse(firstCharacter) - 1
 		};
 	}
 }

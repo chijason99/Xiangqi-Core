@@ -5,7 +5,7 @@ using XiangqiCore.Pieces.PieceTypes;
 
 namespace XiangqiCore.Move.NotationTranslators;
 
-public abstract class BaseNotationTranslator(Language language = Language.NotSpecified) : IMoveNotationTranslator
+public abstract class BaseNotationTranslator(Language language = Language.NotSpecified) : INotationTranslator
 {
 	public Language Language { get; init; } = language;
 

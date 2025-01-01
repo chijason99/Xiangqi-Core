@@ -1,5 +1,4 @@
 ﻿using XiangqiCore.Move.MoveObject;
-using XiangqiCore.Move.MoveObjects;
 using XiangqiCore.Move.NotationParsers;
 
 namespace XiangqiCore.Move;
@@ -17,12 +16,4 @@ public abstract class MoveNotationBase : IMoveNotationParser
     }
 
     public abstract ParsedMoveObject Parse(string notation);
-
-    public virtual string TranslateToChinese(MoveHistoryObject moveHistoryObject)
-        => throw new NotImplementedException();
-    public virtual string TranslateToEnglish(MoveHistoryObject moveHistoryObject)
-		=> throw new NotImplementedException();
-
-	public virtual string TranslateToUcci(MoveHistoryObject moveHistoryObject)
-		=> throw new NotImplementedException();
 }

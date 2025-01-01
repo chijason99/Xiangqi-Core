@@ -1,6 +1,4 @@
-﻿using System.Reflection;
-using XiangqiCore.Attributes;
-using XiangqiCore.Extension;
+﻿using XiangqiCore.Extension;
 using XiangqiCore.Misc;
 using XiangqiCore.Move;
 using XiangqiCore.Move.MoveObject;
@@ -64,7 +62,7 @@ public class Board
 		if (!pieceToMove.ValidateMove(_position, startingPosition, destination))
 			throw new InvalidOperationException($"The proposed move from {startingPosition} to {destination} violates the game logic"); ;
 
-		MoveHistoryObject moveHistory = CreateMoveHistory(sideToMove, startingPosition, destination);
+		MoveHistoryObject moveHistory = CreateMoveHistory(sideToMove, startingPosition, destination, PieceOrder.Unknown);
 		_position.MakeMove(startingPosition, destination);
 
 		return moveHistory;
@@ -81,10 +79,10 @@ public class Board
 	private Coordinate FindStartingPosition(ParsedMoveObject moveObject, Side sideToMove)
 	{
 		if (moveObject.IsFromUcciNotation)
-			return moveObject.StartingPosition.Value;
+			return moveObject.StartingPosition!.Value;
 
 		Piece[] piecesToMove = GetPiecesToMove(moveObject.PieceType, sideToMove);
-		Piece pieceToMove;
+		Piece? pieceToMove = null;
 
 		// If the starting column is provided, then find the piece that has the same column as the starting column;
 		// Otherwise, i.e. there are more than one piece of the same type and side in the column, pick the one following the order
@@ -95,28 +93,38 @@ public class Board
 			int actualStartingColumn = moveObject.StartingColumn.ConvertToColumnBasedOnSide(sideToMove);
 
 			if (piecesToMove.Count(p => p.Coordinate.Column == actualStartingColumn) == 1)
+			{
 				pieceToMove = piecesToMove.Single(p => p.Coordinate.Column == actualStartingColumn);
+				moveObject.PieceOrder = PieceOrder.First;
+			}
 			// Edge case: in some notation, there are two pieces of the same type on the same column and the notation
 			// do not mark which piece is moving, but only one of them would be able to perform the move specified validly
-			else if (moveObject.PieceOrderIndex == ParsedMoveObject.UnknownPieceOrderIndex)
+			else if (moveObject.PieceOrder == PieceOrder.Unknown)
 			{
-				pieceToMove = piecesToMove.First(x =>
+				foreach (Piece piece in piecesToMove)
 				{
 					try
 					{
-						Coordinate guessedDestination = x.GetDestinationCoordinateFromNotation(moveObject.MoveDirection, moveObject.FourthCharacter);
+						Coordinate guessedDestination = piece.GetDestinationCoordinateFromNotation(moveObject.MoveDirection, moveObject.FourthCharacter);
 
-						return x.ValidateMove(Position, x.Coordinate, guessedDestination);
+						if (piece.ValidateMove(Position, piece.Coordinate, guessedDestination))
+						{
+							pieceToMove = piece;
+							break;
+						}
 					}
-					catch (ArgumentOutOfRangeException ex)
+					catch (ArgumentOutOfRangeException)
 					{
-						return false;
+						continue;
 					}
-				});
+				}
 			}
 			else
-				pieceToMove = piecesToMove[moveObject.PieceOrderIndex];
+				pieceToMove = piecesToMove[(int)moveObject.PieceOrder];
 		}
+
+		if (pieceToMove is null)
+			throw new InvalidOperationException("No valid piece found to move.");
 
 		return pieceToMove.Coordinate;
 	}
@@ -155,10 +163,10 @@ public class Board
 								.ToArray();
 		}
 
-		if (moveObject.PieceOrderIndex == MultiColumnPawnParsedMoveObject.LastPawnIndex)
+		if (moveObject.PieceOrder == PieceOrder.Last)
 			return pawnsOnColumn.Last();
 		else
-			return pawnsOnColumn[moveObject.PieceOrderIndex];
+			return pawnsOnColumn[(int)moveObject.PieceOrder];
 	}
 
 	private Coordinate FindDestination(ParsedMoveObject moveObject, Coordinate startingCoordinate)
@@ -170,7 +178,7 @@ public class Board
 
 		MoveDirection moveDirection = moveObject.MoveDirection;
 
-		if (pieceToMove.GetType().GetCustomAttribute<MoveInDiagonalsAttribute>() is not null && moveDirection == MoveDirection.Horizontal)
+		if (pieceToMove.PieceType.IsMovingInDiagonals() && moveDirection == MoveDirection.Horizontal)
 			throw new ArgumentException($"Piece type {EnumHelper<PieceType>.GetDisplayName(pieceToMove.PieceType)} cannot move horizontally");
 
 		Coordinate destination = pieceToMove.GetDestinationCoordinateFromNotation(moveObject.MoveDirection, moveObject.FourthCharacter);
@@ -178,7 +186,7 @@ public class Board
 		return destination;
 	}
 
-	private MoveHistoryObject CreateMoveHistory(Side sideToMove, Coordinate startingPosition, Coordinate destination)
+	private MoveHistoryObject CreateMoveHistory(Side sideToMove, Coordinate startingPosition, Coordinate destination, PieceOrder pieceOrder)
 	{
 		Piece pieceCaptured = GetPieceAtPosition(destination);
 		Piece[,] positionAfterTheProposedMove = _position.SimulateMove(startingPosition, destination);
@@ -197,7 +205,8 @@ public class Board
 			pieceCaptured.PieceType,
 			sideToMove,
 			startingPosition,
-			destination
+			destination,
+			pieceOrder
 		);
 
 		return moveHistory;
