@@ -2,6 +2,7 @@
 using XiangqiCore.Pieces.PieceTypes;
 
 namespace XiangqiCore.Move.MoveObject;
+
 public record ParsedMoveObject
 {
     // The starting column would be unknown if there are more than one piece on the same column,

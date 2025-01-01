@@ -18,18 +18,24 @@ public record MoveHistoryObject
 		PieceType pieceCaptured,
 		Side side, 
 		Coordinate startingPosition, 
-		Coordinate destination)
+		Coordinate destination,
+		int pieceOrderIndex)
 	{
 		FenAfterMove = fenAfterMove;
 		FenBeforeMove = fenBeforeMove;
+
 		IsCapture = isCapture;
 		IsCheck = isCheck;
 		IsCheckmate = isCheckMate;
+
 		PieceMoved = pieceMoved;
 		PieceCaptured = pieceCaptured;
 		MovingSide = side;
+
 		StartingPosition = startingPosition;
 		Destination = destination;
+
+		PieceOrderIndex = pieceOrderIndex;
 
 		InitializeMoveDirection();
 	}
@@ -40,6 +46,9 @@ public record MoveHistoryObject
 	public bool IsCapture { get; init; }
 	public bool IsCheck { get; init; }
 	public bool IsCheckmate { get; init; }
+
+	public int PieceOrderIndex { get; init; }
+	
 	public PieceType PieceMoved { get; init; }
 	public PieceType PieceCaptured { get; init; }
 	public MoveDirection MoveDirection { get; private set; }
