@@ -36,16 +36,16 @@ public class EnglishNotationParser : MoveNotationParserBase
             parsedMoveObject;
     }
 
-    private int GetMinNumberOfPawnsOnColumn(string notation)
-    {
-        const int defaultMinNumberOfPawnsOnColumn = 2;
-        char firstCharacter = notation[0];
+    //private int GetMinNumberOfPawnsOnColumn(string notation)
+    //{
+    //    const int defaultMinNumberOfPawnsOnColumn = 2;
+    //    char firstCharacter = notation[0];
 
-        bool successfulParseFirstCharacter = int.TryParse(firstCharacter.ToString(), out int minNumberOfPawnsOnColumn);
+    //    bool successfulParseFirstCharacter = int.TryParse(firstCharacter.ToString(), out int minNumberOfPawnsOnColumn);
 
-        if (!successfulParseFirstCharacter)
-            return defaultMinNumberOfPawnsOnColumn;
-        else
-            return minNumberOfPawnsOnColumn;
-    }
+    //    if (!successfulParseFirstCharacter)
+    //        return defaultMinNumberOfPawnsOnColumn;
+    //    else
+    //        return minNumberOfPawnsOnColumn;
+    //}
 }

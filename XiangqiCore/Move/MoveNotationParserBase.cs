@@ -120,6 +120,20 @@ public abstract class MoveNotationParserBase : IMoveNotationParser
 	// Meaning that there are more than one columns holding two or more pawns of the same color
 	protected virtual bool IsMultiColumnPawn(string notation) => ParsePieceType(notation) == PieceType.Pawn &&
 		notation.IndexOfAny(['兵', '卒', 'p', 'P']) != 0;
+
+	protected virtual int GetMinNumberOfPawnsOnColumn(string notation)
+	{
+		const int defaultMinNumberOfPawnsOnColumn = 2;
+
+		if (SymbolToPieceOrderMap.TryGetValue(notation[0], out PieceOrder pieceOrder)
+			&& pieceOrder != PieceOrder.First
+			&& pieceOrder != PieceOrder.Last)
+		{
+			return (int)pieceOrder;
+		}
+
+		return defaultMinNumberOfPawnsOnColumn;
+	}
 }
 
 public readonly struct PieceTypeSideKey(PieceType pieceType, Side side)

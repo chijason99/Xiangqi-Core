@@ -23,7 +23,7 @@ public enum PieceOrder
 	/// Also used when there is only one piece of that type in the column
 	/// </summary>
 	[Symbol(Language.TraditionalChinese, "前")]
-	[Symbol(Language.English, "+")]
+	[Symbol(Language.English, ["1", "+"])]
 	First = 1,
 
 	/// <summary>

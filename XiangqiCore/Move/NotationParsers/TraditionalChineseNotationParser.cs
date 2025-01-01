@@ -24,11 +24,9 @@ public class TraditionalChineseNotationParser : MoveNotationParserBase
 		int startingColumn = ParseStartingColumn(translatedNotation, notationSide);
 		MoveDirection moveDirection = ParseMoveDirection(translatedNotation);
 		int foruthCharacter = ParseFourthCharacter(translatedNotation);
+		PieceOrder pieceOrder = ParsePieceOrder(translatedNotation);
 
-		ParsedMoveObject result = new(pieceType, startingColumn, moveDirection, foruthCharacter)
-		{
-			PieceOrder = isMultiColumnPawn ? ParsePieceOrderIndexForMultiColumnPawn(translatedNotation) : ParsePieceOrder(translatedNotation)
-		};
+		ParsedMoveObject result = new(pieceType, startingColumn, moveDirection, foruthCharacter, pieceOrder);
 
 		if (isMultiColumnPawn)
 		{
@@ -72,24 +70,5 @@ public class TraditionalChineseNotationParser : MoveNotationParserBase
 			return ChineseNumbers.Contains(notation[fourthCharacterIndex]) ? ChineseNumberParser.Parse(notation[fourthCharacterIndex]) : ParsedMoveObject.UnknownStartingColumn;
 	}
 
-	private int GetMinNumberOfPawnsOnColumn(string notation)
-		=> notation[0] switch
-		{
-			'中' => 3,
-			'前' or '後' => 2,
-			_ => ChineseNumberParser.Parse(notation[0])
-		};
 
-	private PieceOrder ParsePieceOrderIndexForMultiColumnPawn(string notation)
-	{
-		char firstCharacter = notation[0];
-
-		return firstCharacter switch
-		{
-			'前' => PieceOrder.First,
-			'中' => PieceOrder.Second,
-			'後' => PieceOrder.Last,
-			_ => (PieceOrder)ChineseNumberParser.Parse(firstCharacter) - 1
-		};
-	}
 }

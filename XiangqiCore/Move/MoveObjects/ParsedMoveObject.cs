@@ -24,13 +24,13 @@ public record ParsedMoveObject
         int startingColumn, 
         MoveDirection moveDirection, 
         int foruthCharacter,
-		PieceOrder pieceOrderIndex = PieceOrder.Unknown)
+		PieceOrder pieceOrder = PieceOrder.Unknown)
     {
         PieceType = pieceType;
         StartingColumn = startingColumn;
         MoveDirection = moveDirection;
         FourthCharacter = foruthCharacter;
-        PieceOrder = pieceOrderIndex;
+        PieceOrder = pieceOrder;
     }
 
     public PieceType PieceType { get; set; }
