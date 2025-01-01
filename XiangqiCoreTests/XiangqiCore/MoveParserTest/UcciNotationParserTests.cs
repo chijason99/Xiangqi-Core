@@ -48,7 +48,7 @@ public static class UcciNotationParserTests
 							.WithStartingFen(startingFen)
 							.Build();
 
-		bool moveResult = game.MakeMove(moveNotation, MoveNotationType.Chinese);
+		bool moveResult = game.MakeMove(moveNotation, MoveNotationType.TraditionalChinese);
 
 		moveResult.Should().BeTrue();
 		game.MoveHistory.Count.Should().Be(1);

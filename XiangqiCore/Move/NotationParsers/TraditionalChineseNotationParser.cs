@@ -5,13 +5,11 @@ using XiangqiCore.Pieces.PieceTypes;
 
 namespace XiangqiCore.Move.NotationParsers;
 
-public class ChineseNotationParser : MoveNotationBase
+public class TraditionalChineseNotationParser : MoveNotationParserBase
 {
-	private static char[] pieceChineseNames => ['將', '帥', '車', '俥', '馬', '傌', '砲', '炮', '士', '仕', '象', '相', '卒', '兵'];
-	private static char[] chineseNumbers => ['一', '二', '三', '四', '五', '六', '七', '八', '九'];
-	private static char[] pawnsInChinese => ['卒', '兵'];
+	private static char[] ChineseNumbers => ['一', '二', '三', '四', '五', '六', '七', '八', '九'];
 
-	public ChineseNotationParser() { }
+	public TraditionalChineseNotationParser() : base(Language.TraditionalChinese) { }
 
 	public Side GetNotationSide(string notation) => notation.Any(char.IsDigit) ? Side.Black : Side.Red;
 
@@ -29,7 +27,7 @@ public class ChineseNotationParser : MoveNotationBase
 
 		ParsedMoveObject result = new(pieceType, startingColumn, moveDirection, foruthCharacter)
 		{
-			PieceOrder = isMultiColumnPawn ? ParsePieceOrderIndexForMultiColumnPawn(translatedNotation) : ParsePieceOrderIndex(translatedNotation)
+			PieceOrder = isMultiColumnPawn ? ParsePieceOrderIndexForMultiColumnPawn(translatedNotation) : ParsePieceOrder(translatedNotation)
 		};
 
 		if (isMultiColumnPawn)
@@ -42,32 +40,6 @@ public class ChineseNotationParser : MoveNotationBase
 
 		return result;
 	}
-
-	private PieceType ParsePieceType(string notation)
-	{
-		char pieceNameToCheck = pieceChineseNames.Contains(notation[0]) ? notation[0] : notation[1];
-
-		return pieceNameToCheck switch
-		{
-			'將' or '帥' => PieceType.King,
-			'車' or '俥' => PieceType.Rook,
-			'馬' or '傌' => PieceType.Knight,
-			'砲' or '炮' => PieceType.Cannon,
-			'士' or '仕' => PieceType.Advisor,
-			'象' or '相' => PieceType.Bishop,
-			'卒' or '兵' => PieceType.Pawn,
-			_ => PieceType.Pawn
-		};
-	}
-
-	private MoveDirection ParseMoveDirection(string notation)
-		=> notation[2] switch
-		{
-			'進' => MoveDirection.Forward,
-			'退' => MoveDirection.Backward,
-			'平' => MoveDirection.Horizontal,
-			_ => throw new ArgumentException("Invalid Move Direction")
-		};
 
 	private int ParseStartingColumn(string notation, Side notationSide)
 	{
@@ -97,16 +69,8 @@ public class ChineseNotationParser : MoveNotationBase
 			return (int)fourthCharacterInDouble;
 		}
 		else
-			return chineseNumbers.Contains(notation[fourthCharacterIndex]) ? ChineseNumberParser.Parse(notation[fourthCharacterIndex]) : ParsedMoveObject.UnknownStartingColumn;
+			return ChineseNumbers.Contains(notation[fourthCharacterIndex]) ? ChineseNumberParser.Parse(notation[fourthCharacterIndex]) : ParsedMoveObject.UnknownStartingColumn;
 	}
-
-	private PieceOrder ParsePieceOrderIndex(string notation)
-		=> notation[0] == '後' ? PieceOrder.Second : notation[0] == '前' ? PieceOrder.First : PieceOrder.Unknown;
-
-	// Multi Column Pawn situation
-	// Meaning that there are more than one columns holding two or more pawns of the same color
-	private bool IsMultiColumnPawn(string notation) => ParsePieceType(notation) == PieceType.Pawn &&
-													   notation.IndexOfAny(pawnsInChinese) != 0;
 
 	private int GetMinNumberOfPawnsOnColumn(string notation)
 		=> notation[0] switch

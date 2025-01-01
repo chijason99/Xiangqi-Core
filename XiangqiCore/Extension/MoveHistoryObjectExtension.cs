@@ -9,7 +9,7 @@ public static class MoveHistoryObjectExtension
 {
 	public static string TranslateTo(
 		this MoveHistoryObject moveHistoryObject, 
-		MoveNotationType targetNotationType = MoveNotationType.Chinese, 
+		MoveNotationType targetNotationType = MoveNotationType.TraditionalChinese, 
 		Language language = Language.TraditionalChinese)
 	{
 		INotationTranslator translator = NotationTranslatorFactory.GetTranslator(targetNotationType, language);

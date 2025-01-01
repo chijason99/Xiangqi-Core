@@ -4,7 +4,7 @@ using XiangqiCore.Move.MoveObjects;
 
 namespace XiangqiCore.Move.NotationParsers;
 
-public class UcciNotationParser : MoveNotationBase
+public class UcciNotationParser : MoveNotationParserBase
 {
 
 	private Dictionary<char, int> UcciColumnMap;

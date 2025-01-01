@@ -17,7 +17,7 @@ public enum PieceType
 
 	[Symbol(Language.TraditionalChinese, "馬")]
 	[Symbol(Language.SimplifiedChinese, "马")]
-	[Symbol(Language.English, "N", "n")]
+	[Symbol(Language.English, "H", "h")]
 	Knight,
 
 	[Symbol(Language.TraditionalChinese, "炮")]

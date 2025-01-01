@@ -87,7 +87,7 @@ public class EnumHelper<T> where T : Enum
 	/// <param name="side">The side (default is Red).</param>
 	/// <returns>The symbol for the target element.</returns>
 	/// <exception cref="InvalidOperationException">Thrown if no symbol attribute is found.</exception>
-	public static string GetSymbol(T targetElement, Language language, Side side = Side.Red)
+	public static string[] GetSymbols(T targetElement, Language language, Side side = Side.Red)
 	{
 		MemberInfo memberInfo = typeof(T).GetMember(targetElement.ToString()).First();
 

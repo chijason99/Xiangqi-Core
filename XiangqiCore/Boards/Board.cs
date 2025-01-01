@@ -49,7 +49,7 @@ public class Board
 
 	public static int[] GetPalaceColumns() => [4, 5, 6];
 
-	internal MoveHistoryObject MakeMove(Coordinate startingPosition, Coordinate destination, Side sideToMove)
+	internal MoveHistoryObject MakeMove(Coordinate startingPosition, Coordinate destination, Side sideToMove, PieceOrder pieceOrder = PieceOrder.Unknown)
 	{
 		if (!_position.HasPieceAtPosition(startingPosition))
 			throw new InvalidOperationException($"There must be a piece on the starting position {startingPosition}");
@@ -62,7 +62,7 @@ public class Board
 		if (!pieceToMove.ValidateMove(_position, startingPosition, destination))
 			throw new InvalidOperationException($"The proposed move from {startingPosition} to {destination} violates the game logic"); ;
 
-		MoveHistoryObject moveHistory = CreateMoveHistory(sideToMove, startingPosition, destination, PieceOrder.Unknown);
+		MoveHistoryObject moveHistory = CreateMoveHistory(sideToMove, startingPosition, destination, pieceOrder);
 		_position.MakeMove(startingPosition, destination);
 
 		return moveHistory;
@@ -73,7 +73,7 @@ public class Board
 		Coordinate startingPosition = FindStartingPosition(moveObject, sideToMove);
 		Coordinate destination = FindDestination(moveObject, startingPosition);
 
-		return MakeMove(startingPosition, destination, sideToMove);
+		return MakeMove(startingPosition, destination, sideToMove, moveObject.PieceOrder);
 	}
 
 	private Coordinate FindStartingPosition(ParsedMoveObject moveObject, Side sideToMove)
@@ -81,68 +81,95 @@ public class Board
 		if (moveObject.IsFromUcciNotation)
 			return moveObject.StartingPosition!.Value;
 
-		Piece[] piecesToMove = GetPiecesToMove(moveObject.PieceType, sideToMove);
-		Piece? pieceToMove = null;
+		Piece[] potentialPiecesToMove = GetPotentialPiecesToMove(moveObject.PieceType, sideToMove);
+		Piece? movedPiece = null;
 
-		// If the starting column is provided, then find the piece that has the same column as the starting column;
-		// Otherwise, i.e. there are more than one piece of the same type and side in the column, pick the one following the order
 		if (moveObject is MultiColumnPawnParsedMoveObject multiColumnPawnObject)
-			pieceToMove = FindPieceToMoveForMultiColumnPawn(multiColumnPawnObject, piecesToMove, sideToMove);
+			movedPiece = FindMovedPieceForMultiColumnPawn(multiColumnPawnObject, potentialPiecesToMove, sideToMove);
 		else
-		{
-			int actualStartingColumn = moveObject.StartingColumn.ConvertToColumnBasedOnSide(sideToMove);
+			movedPiece = FindMovedPiece(potentialPiecesToMove, moveObject, sideToMove);
 
-			if (piecesToMove.Count(p => p.Coordinate.Column == actualStartingColumn) == 1)
-			{
-				pieceToMove = piecesToMove.Single(p => p.Coordinate.Column == actualStartingColumn);
-				moveObject.PieceOrder = PieceOrder.First;
-			}
-			// Edge case: in some notation, there are two pieces of the same type on the same column and the notation
-			// do not mark which piece is moving, but only one of them would be able to perform the move specified validly
-			else if (moveObject.PieceOrder == PieceOrder.Unknown)
-			{
-				foreach (Piece piece in piecesToMove)
-				{
-					try
-					{
-						Coordinate guessedDestination = piece.GetDestinationCoordinateFromNotation(moveObject.MoveDirection, moveObject.FourthCharacter);
-
-						if (piece.ValidateMove(Position, piece.Coordinate, guessedDestination))
-						{
-							pieceToMove = piece;
-							break;
-						}
-					}
-					catch (ArgumentOutOfRangeException)
-					{
-						continue;
-					}
-				}
-			}
-			else
-				pieceToMove = piecesToMove[(int)moveObject.PieceOrder];
-		}
-
-		if (pieceToMove is null)
+		if (movedPiece is null)
 			throw new InvalidOperationException("No valid piece found to move.");
 
-		return pieceToMove.Coordinate;
+		return movedPiece.Coordinate;
 	}
 
-	private Piece[] GetPiecesToMove(PieceType pieceType, Side sideToMove)
+	private Piece[] GetPotentialPiecesToMove(PieceType pieceType, Side sideToMove)
 	{
 		var allPiecesOfType = _position.GetPiecesOfType(pieceType, sideToMove);
 
 		if (!allPiecesOfType.Any()) throw new InvalidOperationException($"Cannot find any columns containing more than one {EnumHelper<Side>.GetDisplayName(sideToMove)} {EnumHelper<PieceType>.GetDisplayName(pieceType)}");
 
-		Piece[] piecesToMove = allPiecesOfType
+		Piece[] potentialPiecesToMove = allPiecesOfType
 			.OrderByRowWithSide(sideToMove)
 			.ToArray();
 
-		return piecesToMove;
+		return potentialPiecesToMove;
 	}
 
-	private Piece FindPieceToMoveForMultiColumnPawn(MultiColumnPawnParsedMoveObject moveObject, Piece[] piecesToMove, Side sideToMove)
+	private Piece FindMovedPiece(Piece[] piecesToMove, ParsedMoveObject moveObject, Side sideToMove)
+	{
+		// If the starting column is provided, then find the piece that has the same column as the starting column;
+		// Otherwise, i.e. there are more than one piece of the same type and side in the column, pick the one following the order
+
+		if (piecesToMove.Length == 0)
+			throw new ArgumentException("No pieces to move");
+
+		Piece? movedPiece = null;
+
+		// If the starting column is unknown, it means that the two pieces are on the same column
+		if (moveObject.StartingColumn == ParsedMoveObject.UnknownStartingColumn)
+		{
+			movedPiece = moveObject.PieceOrder == PieceOrder.First ?
+				piecesToMove.FirstOrDefault() :
+				piecesToMove.LastOrDefault();
+		}
+		else
+		{
+			int startingColumn = moveObject.StartingColumn.ConvertToColumnBasedOnSide(sideToMove);
+
+			if (piecesToMove.Count(p => p.Coordinate.Column == startingColumn) == 1)
+			{
+				movedPiece = piecesToMove.Single(p => p.Coordinate.Column == startingColumn);
+				moveObject.PieceOrder = PieceOrder.First;
+			}
+
+			// Edge case: in some notation, there are two pieces of the same type on the same column and the notation
+			// do not mark which piece is moving, but only one of them would be able to perform the move specified validly
+			if (moveObject.PieceOrder == PieceOrder.Unknown)
+			{
+				Piece piece = piecesToMove.First();
+
+				try
+				{
+					Coordinate guessedDestination = piece.GetDestinationCoordinateFromNotation(moveObject.MoveDirection, moveObject.FourthCharacter);
+
+					if (piece.ValidateMove(Position, piece.Coordinate, guessedDestination))
+					{
+						movedPiece = piece;
+						moveObject.PieceOrder = PieceOrder.First;
+					}
+					else
+					{
+						movedPiece = piecesToMove.Last();
+						moveObject.PieceOrder = PieceOrder.Last;
+					}
+				}
+				catch (ArgumentOutOfRangeException)
+				{
+					Console.WriteLine("Trying to find out the correct piece to move due to an ambiguous move notation");
+				}
+			}
+		}
+
+		if (movedPiece is null)
+			throw new InvalidOperationException("No valid piece found to move.");
+
+		return movedPiece;
+	}
+
+	private Piece FindMovedPieceForMultiColumnPawn(MultiColumnPawnParsedMoveObject moveObject, Piece[] piecesToMove, Side sideToMove)
 	{
 		Piece[] pawnsOnColumn;
 
@@ -166,7 +193,7 @@ public class Board
 		if (moveObject.PieceOrder == PieceOrder.Last)
 			return pawnsOnColumn.Last();
 		else
-			return pawnsOnColumn[(int)moveObject.PieceOrder];
+			return pawnsOnColumn[(int)moveObject.PieceOrder - 1];
 	}
 
 	private Coordinate FindDestination(ParsedMoveObject moveObject, Coordinate startingCoordinate)

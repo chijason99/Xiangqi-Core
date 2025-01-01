@@ -7,9 +7,10 @@ public static class MoveNotationParserFactory
 	public static IMoveNotationParser GetParser(MoveNotationType notationType)
 		=> notationType switch
 		{
-			MoveNotationType.Chinese => MoveNotationBase.GetMoveNotationParserInstance<ChineseNotationParser>(),
-			MoveNotationType.English => MoveNotationBase.GetMoveNotationParserInstance<EnglishNotationParser>(),
-			MoveNotationType.UCCI => MoveNotationBase.GetMoveNotationParserInstance<UcciNotationParser>(),
+			MoveNotationType.TraditionalChinese => MoveNotationParserBase.GetMoveNotationParserInstance<TraditionalChineseNotationParser>(),
+			MoveNotationType.SimplifiedChinese => MoveNotationParserBase.GetMoveNotationParserInstance<SimplifiedChineseNotationParser>(),
+			MoveNotationType.English => MoveNotationParserBase.GetMoveNotationParserInstance<EnglishNotationParser>(),
+			MoveNotationType.UCCI => MoveNotationParserBase.GetMoveNotationParserInstance<UcciNotationParser>(),
 			_ => throw new ArgumentException("Invalid Move Notation Type")
 		};
 }

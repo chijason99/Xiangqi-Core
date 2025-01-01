@@ -67,7 +67,7 @@ public static class XiangqiGameTests
 		// Act
 		foreach (string move in moves)
 		{
-			bool isMoveSuccessful = game.MakeMove(move, MoveNotationType.Chinese);
+			bool isMoveSuccessful = game.MakeMove(move, MoveNotationType.TraditionalChinese);
 			isMoveSuccessful.Should().BeTrue();
 		}
 
@@ -78,7 +78,7 @@ public static class XiangqiGameTests
 	[Theory]
 	[InlineData("2bak4/4a4/1c2b4/4C4/C5P2/3p1cnN1/P1n1P3P/2N1B4/4A4/4KAB2 w - - 7 21", "22. 馬二進三  馬７進８\r\n 23. 兵三平四  馬８進９   24. 馬三退四  馬９退７\r\n 25. 帥五平六  炮２平４   26. 仕五進六  卒４平５\r\n 27. 炮五平六  卒５平６   28. 相五進七  卒６進１\r\n 29. 炮九平七  卒６平５   30. 炮七退二  卒５平４\r\n 31. 炮七平八  卒４平３   32. 馬七退九  炮４平１\r\n 33. 炮六平九  卒３平２", 22)]
 	[InlineData("2baka2r/2r2n3/1c2b1c2/p1C1p1p1p/9/5NP2/PRn1P2CP/2N5R/9/2BAKAB2 b - - 0 13", "13. 車３進２   14. 車八平七  車３進３\r\n 15. 炮二平七  車９平８   16. 馬四進六  車８進４\r\n 17. 車一平六  炮２平４   18. 馬六進八  車８平３\r\n 19. 炮七進一  炮４平２   20. 車六進六  士４進５\r\n 21. 馬七進六  卒７進１   22. 相三進五  車３平２\r\n 23. 馬八退六  炮２平４", 13)]
-	[InlineData("5ab2/3k5/5a3/p4N3/2b2CP2/3n5/1c1n4P/4B4/3NA4/2BA1K3 b - - 0 42", "42. 士6進5", 42)]
+	[InlineData("5ab2/3k5/5a3/p4N3/2b2CP2/3n5/1c1n4P/4B4/3NA4/2BA1K3 b - - 0 42", "42. 士６進５", 42)]
 	public static void ExportMoveHistory_ShouldReturnCorrectPgnGameRecordString(string startingFen, string gameRecord, int initialMoveRoundNumber)
 	{
 		// Arrange
@@ -92,7 +92,7 @@ public static class XiangqiGameTests
 
 		foreach (string move in moves)
 		{
-			bool isMoveSuccessful = game.MakeMove(move, MoveNotationType.Chinese);
+			bool isMoveSuccessful = game.MakeMove(move, MoveNotationType.TraditionalChinese);
 			isMoveSuccessful.Should().BeTrue();
 		}
 

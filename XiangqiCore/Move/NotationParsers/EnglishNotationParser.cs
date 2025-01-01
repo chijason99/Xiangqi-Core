@@ -1,33 +1,13 @@
-﻿using XiangqiCore.Move.MoveObject;
-using XiangqiCore.Pieces;
+﻿using XiangqiCore.Misc;
+using XiangqiCore.Move.MoveObject;
 using XiangqiCore.Pieces.PieceTypes;
 
 namespace XiangqiCore.Move.NotationParser;
-public class EnglishNotationParser : MoveNotationBase
+
+public class EnglishNotationParser : MoveNotationParserBase
 {
-    private static char[] pieceEnglishNames => ['k', 'r', 'h', 'c', 'a', 'e', 'p'];
-    private static char[] pieceOrderIndexSymbol => ['+', '-'];
-    private static char[] pawnsInEnglish => ['p', 'P'];
-    public EnglishNotationParser() { }
+    public EnglishNotationParser() : base(Language.English) { }
 
-    public PieceType ParsePieceType(string notation)
-    {
-        char pieceNameToCheck = pieceEnglishNames.Contains(char.ToLower(notation[0])) ? notation[0] : notation[1];
-
-        return char.ToLower(pieceNameToCheck) switch
-        {
-            'k' => PieceType.King,
-            'r' => PieceType.Rook,
-            'h' => PieceType.Knight,
-            'c' => PieceType.Cannon,
-            'a' => PieceType.Advisor,
-            'e' => PieceType.Bishop,
-            'p' => PieceType.Pawn,
-            _ => PieceType.Pawn
-        };
-    }
-
-    // Write a function that could parse the starting column of the move notation
     public int ParseStartingColumn(string notation)
     {
         const int defaultColumnIndex = 1;
@@ -37,40 +17,9 @@ public class EnglishNotationParser : MoveNotationBase
         return int.TryParse(secondCharacter.ToString(), out int startingColumn) ?
                 startingColumn :
                 ParsedMoveObject.UnknownStartingColumn;
-
-    }
-
-    public MoveDirection ParseMoveDirection(string notation)
-    {
-        const int defaultMoveActionIndex = 2;
-        char thirdCharacter = notation[defaultMoveActionIndex];
-
-        return thirdCharacter switch
-        {
-            '+' => MoveDirection.Forward,
-            '-' => MoveDirection.Backward,
-            '=' => MoveDirection.Horizontal,
-            _ => throw new ArgumentException("Invalid Move Direction")
-        };
     }
 
     public int GetFourthCharacter(string notation) => int.Parse(notation.Last().ToString());
-
-    public PieceOrder GetPieceOrder(string notation)
-    {
-        const int pieceOrderCharacterIndex = 0;
-        const int defaultPieceOrderIndex = 0;
-
-        char pieceOrderCharacter = notation[pieceOrderCharacterIndex];
-
-        // Multi column pawn scenario
-        if (char.IsDigit(pieceOrderCharacter))
-            return (PieceOrder)int.Parse(pieceOrderCharacter.ToString()) - 1;
-        else if (pieceOrderIndexSymbol.Contains(pieceOrderCharacter))
-            return pieceOrderCharacter == '+' ? PieceOrder.First : IsMultiColumnPawn(notation) ? PieceOrder.Last : PieceOrder.Second;
-        else
-            return defaultPieceOrderIndex;
-    }
 
     public override ParsedMoveObject Parse(string notation)
     {
@@ -78,15 +27,14 @@ public class EnglishNotationParser : MoveNotationBase
         int startingColumn = ParseStartingColumn(notation);
         MoveDirection moveDirection = ParseMoveDirection(notation);
         int fourthCharacter = GetFourthCharacter(notation);
-        PieceOrder pieceOrder = GetPieceOrder(notation);
+        PieceOrder pieceOrder = ParsePieceOrder(notation);
 
         ParsedMoveObject parsedMoveObject = new(pieceType, startingColumn, moveDirection, fourthCharacter, pieceOrder);
 
-        return IsMultiColumnPawn(notation) ? new MultiColumnPawnParsedMoveObject(parsedMoveObject, GetMinNumberOfPawnsOnColumn(notation)) :
-                                             parsedMoveObject;
+        return IsMultiColumnPawn(notation) ? 
+            new MultiColumnPawnParsedMoveObject(parsedMoveObject, GetMinNumberOfPawnsOnColumn(notation)) :
+            parsedMoveObject;
     }
-
-    private bool IsMultiColumnPawn(string notation) => ParsePieceType(notation) == PieceType.Pawn && notation.IndexOfAny(pawnsInEnglish) == -1;
 
     private int GetMinNumberOfPawnsOnColumn(string notation)
     {

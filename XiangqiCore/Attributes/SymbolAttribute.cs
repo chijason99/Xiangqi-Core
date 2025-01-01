@@ -3,9 +3,31 @@
 namespace XiangqiCore.Attributes;
 
 [AttributeUsage(AttributeTargets.Field, AllowMultiple = true)]
-public class SymbolAttribute(Language language, string redSymbol, string blackSymbol = "") : Attribute
+public class SymbolAttribute : Attribute
 {
-	public Language Language { get; } = language;
-	public string RedSymbol { get; } = redSymbol;
-	public string BlackSymbol { get; } = string.IsNullOrWhiteSpace(blackSymbol) ? redSymbol : blackSymbol;
+	public SymbolAttribute(Language language, string redSymbol, string blackSymbol = "")
+	{
+		Language = language;
+		RedSymbol = [redSymbol];
+
+		if (string.IsNullOrWhiteSpace(blackSymbol))
+			BlackSymbol = RedSymbol;
+		else
+			BlackSymbol = [blackSymbol];
+	}
+
+	public SymbolAttribute(Language language, string[] redSymbol, string[] blackSymbol = null)
+	{
+		Language = language;
+		RedSymbol = redSymbol;
+
+		if (blackSymbol == null)
+			BlackSymbol = redSymbol;
+		else
+			BlackSymbol = blackSymbol;
+	}
+
+	public Language Language { get; }
+	public string[] RedSymbol { get; }
+	public string[] BlackSymbol { get; }
 }

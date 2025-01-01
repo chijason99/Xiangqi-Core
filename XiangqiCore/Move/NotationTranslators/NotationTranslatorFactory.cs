@@ -8,7 +8,7 @@ public static class NotationTranslatorFactory
 	{
 		return targetNotationType switch
 		{
-			MoveNotationType.Chinese => language switch
+			MoveNotationType.TraditionalChinese => language switch
 			{
 				Language.SimplifiedChinese => new SimplifiedChineseNotationTranslator(),
 				Language.TraditionalChinese => new TraditionalChineseNotationTranslator(),

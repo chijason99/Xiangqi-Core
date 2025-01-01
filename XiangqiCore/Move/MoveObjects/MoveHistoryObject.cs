@@ -19,7 +19,7 @@ public record MoveHistoryObject
 		Side side, 
 		Coordinate startingPosition, 
 		Coordinate destination,
-		PieceOrder pieceOrderIndex)
+		PieceOrder pieceOrder)
 	{
 		FenAfterMove = fenAfterMove;
 		FenBeforeMove = fenBeforeMove;
@@ -35,7 +35,7 @@ public record MoveHistoryObject
 		StartingPosition = startingPosition;
 		Destination = destination;
 
-		PieceOrderIndex = pieceOrderIndex;
+		PieceOrder = pieceOrder;
 
 		InitializeMoveDirection();
 	}
@@ -47,7 +47,7 @@ public record MoveHistoryObject
 	public bool IsCheck { get; init; }
 	public bool IsCheckmate { get; init; }
 
-	public PieceOrder PieceOrderIndex { get; init; }
+	public PieceOrder PieceOrder { get; init; }
 	
 	public PieceType PieceMoved { get; init; }
 	public PieceType PieceCaptured { get; init; }

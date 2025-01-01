@@ -253,7 +253,7 @@ public class XiangqiGame
 	/// <param name="targetNotationType">The target notation type.</param>
 	/// <returns>The move history in the specified notation type.</returns>
 	[BetaMethod("Currently only supports converting MoveNotationType from Chinese/English to UCCI. The translation would not work for Chinese -> English or English -> Chinese")]
-	public string ExportMoveHistory(MoveNotationType targetNotationType = MoveNotationType.Chinese, Language language = Language.TraditionalChinese)
+	public string ExportMoveHistory(MoveNotationType targetNotationType = MoveNotationType.TraditionalChinese, Language language = Language.TraditionalChinese)
 	{
 		List<string> movesOfEachRound = [];
 
@@ -538,7 +538,7 @@ public class XiangqiGame
 
 		foreach (string move in moves)
 		{
-			bool isSuccessful = MakeMove(move, MoveNotationType.Chinese);
+			bool isSuccessful = MakeMove(move, MoveNotationType.TraditionalChinese);
 
 			if (!isSuccessful)
 				break;

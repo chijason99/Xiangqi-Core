@@ -11,8 +11,8 @@ public class EnglishNotationTranslator : BaseNotationTranslator
 
 	public override string Translate(MoveHistoryObject moveHistoryObject)
 	{
-		string pieceType = GetPieceTypeSymbol(moveHistoryObject.PieceMoved, moveHistoryObject.MovingSide);
-		string direction = GetMoveDirectionSymbol(moveHistoryObject.MoveDirection, moveHistoryObject.MovingSide);
+		char pieceType = GetPieceTypeSymbol(moveHistoryObject.PieceMoved, moveHistoryObject.MovingSide);
+		char direction = GetMoveDirectionSymbol(moveHistoryObject.MoveDirection);
 
 		string startingColumn = GetStartingColumn(moveHistoryObject).ToString();
 
