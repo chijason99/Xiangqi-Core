@@ -19,7 +19,8 @@ public record MoveHistoryObject
 		Side side, 
 		Coordinate startingPosition, 
 		Coordinate destination,
-		PieceOrder pieceOrder)
+		PieceOrder pieceOrder,
+		bool hasMultiplePieceOfSameTypeOnSameColumn)
 	{
 		FenAfterMove = fenAfterMove;
 		FenBeforeMove = fenBeforeMove;
@@ -27,6 +28,7 @@ public record MoveHistoryObject
 		IsCapture = isCapture;
 		IsCheck = isCheck;
 		IsCheckmate = isCheckMate;
+		HasMultiplePieceOfSameTypeOnSameColumn = hasMultiplePieceOfSameTypeOnSameColumn;
 
 		PieceMoved = pieceMoved;
 		PieceCaptured = pieceCaptured;
@@ -46,6 +48,7 @@ public record MoveHistoryObject
 	public bool IsCapture { get; init; }
 	public bool IsCheck { get; init; }
 	public bool IsCheckmate { get; init; }
+	public bool HasMultiplePieceOfSameTypeOnSameColumn { get; init; }
 
 	public PieceOrder PieceOrder { get; init; }
 	

@@ -4,16 +4,12 @@ namespace XiangqiCore.Move.NotationTranslators;
 
 public static class NotationTranslatorFactory
 {
-	public static INotationTranslator GetTranslator(MoveNotationType targetNotationType, Language language = Language.NotSpecified)
+	public static INotationTranslator GetTranslator(MoveNotationType targetNotationType)
 	{
 		return targetNotationType switch
 		{
-			MoveNotationType.TraditionalChinese => language switch
-			{
-				Language.SimplifiedChinese => new SimplifiedChineseNotationTranslator(),
-				Language.TraditionalChinese => new TraditionalChineseNotationTranslator(),
-				_ => throw new NotSupportedException($"Language {language} is not supported for Chinese notation."),
-			},
+			MoveNotationType.TraditionalChinese => new TraditionalChineseNotationTranslator(),
+			MoveNotationType.SimplifiedChinese => new SimplifiedChineseNotationTranslator(),
 			MoveNotationType.English => new EnglishNotationTranslator(),
 			MoveNotationType.UCCI => new UcciNotationTranslator(),
 			_ => throw new NotSupportedException($"Notation type {targetNotationType} is not supported."),

@@ -15,22 +15,26 @@ public class TraditionalChineseNotationParser : MoveNotationParserBase
 
 	public override ParsedMoveObject Parse(string notation)
 	{
-		string translatedNotation = notation.Translate(Chinese.Traditional);
+		Side notationSide = GetNotationSide(notation);
+		bool isMultiColumnPawn = IsMultiColumnPawn(notation);
 
-		Side notationSide = GetNotationSide(translatedNotation);
-		bool isMultiColumnPawn = IsMultiColumnPawn(translatedNotation);
+		PieceType pieceType = ParsePieceType(notation);
+		int startingColumn = ParseStartingColumn(notation, notationSide);
+		MoveDirection moveDirection = ParseMoveDirection(notation);
+		int foruthCharacter = ParseFourthCharacter(notation);
+		PieceOrder pieceOrder = ParsePieceOrder(notation);
 
-		PieceType pieceType = ParsePieceType(translatedNotation);
-		int startingColumn = ParseStartingColumn(translatedNotation, notationSide);
-		MoveDirection moveDirection = ParseMoveDirection(translatedNotation);
-		int foruthCharacter = ParseFourthCharacter(translatedNotation);
-		PieceOrder pieceOrder = ParsePieceOrder(translatedNotation);
-
-		ParsedMoveObject result = new(pieceType, startingColumn, moveDirection, foruthCharacter, pieceOrder);
+		ParsedMoveObject result = new(
+			pieceType, 
+			startingColumn, 
+			moveDirection, 
+			foruthCharacter, 
+			pieceOrder,
+			hasMultiplePieceOfSameTypeOnSameColumn: isMultiColumnPawn || startingColumn == ParsedMoveObject.UnknownStartingColumn);
 
 		if (isMultiColumnPawn)
 		{
-			int minNumberOfPawnsOnColumn = GetMinNumberOfPawnsOnColumn(translatedNotation);
+			int minNumberOfPawnsOnColumn = GetMinNumberOfPawnsOnColumn(notation);
 			MultiColumnPawnParsedMoveObject multiColumnPawnResult = new(result, minNumberOfPawnsOnColumn);
 
 			return multiColumnPawnResult;
@@ -69,6 +73,4 @@ public class TraditionalChineseNotationParser : MoveNotationParserBase
 		else
 			return ChineseNumbers.Contains(notation[fourthCharacterIndex]) ? ChineseNumberParser.Parse(notation[fourthCharacterIndex]) : ParsedMoveObject.UnknownStartingColumn;
 	}
-
-
 }

@@ -233,7 +233,11 @@ public class Board
 			sideToMove,
 			startingPosition,
 			destination,
-			pieceOrder
+			pieceOrder,
+			hasMultiplePieceOfSameTypeOnSameColumn: _position.HasMultiplePieceOfSameTypeOnSameColumn(
+				pieceMoved.PieceType, 
+				sideToMove, 
+				startingPosition.Column)
 		);
 
 		return moveHistory;

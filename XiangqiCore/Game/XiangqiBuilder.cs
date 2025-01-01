@@ -2,6 +2,7 @@
 using XiangqiCore.Attributes;
 using XiangqiCore.Boards;
 using XiangqiCore.Misc;
+using XiangqiCore.Move;
 
 namespace XiangqiCore.Game;
 
@@ -26,6 +27,7 @@ public class XiangqiBuilder : IXiangqiBuilder
 	private BoardConfig? _boardConfig { get; set; } = null;
 
 	private string _moveRecord { get; set; } = "";
+	private MoveNotationType _moveNotationType { get; set; } = MoveNotationType.TraditionalChinese;
 
 	private string _gameName { get; set; } = "";
 
@@ -94,7 +96,8 @@ public class XiangqiBuilder : IXiangqiBuilder
 			_boardConfig,
 			_gameResult,
 			_moveRecord,
-			_gameName);
+			_gameName,
+			_moveNotationType);
 
 	/// <summary>
 	/// Sets the configuration for the red player.
@@ -170,13 +173,14 @@ public class XiangqiBuilder : IXiangqiBuilder
 	}
 
 	/// <summary>
-	/// Sets the move record for the Xiangqi game.
+	/// Sets the move record for the Xiangqi game. The move record should be in the format of the specified <see cref="MoveNotationType"/>.
 	/// </summary>
 	/// <param name="moveRecord">The move record.</param>
 	/// <returns>The current instance of the <see cref="XiangqiBuilder"/> class.</returns>
-	public XiangqiBuilder WithMoveRecord(string moveRecord)
+	public XiangqiBuilder WithMoveRecord(string moveRecord, MoveNotationType moveNotationType = MoveNotationType.TraditionalChinese)
 	{
 		_moveRecord = moveRecord;
+		_moveNotationType = moveNotationType;
 
 		return this;
 	}
@@ -207,15 +211,17 @@ public class XiangqiBuilder : IXiangqiBuilder
 	}
 
 	/// <summary>
-	/// Sets the Xiangqi game configuration using a Dpxq game record.
+	/// Sets the Xiangqi game configuration using a Dpxq game record. This will by default use the Simplified Chinese move notation to parse the record.
 	/// </summary>
 	/// <param name="dpxqGameRecord"></param>
 	/// <returns></returns>
 	[BetaMethod("This method would require more testing because of the lack of standard of the game records on dpxq.com")]
-	public XiangqiBuilder WithDpxqGameRecord(string dpxqGameRecord)
+	public XiangqiBuilder WithDpxqGameRecord(string dpxqGameRecord, MoveNotationType moveNotationType = MoveNotationType.SimplifiedChinese)
 	{
 		ExtractGameInfoFromDpxqRecord(dpxqGameRecord);
 		ExtractMoveRecordFromDpxqRecord(dpxqGameRecord);
+
+		_moveNotationType = moveNotationType;
 
 		return this;
 	}

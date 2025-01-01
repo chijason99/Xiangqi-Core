@@ -395,4 +395,24 @@ public static class PieceExtension
 
 		return memoryStream.ToArray();
 	}
+
+	/// <summary>
+	/// Checks if there are multiple pieces of the same type on the same column.
+	/// This method is used for the move notation generation, so advisor and bishop are excluded from the check.
+	/// </summary>
+	/// <param name="position"></param>
+	/// <param name="pieceType"></param>
+	/// <param name="side"></param>
+	/// <returns></returns>
+	public static bool HasMultiplePieceOfSameTypeOnSameColumn(
+        this Piece[,] position, 
+        PieceType pieceType, 
+        Side side,
+        int column)
+    {
+        if (pieceType == PieceType.Advisor || pieceType == PieceType.Bishop)
+            return false;
+
+		return position.GetPiecesOfType(pieceType, side).Count(p => p.Coordinate.Column == column) > 1;
+	}
 }

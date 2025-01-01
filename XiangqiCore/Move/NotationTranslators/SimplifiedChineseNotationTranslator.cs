@@ -10,20 +10,33 @@ public class SimplifiedChineseNotationTranslator : BaseNotationTranslator
 	{
 	}
 
-	public override string Translate(MoveHistoryObject moveHistoryObject)
+	protected override string GetSecondCharacter(MoveHistoryObject moveHistoryObject)
 	{
-		char pieceType = GetPieceTypeSymbol(moveHistoryObject.PieceMoved, moveHistoryObject.MovingSide);
-		char direction = GetMoveDirectionSymbol(moveHistoryObject.MoveDirection);
-		
-		int startingColumn = GetStartingColumn(moveHistoryObject);
-		int fourthCharacter = GetFourthCharacter(moveHistoryObject);
+		if (moveHistoryObject.HasMultiplePieceOfSameTypeOnSameColumn)
+			return GetPieceTypeSymbol(moveHistoryObject.PieceMoved, moveHistoryObject.MovingSide).ToString();
+		else
+		{
+			return moveHistoryObject.MovingSide == Side.Red ?
+				GetStartingColumn(moveHistoryObject).ToChineseNumeral().ToString() :
+				GetStartingColumn(moveHistoryObject).ToString().ToFullWidth();
+		}
+	}
 
-		string startingColumnString = moveHistoryObject.MovingSide == Side.Red ?
-			startingColumn.ToChineseNumeral() : startingColumn.ToString().ToFullWidth();
+	protected override string GetFourthCharacter(MoveHistoryObject moveHistoryObject)
+	{
+		int fourthCharacter;
 
-		string fourthCharacterString = moveHistoryObject.MovingSide == Side.Red ?
-			fourthCharacter.ToChineseNumeral() : fourthCharacter.ToString().ToFullWidth();
+		// If the piece is moving in diagonals or if the piece is moving horizontally, the fourth character is the destination column
+		if (moveHistoryObject.PieceMoved.IsMovingInDiagonals() || moveHistoryObject.MoveDirection == MoveDirection.Horizontal)
+			fourthCharacter = moveHistoryObject.Destination
+				.Column
+				.ConvertToColumnBasedOnSide(moveHistoryObject.MovingSide);
+		// If the piece is moving vertically, the fourth character is the number of rows moved
+		else
+			fourthCharacter = Math.Abs(moveHistoryObject.Destination.Row - moveHistoryObject.StartingPosition.Row);
 
-		return $"{pieceType}{startingColumn}{direction}{fourthCharacter}";
+		return moveHistoryObject.MovingSide == Side.Red ?
+			fourthCharacter.ToChineseNumeral().ToString() :
+			fourthCharacter.ToString().ToFullWidth();
 	}
 }

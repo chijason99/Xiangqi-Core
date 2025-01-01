@@ -7,7 +7,8 @@ public record MultiColumnPawnParsedMoveObject : ParsedMoveObject
                parsedMoveObject.StartingColumn,
                parsedMoveObject.MoveDirection,
                parsedMoveObject.FourthCharacter,
-               parsedMoveObject.PieceOrder)
+               parsedMoveObject.PieceOrder,
+               parsedMoveObject.HasMultiplePieceOfSameTypeOnSameColumn)
     {
         MinNumberOfPawnsOnColumn = minNumberOfPawnsOnColumn;
     }

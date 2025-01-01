@@ -28,24 +28,18 @@ public class EnglishNotationParser : MoveNotationParserBase
         MoveDirection moveDirection = ParseMoveDirection(notation);
         int fourthCharacter = GetFourthCharacter(notation);
         PieceOrder pieceOrder = ParsePieceOrder(notation);
+        bool isMultiColumnPawn = IsMultiColumnPawn(notation);
 
-        ParsedMoveObject parsedMoveObject = new(pieceType, startingColumn, moveDirection, fourthCharacter, pieceOrder);
+        ParsedMoveObject parsedMoveObject = new(
+            pieceType,
+            startingColumn,
+            moveDirection,
+            fourthCharacter,
+            pieceOrder,
+            hasMultiplePieceOfSameTypeOnSameColumn: isMultiColumnPawn || startingColumn == ParsedMoveObject.UnknownStartingColumn);
 
-        return IsMultiColumnPawn(notation) ? 
+        return isMultiColumnPawn ? 
             new MultiColumnPawnParsedMoveObject(parsedMoveObject, GetMinNumberOfPawnsOnColumn(notation)) :
             parsedMoveObject;
     }
-
-    //private int GetMinNumberOfPawnsOnColumn(string notation)
-    //{
-    //    const int defaultMinNumberOfPawnsOnColumn = 2;
-    //    char firstCharacter = notation[0];
-
-    //    bool successfulParseFirstCharacter = int.TryParse(firstCharacter.ToString(), out int minNumberOfPawnsOnColumn);
-
-    //    if (!successfulParseFirstCharacter)
-    //        return defaultMinNumberOfPawnsOnColumn;
-    //    else
-    //        return minNumberOfPawnsOnColumn;
-    //}
 }
