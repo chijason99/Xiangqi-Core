@@ -7,7 +7,6 @@ using XiangqiCore.Pieces.ValidationStrategy;
 
 namespace XiangqiCore.Pieces;
 
-[MoveInDiagonals]
 public sealed class Knight : Piece
 {
     public Knight(Coordinate coordinate, Side side) 

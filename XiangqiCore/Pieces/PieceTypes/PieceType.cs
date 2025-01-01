@@ -18,7 +18,6 @@ public enum PieceType
 	[Symbol(Language.TraditionalChinese, "馬")]
 	[Symbol(Language.SimplifiedChinese, "马")]
 	[Symbol(Language.English, "N", "n")]
-	[MoveInDiagonals]
 	Knight,
 
 	[Symbol(Language.TraditionalChinese, "炮")]
@@ -27,12 +26,10 @@ public enum PieceType
 
 	[Symbol(Language.TraditionalChinese, "士")]
 	[Symbol(Language.English, "A", "a")]
-	[MoveInDiagonals]
 	Advisor,
 
 	[Symbol(Language.TraditionalChinese, "相", "象")]
 	[Symbol(Language.English, "E", "e")]
-	[MoveInDiagonals]
 	Bishop,
 
 	[Symbol(Language.TraditionalChinese, "兵", "卒")]

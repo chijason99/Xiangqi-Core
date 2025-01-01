@@ -7,7 +7,6 @@ using XiangqiCore.Pieces.ValidationStrategy;
 
 namespace XiangqiCore.Pieces;
 
-[MoveInDiagonals]
 public sealed class Bishop : Piece
 {
     public Bishop(Coordinate coordinate, Side side) 
