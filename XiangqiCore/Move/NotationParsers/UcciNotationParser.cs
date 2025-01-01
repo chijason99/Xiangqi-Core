@@ -68,12 +68,4 @@ public class UcciNotationParser : MoveNotationBase
 
 		return map;
 	}
-
-	public override string TranslateToUcci(MoveHistoryObject moveHistoryObject)
-	{
-		string UcciStartingCoordinate = Coordinate.TranslateToUcciCoordinate(moveHistoryObject.StartingPosition);
-		string UcciDestinationCoordinate = Coordinate.TranslateToUcciCoordinate(moveHistoryObject.Destination);
-
-		return $"{UcciStartingCoordinate}{UcciDestinationCoordinate}";
-	}
 }
