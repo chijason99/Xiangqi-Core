@@ -46,7 +46,7 @@ public readonly struct Coordinate()
 
 	private static char TranslateToUcciColumn(int column)
 	{
-		int columnUnicode = column + _uniCodeOfA - 1;
+		int columnUnicode = column + _uniCodeOfA - 1 + 32; // Adding 32 to convert to lower case
 		return Convert.ToChar(columnUnicode);
 	}
 
