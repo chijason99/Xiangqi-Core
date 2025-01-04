@@ -12,7 +12,7 @@ using XiangqiCore.Pieces.ValidationStrategy;
 
 namespace XiangqiCore.Extension;
 
-public class EnumHelper<T> where T : Enum 
+public class EnumHelper<T> where T : Enum
 {
     /// <summary>
     /// Gets a random value from the specified enum type.
@@ -33,13 +33,13 @@ public class EnumHelper<T> where T : Enum
     {
         List<T> result = [];
 
-        foreach(T element in Enum.GetValues(typeof(T)))
+        foreach (T element in Enum.GetValues(typeof(T)))
         {
             MemberInfo memberInfo = typeof(T).GetMember(element.ToString()).First();
 
             bool shouldBeIgnored = memberInfo.GetCustomAttribute<IgnoreFromRandomPickAttribute>() is not null;
 
-            if (!shouldBeIgnored) 
+            if (!shouldBeIgnored)
                 result.Add(element);
         }
 
@@ -48,20 +48,20 @@ public class EnumHelper<T> where T : Enum
 
     public static List<string> GetAllNames()
     {
-		List<string> result = [];
+        List<string> result = [];
 
-		foreach (T element in Enum.GetValues(typeof(T)))
-		{
-			MemberInfo memberInfo = typeof(T).GetMember(element.ToString()).First();
+        foreach (T element in Enum.GetValues(typeof(T)))
+        {
+            MemberInfo memberInfo = typeof(T).GetMember(element.ToString()).First();
 
-			bool shouldBeIgnored = memberInfo.GetCustomAttribute<IgnoreFromRandomPickAttribute>() is not null;
+            bool shouldBeIgnored = memberInfo.GetCustomAttribute<IgnoreFromRandomPickAttribute>() is not null;
 
-			if (!shouldBeIgnored)
-				result.Add(element.GetType().Name);
-		}
+            if (!shouldBeIgnored)
+                result.Add(element.GetType().Name);
+        }
 
-		return result;
-	}
+        return result;
+    }
 
     /// <summary>
     /// Gets the display name of the specified target element.
@@ -77,27 +77,38 @@ public class EnumHelper<T> where T : Enum
         return descriptionAttribute is not null ? descriptionAttribute.Description : targetMember.Name;
     }
 
-	/// <summary>
-	/// Gets the symbol for the specified target element, language, and side.
-	/// If the specified language is not found, it falls back to Traditional Chinese.
-	/// </summary>
-	/// <typeparam name="T">The enum type.</typeparam>
-	/// <param name="targetElement">The target element.</param>
-	/// <param name="language">The language.</param>
-	/// <param name="side">The side (default is Red).</param>
-	/// <returns>The symbol for the target element.</returns>
-	/// <exception cref="InvalidOperationException">Thrown if no symbol attribute is found.</exception>
-	public static string[] GetSymbols(T targetElement, Language language, Side side = Side.Red)
-	{
-		MemberInfo memberInfo = typeof(T).GetMember(targetElement.ToString()).First();
+    /// <summary>
+    /// Gets the symbol for the specified target element, language, and side.
+    /// If the specified language is not found, it falls back to Traditional Chinese.
+    /// </summary>
+    /// <typeparam name="T">The enum type.</typeparam>
+    /// <param name="targetElement">The target element.</param>
+    /// <param name="language">The language.</param>
+    /// <param name="side">The side (default is Red).</param>
+    /// <returns>The symbol for the target element.</returns>
+    /// <exception cref="InvalidOperationException">Thrown if no symbol attribute is found.</exception>
+    public static string[] GetSymbols(T targetElement, Language language, Side side = Side.Red)
+    {
+        MemberInfo memberInfo = typeof(T).GetMember(targetElement.ToString()).First();
 
-		SymbolAttribute symbolAttribute = memberInfo.GetCustomAttributes<SymbolAttribute>().SingleOrDefault(x => x.Language == language) ??
-			memberInfo.GetCustomAttributes<SymbolAttribute>().SingleOrDefault(x => x.Language == Language.TraditionalChinese) ??
-			throw new InvalidOperationException($"Please use the Symbol attribute to set the corresponding symbol for {language}");
+        SymbolAttribute symbolAttribute = memberInfo.GetCustomAttributes<SymbolAttribute>().SingleOrDefault(x => x.Language == language) ??
+            memberInfo.GetCustomAttributes<SymbolAttribute>().SingleOrDefault(x => x.Language == Language.TraditionalChinese) ??
+            throw new InvalidOperationException($"Please use the Symbol attribute to set the corresponding symbol for {language}");
 
 
-        return side == Side.Red ? symbolAttribute.RedSymbol : symbolAttribute.BlackSymbol;
-	}
+        return side == Side.Red ? symbolAttribute.RedSymbols : symbolAttribute.BlackSymbols;
+    }
+
+    public static string GetDefaultSymbol(T targetElement, Language language, Side side = Side.Red)
+    {
+        MemberInfo memberInfo = typeof(T).GetMember(targetElement.ToString()).First();
+
+        SymbolAttribute symbolAttribute = memberInfo.GetCustomAttributes<SymbolAttribute>().SingleOrDefault(x => x.Language == language) ??
+            memberInfo.GetCustomAttributes<SymbolAttribute>().SingleOrDefault(x => x.Language == Language.TraditionalChinese) ??
+            throw new InvalidOperationException($"Please use the Symbol attribute to set the corresponding symbol for {language}");
+
+        return side == Side.Red ? symbolAttribute.DefaultRedSymbol : symbolAttribute.DefaultBlackSymbol;
+    }
 }
 
 public static class EnumExtension

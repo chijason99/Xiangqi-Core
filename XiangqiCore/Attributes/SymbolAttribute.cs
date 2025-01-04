@@ -2,32 +2,40 @@
 
 namespace XiangqiCore.Attributes;
 
+/// <summary>
+/// An attribute to store the symbols of a piece type in different languages.
+/// In the case of more than one symbol, the first symbol is the default symbol for move translation.
+/// </summary>
 [AttributeUsage(AttributeTargets.Field, AllowMultiple = true)]
 public class SymbolAttribute : Attribute
 {
 	public SymbolAttribute(Language language, string redSymbol, string blackSymbol = "")
 	{
 		Language = language;
-		RedSymbol = [redSymbol];
+		RedSymbols = [redSymbol];
 
 		if (string.IsNullOrWhiteSpace(blackSymbol))
-			BlackSymbol = RedSymbol;
+			BlackSymbols = RedSymbols;
 		else
-			BlackSymbol = [blackSymbol];
+			BlackSymbols = [blackSymbol];
 	}
 
-	public SymbolAttribute(Language language, string[] redSymbol, string[] blackSymbol = null)
+	public SymbolAttribute(Language language, string[] redSymbols, string[] blackSymbols = null)
 	{
 		Language = language;
-		RedSymbol = redSymbol;
+		RedSymbols = redSymbols;
 
-		if (blackSymbol == null)
-			BlackSymbol = redSymbol;
+		if (blackSymbols == null)
+			BlackSymbols = redSymbols;
 		else
-			BlackSymbol = blackSymbol;
+			BlackSymbols = blackSymbols;
 	}
 
 	public Language Language { get; }
-	public string[] RedSymbol { get; }
-	public string[] BlackSymbol { get; }
+
+	public string[] RedSymbols { get; }
+	public string[] BlackSymbols { get; }
+
+	public string DefaultRedSymbol => RedSymbols.First();
+	public string DefaultBlackSymbol => BlackSymbols.First();
 }

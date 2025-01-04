@@ -7,9 +7,9 @@ namespace XiangqiCore.Move.NotationTranslators;
 
 public abstract class BaseNotationTranslator : INotationTranslator
 {
-	protected virtual Dictionary<PieceTypeSideKey, char[]> PieceTypeSymbolCache { get; set; } = [];
-	protected virtual Dictionary<MoveDirection, char[]> MoveDirectionSymbolCache { get; set; } = [];
-	protected virtual Dictionary<PieceOrder, char[]> PieceOrderSymbolCache { get; set; } = [];
+	protected virtual Dictionary<PieceTypeSideKey, char> PieceTypeSymbolCache { get; set; } = [];
+	protected virtual Dictionary<MoveDirection, char> MoveDirectionSymbolCache { get; set; } = [];
+	protected virtual Dictionary<PieceOrder, char> PieceOrderSymbolCache { get; set; } = [];
 
 	public Language Language { get; init; }
 
@@ -39,14 +39,9 @@ public abstract class BaseNotationTranslator : INotationTranslator
 
 		foreach (MoveDirection moveDirection in Enum.GetValues<MoveDirection>())
 		{
-			string[] symbols = EnumHelper<MoveDirection>.GetSymbols(moveDirection, Language);
+			string defaultSymbol = EnumHelper<MoveDirection>.GetDefaultSymbol(moveDirection, Language);
 
-			foreach (string symbol in symbols)
-			{
-				char symbolChar = symbol[0];
-
-				MoveDirectionSymbolCache[moveDirection] = [symbolChar];
-			}
+			MoveDirectionSymbolCache[moveDirection] = defaultSymbol[0];
 		}
 	}
 
@@ -57,14 +52,9 @@ public abstract class BaseNotationTranslator : INotationTranslator
 
 		foreach (PieceOrder pieceOrder in Enum.GetValues<PieceOrder>().Where(po => po != PieceOrder.Unknown))
 		{
-			string[] symbols = EnumHelper<PieceOrder>.GetSymbols(pieceOrder, Language);
+			string defaultSymbol = EnumHelper<PieceOrder>.GetDefaultSymbol(pieceOrder, Language);
 
-			foreach (string symbol in symbols)
-			{
-				char symbolChar = symbol[0];
-
-				PieceOrderSymbolCache[pieceOrder] = [symbolChar];
-			}
+			PieceOrderSymbolCache[pieceOrder] = defaultSymbol[0];
 		}
 	}
 
@@ -77,26 +67,21 @@ public abstract class BaseNotationTranslator : INotationTranslator
 		{
 			foreach (Side side in Enum.GetValues<Side>().Where(s => s != Side.None))
 			{
-				string[] symbols = EnumHelper<PieceType>.GetSymbols(pieceType, Language, side);
+				string defaultSymbol = EnumHelper<PieceType>.GetDefaultSymbol(pieceType, Language, side);
 
-				foreach (string symbol in symbols)
-				{
-					char symbolChar = symbol[0];
-
-					PieceTypeSymbolCache[new PieceTypeSideKey(pieceType, side)] = [symbolChar];
-				}
+				PieceTypeSymbolCache[new PieceTypeSideKey(pieceType, side)] = defaultSymbol[0];
 			}
 		}
 	}
 
 	protected virtual char GetPieceTypeSymbol(PieceType pieceType, Side side)
-		=> PieceTypeSymbolCache[new PieceTypeSideKey(pieceType, side)].First();
+		=> PieceTypeSymbolCache[new PieceTypeSideKey(pieceType, side)];
 
 	protected virtual char GetMoveDirectionSymbol(MoveDirection moveDirection)
-		=> MoveDirectionSymbolCache[moveDirection].First();
+		=> MoveDirectionSymbolCache[moveDirection];
 
 	protected virtual char GetPieceOrderSymbol(PieceOrder pieceOrder)
-		=> PieceOrderSymbolCache[pieceOrder].First();
+		=> PieceOrderSymbolCache[pieceOrder];
 
 	protected virtual string GetFirstCharacter(MoveHistoryObject moveHistoryObject)
 	{

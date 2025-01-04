@@ -10,17 +10,17 @@ public enum PieceType
 	[Symbol(Language.SimplifiedChinese, "帅", "将")]
     King,
 
-	[Symbol(Language.TraditionalChinese, "車")]
+	[Symbol(Language.TraditionalChinese, ["車", "俥"])]
 	[Symbol(Language.SimplifiedChinese, "车")]
 	[Symbol(Language.English, "R", "r")]
 	Rook,
 
-	[Symbol(Language.TraditionalChinese, "馬")]
-	[Symbol(Language.SimplifiedChinese, "马")]
+	[Symbol(Language.TraditionalChinese, ["馬", "傌"])]
+	[Symbol(Language.SimplifiedChinese, ["马"])]
 	[Symbol(Language.English, ["H", "N"], ["h", "n"])]
 	Knight,
 
-	[Symbol(Language.TraditionalChinese, "炮")]
+	[Symbol(Language.TraditionalChinese, ["炮", "砲"])]
 	[Symbol(Language.English, "C", "c")]
 	Cannon,
 
@@ -29,7 +29,7 @@ public enum PieceType
 	Advisor,
 
 	[Symbol(Language.TraditionalChinese, "相", "象")]
-	[Symbol(Language.English, ["E", "B"], ["b", "e"])]
+	[Symbol(Language.English, ["E", "B"], ["e", "b"])]
 	Bishop,
 
 	[Symbol(Language.TraditionalChinese, "兵", "卒")]
