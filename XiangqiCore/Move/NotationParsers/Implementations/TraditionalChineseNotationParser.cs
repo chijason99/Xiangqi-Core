@@ -3,7 +3,7 @@ using XiangqiCore.Misc;
 using XiangqiCore.Move.MoveObject;
 using XiangqiCore.Pieces.PieceTypes;
 
-namespace XiangqiCore.Move.NotationParsers;
+namespace XiangqiCore.Move.NotationParsers.Implementations;
 
 public class TraditionalChineseNotationParser : MoveNotationParserBase
 {
@@ -25,10 +25,10 @@ public class TraditionalChineseNotationParser : MoveNotationParserBase
 		PieceOrder pieceOrder = ParsePieceOrder(notation);
 
 		ParsedMoveObject result = new(
-			pieceType, 
-			startingColumn, 
-			moveDirection, 
-			foruthCharacter, 
+			pieceType,
+			startingColumn,
+			moveDirection,
+			foruthCharacter,
 			pieceOrder,
 			hasMultiplePieceOfSameTypeOnSameColumn: isMultiColumnPawn || startingColumn == ParsedMoveObject.UnknownStartingColumn);
 

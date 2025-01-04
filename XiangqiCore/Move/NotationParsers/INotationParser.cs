@@ -2,7 +2,7 @@
 
 namespace XiangqiCore.Move.NotationParsers;
 
-public interface IMoveNotationParser
+public interface INotationParser
 {
 	ParsedMoveObject Parse(string notation);
 }

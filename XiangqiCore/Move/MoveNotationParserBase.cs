@@ -6,7 +6,7 @@ using XiangqiCore.Pieces.PieceTypes;
 
 namespace XiangqiCore.Move;
 
-public abstract class MoveNotationParserBase : IMoveNotationParser
+public abstract class MoveNotationParserBase : INotationParser
 {
 	private static Dictionary<Type, MoveNotationParserBase> _instances = [];
 

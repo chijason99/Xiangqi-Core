@@ -1,12 +1,12 @@
 ﻿using XiangqiCore.Extension;
-using XiangqiCore.Move.MoveObjects;
 using XiangqiCore.Misc;
+using XiangqiCore.Move.MoveObjects;
 
-namespace XiangqiCore.Move.NotationTranslators;
+namespace XiangqiCore.Move.NotationTranslators.Implementations;
 
-public class SimplifiedChineseNotationTranslator : BaseNotationTranslator
+public class TraditionalChineseNotationTranslator : BaseNotationTranslator
 {
-	public SimplifiedChineseNotationTranslator() : base(Language.SimplifiedChinese)
+	public TraditionalChineseNotationTranslator() : base(Language.TraditionalChinese)
 	{
 	}
 

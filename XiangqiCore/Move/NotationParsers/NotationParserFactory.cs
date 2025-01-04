@@ -1,10 +1,10 @@
-﻿using XiangqiCore.Move.NotationParser;
+﻿using XiangqiCore.Move.NotationParsers.Implementations;
 
 namespace XiangqiCore.Move.NotationParsers;
 
-public static class MoveNotationParserFactory
+public static class NotationParserFactory
 {
-	public static IMoveNotationParser GetParser(MoveNotationType notationType)
+	public static INotationParser GetParser(MoveNotationType notationType)
 		=> notationType switch
 		{
 			MoveNotationType.TraditionalChinese => MoveNotationParserBase.GetMoveNotationParserInstance<TraditionalChineseNotationParser>(),

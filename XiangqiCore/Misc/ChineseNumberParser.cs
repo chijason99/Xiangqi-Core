@@ -1,4 +1,4 @@
-﻿namespace XiangqiCore.Move.NotationParsers;
+﻿namespace XiangqiCore.Misc;
 
 public static class ChineseNumberParser
 {

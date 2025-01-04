@@ -1,12 +1,12 @@
 ﻿using XiangqiCore.Extension;
-using XiangqiCore.Misc;
 using XiangqiCore.Move.MoveObjects;
+using XiangqiCore.Misc;
 
-namespace XiangqiCore.Move.NotationTranslators;
+namespace XiangqiCore.Move.NotationTranslators.Implementations;
 
-public class TraditionalChineseNotationTranslator : BaseNotationTranslator
+public class SimplifiedChineseNotationTranslator : BaseNotationTranslator
 {
-	public TraditionalChineseNotationTranslator() : base(Language.TraditionalChinese)
+	public SimplifiedChineseNotationTranslator() : base(Language.SimplifiedChinese)
 	{
 	}
 
@@ -16,7 +16,7 @@ public class TraditionalChineseNotationTranslator : BaseNotationTranslator
 			return GetPieceTypeSymbol(moveHistoryObject.PieceMoved, moveHistoryObject.MovingSide).ToString();
 		else
 		{
-			return moveHistoryObject.MovingSide == Side.Red ? 
+			return moveHistoryObject.MovingSide == Side.Red ?
 				GetStartingColumn(moveHistoryObject).ToChineseNumeral().ToString() :
 				GetStartingColumn(moveHistoryObject).ToString().ToFullWidth();
 		}

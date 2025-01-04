@@ -2,11 +2,6 @@
 using System.Reflection;
 using XiangqiCore.Attributes;
 using XiangqiCore.Misc;
-using XiangqiCore.Move;
-using XiangqiCore.Move.MoveObjects;
-using XiangqiCore.Move.NotationParser;
-using XiangqiCore.Move.NotationParsers;
-using XiangqiCore.Move.NotationTranslators;
 using XiangqiCore.Pieces.PieceTypes;
 using XiangqiCore.Pieces.ValidationStrategy;
 

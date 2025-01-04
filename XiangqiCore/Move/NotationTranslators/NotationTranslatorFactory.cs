@@ -1,4 +1,6 @@
-﻿namespace XiangqiCore.Move.NotationTranslators;
+﻿using XiangqiCore.Move.NotationTranslators.Implementations;
+
+namespace XiangqiCore.Move.NotationTranslators;
 
 public static class NotationTranslatorFactory
 {

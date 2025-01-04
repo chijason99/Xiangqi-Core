@@ -2,7 +2,7 @@
 using XiangqiCore.Move.MoveObject;
 using XiangqiCore.Pieces.PieceTypes;
 
-namespace XiangqiCore.Move.NotationParsers;
+namespace XiangqiCore.Move.NotationParsers.Implementations;
 
 public class SimplifiedChineseNotationParser : MoveNotationParserBase
 {

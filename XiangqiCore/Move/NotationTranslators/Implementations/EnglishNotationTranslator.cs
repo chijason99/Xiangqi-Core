@@ -1,6 +1,6 @@
 ﻿using XiangqiCore.Misc;
 
-namespace XiangqiCore.Move.NotationTranslators;
+namespace XiangqiCore.Move.NotationTranslators.Implementations;
 
 public class EnglishNotationTranslator : BaseNotationTranslator
 {

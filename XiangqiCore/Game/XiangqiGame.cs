@@ -232,7 +232,7 @@ public class XiangqiGame
 	{
 		try
 		{
-			IMoveNotationParser parser = MoveNotationParserFactory.GetParser(moveNotationType);
+			INotationParser parser = NotationParserFactory.GetParser(moveNotationType);
 			ParsedMoveObject parsedMoveObject = parser.Parse(moveNotation);
 
 			MoveHistoryObject moveHistoryObject = Board.MakeMove(parsedMoveObject, SideToMove);
