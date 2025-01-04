@@ -18,18 +18,26 @@ public record MoveHistoryObject
 		PieceType pieceCaptured,
 		Side side, 
 		Coordinate startingPosition, 
-		Coordinate destination)
+		Coordinate destination,
+		PieceOrder pieceOrder,
+		bool hasMultiplePieceOfSameTypeOnSameColumn)
 	{
 		FenAfterMove = fenAfterMove;
 		FenBeforeMove = fenBeforeMove;
+
 		IsCapture = isCapture;
 		IsCheck = isCheck;
 		IsCheckmate = isCheckMate;
+		HasMultiplePieceOfSameTypeOnSameColumn = hasMultiplePieceOfSameTypeOnSameColumn;
+
 		PieceMoved = pieceMoved;
 		PieceCaptured = pieceCaptured;
 		MovingSide = side;
+
 		StartingPosition = startingPosition;
 		Destination = destination;
+
+		PieceOrder = pieceOrder;
 
 		InitializeMoveDirection();
 	}
@@ -40,6 +48,10 @@ public record MoveHistoryObject
 	public bool IsCapture { get; init; }
 	public bool IsCheck { get; init; }
 	public bool IsCheckmate { get; init; }
+	public bool HasMultiplePieceOfSameTypeOnSameColumn { get; init; }
+
+	public PieceOrder PieceOrder { get; init; }
+	
 	public PieceType PieceMoved { get; init; }
 	public PieceType PieceCaptured { get; init; }
 	public MoveDirection MoveDirection { get; private set; }
@@ -61,9 +73,6 @@ public record MoveHistoryObject
 		MoveNotation = moveNotation;
 		MoveNotationType = moveNotationType;
 	}
-
-	public string TransalateNotation(MoveNotationType targetNotationType)
-		=> MoveNotationType.TranslateTo(this, targetNotationType);
 
 	private void InitializeMoveDirection()
 	{

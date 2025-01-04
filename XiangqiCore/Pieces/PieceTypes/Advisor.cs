@@ -7,7 +7,6 @@ using XiangqiCore.Pieces.ValidationStrategy;
 
 namespace XiangqiCore.Pieces;
 
-[MoveInDiagonals]
 public sealed class Advisor : Piece
 {
     public Advisor(Coordinate coordinate, Side side) 

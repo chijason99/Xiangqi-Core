@@ -2,6 +2,7 @@
 using XiangqiCore.Extension;
 using XiangqiCore.Game;
 using XiangqiCore.Misc;
+using XiangqiCore.Move;
 using XiangqiCore.Pieces.PieceTypes;
 
 namespace XiangqiCoreTests.XiangqiCore.XiangqiBuilderTest;
@@ -708,8 +709,8 @@ public static class XiangqiBuilderTests
 
 		// Act
 		XiangqiGame xiangqiGame = builder
-									.WithDpxqGameRecord(sample)
-									.Build();
+			.WithDpxqGameRecord(sample)
+			.Build();
 
 		// Assert
 		xiangqiGame.Competition.Location.Should().Be("重庆丰都");

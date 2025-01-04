@@ -1,7 +1,6 @@
 ﻿using SixLabors.ImageSharp;
 using SixLabors.ImageSharp.Formats.Gif;
 using SixLabors.ImageSharp.PixelFormats;
-using System.Runtime.Versioning;
 using System.Text;
 using XiangqiCore.Attributes;
 using XiangqiCore.Boards;
@@ -165,7 +164,8 @@ public class XiangqiGame
 		BoardConfig? boardConfig = null,
 		GameResult gameResult = GameResult.Unknown,
 		string moveRecord = "",
-		string gameName = "")
+		string gameName = "",
+		MoveNotationType moveNotationType = MoveNotationType.TraditionalChinese)
 	{
 		bool isFenValid = FenHelper.Validate(initialFenString);
 
@@ -195,7 +195,7 @@ public class XiangqiGame
 					createdGameInstance.NumberOfMovesWithoutCapture);
 
 		if (!string.IsNullOrEmpty(moveRecord))
-			createdGameInstance.SaveMoveRecordToHistory(moveRecord);
+			createdGameInstance.SaveMoveRecordToHistory(moveRecord, moveNotationType);
 
 		return createdGameInstance;
 	}
@@ -232,7 +232,7 @@ public class XiangqiGame
 	{
 		try
 		{
-			IMoveNotationParser parser = MoveNotationParserFactory.GetParser(moveNotationType);
+			INotationParser parser = NotationParserFactory.GetParser(moveNotationType);
 			ParsedMoveObject parsedMoveObject = parser.Parse(moveNotation);
 
 			MoveHistoryObject moveHistoryObject = Board.MakeMove(parsedMoveObject, SideToMove);
@@ -254,7 +254,7 @@ public class XiangqiGame
 	/// <param name="targetNotationType">The target notation type.</param>
 	/// <returns>The move history in the specified notation type.</returns>
 	[BetaMethod("Currently only supports converting MoveNotationType from Chinese/English to UCCI. The translation would not work for Chinese -> English or English -> Chinese")]
-	public string ExportMoveHistory(MoveNotationType targetNotationType = MoveNotationType.Chinese)
+	public string ExportMoveHistory(MoveNotationType targetNotationType = MoveNotationType.TraditionalChinese)
 	{
 		List<string> movesOfEachRound = [];
 
@@ -264,7 +264,7 @@ public class XiangqiGame
 				{
 					moveHistoryItem.RoundNumber,
 					moveHistoryItem.MovingSide,
-					MoveNotation = moveHistoryItem.TransalateNotation(targetNotationType)
+					MoveNotation = moveHistoryItem.TranslateTo(targetNotationType)
 				})
 			.GroupBy(moveHistoryItem => moveHistoryItem.RoundNumber)
 			.OrderBy(roundGroup => roundGroup.Key);
@@ -533,13 +533,13 @@ public class XiangqiGame
 			SwitchSideToMove();
 	}
 
-	private void SaveMoveRecordToHistory(string moveRecord)
+	private void SaveMoveRecordToHistory(string moveRecord, MoveNotationType moveNotationType)
 	{
 		List<string> moves = GameRecordParser.Parse(moveRecord);
 
 		foreach (string move in moves)
 		{
-			bool isSuccessful = MakeMove(move, MoveNotationType.Chinese);
+			bool isSuccessful = MakeMove(move, moveNotationType);
 
 			if (!isSuccessful)
 				break;

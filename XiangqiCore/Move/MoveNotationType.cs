@@ -2,6 +2,7 @@
 public enum MoveNotationType
 {
     English,
-    Chinese,
+	SimplifiedChinese,
+	TraditionalChinese,
     UCCI
 }

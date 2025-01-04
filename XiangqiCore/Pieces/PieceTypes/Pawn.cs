@@ -5,7 +5,6 @@ using XiangqiCore.Pieces.ValidationStrategy;
 
 namespace XiangqiCore.Pieces;
 
-[MoveInOrthogonals]
 public sealed class Pawn : Piece
 {
     public Pawn(Coordinate coordinate, Side side) 

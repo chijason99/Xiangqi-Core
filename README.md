@@ -208,8 +208,8 @@ XiangqiGame game =  builder
 	.Build();
 ```
 
-##### `WithMoveRecord(string moveRecord)`
-Sets the move record for the Xiangqi game.
+##### `WithMoveRecord(string moveRecord, MoveNotationType moveNotationType = MoveNotationType.TraditionalChinese)`
+Sets the move record for the Xiangqi game. The moveNotationType is used to specify the type of move notation used in the move record for parsing. The default value is TraditionalChinese.
 
 ```c#
 using XiangqiCore.Game;
@@ -236,9 +236,10 @@ XiangqiGame game =  builder
 	.Build();
 ```
 
-##### `WithDpxqGameRecord(string dpxqGameRecord)`
+##### `WithDpxqGameRecord(string dpxqGameRecord, MoveNotationType moveNotationType = MoveNotationType.SimplifiedChinese)`
 Sets the Xiangqi game configuration using a Dpxq game record. 
 The method is used to import a game from dpxq.com. The method is still in beta, and there may be issues with parsing the game record, due to the incosistency in the game record format.
+By default the notation would be parsed in Simplified Chinese.
 
 ```c#
 using XiangqiCore.Game;
@@ -937,6 +938,16 @@ The maximum column and row are 9 and 10, respectively.
 ```
 
 ## Release Notes
+
+Version 1.6.0
+Features:
+- Separate the MoveNotationType from Chinese to SimplifiedChinese and TradtionalChinese
+- Now the MoveHistoryObject supports the translation into UCCI, English, Simplified Chinese and Traditional Chinese notations
+
+Bug Fixes:
+- Fix the issue where the UCCI notation is in uppercase but not in lowercase
+
+
 
 Version 1.5.0
 Features:

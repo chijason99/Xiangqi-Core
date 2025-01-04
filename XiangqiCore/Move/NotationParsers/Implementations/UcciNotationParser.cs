@@ -2,9 +2,9 @@
 using XiangqiCore.Move.MoveObject;
 using XiangqiCore.Move.MoveObjects;
 
-namespace XiangqiCore.Move.NotationParsers;
+namespace XiangqiCore.Move.NotationParsers.Implementations;
 
-public class UcciNotationParser : MoveNotationBase
+public class UcciNotationParser : MoveNotationParserBase
 {
 
 	private Dictionary<char, int> UcciColumnMap;
@@ -67,13 +67,5 @@ public class UcciNotationParser : MoveNotationBase
 		}
 
 		return map;
-	}
-
-	public override string TranslateToUcci(MoveHistoryObject moveHistoryObject)
-	{
-		string UcciStartingCoordinate = Coordinate.TranslateToUcciCoordinate(moveHistoryObject.StartingPosition);
-		string UcciDestinationCoordinate = Coordinate.TranslateToUcciCoordinate(moveHistoryObject.Destination);
-
-		return $"{UcciStartingCoordinate}{UcciDestinationCoordinate}";
 	}
 }

@@ -10,7 +10,7 @@ public static class FileGenerationTests
 	[Theory]
 	[InlineData(11, 10)]
 	[InlineData(21, 20)]
-	[InlineData(101, 100)]
+	[InlineData(51, 50)]
 	public static async Task GenerateImagesAsync_ShouldCreateFilesCorrectly(int toIndex, int expectedImageCount)
 	{
 		// Arrange

@@ -5,7 +5,6 @@ using XiangqiCore.Pieces.ValidationStrategy;
 
 namespace XiangqiCore.Pieces;
 
-[MoveInOrthogonals]
 public sealed class Rook : Piece
 {
     public Rook(Coordinate coordinate, Side side)
