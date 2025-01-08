@@ -2,7 +2,9 @@
 using XiangqiCore.Attributes;
 using XiangqiCore.Boards;
 using XiangqiCore.Misc;
+using XiangqiCore.Misc.Images;
 using XiangqiCore.Move;
+using XiangqiCore.Services.ImageGeneration;
 
 namespace XiangqiCore.Game;
 
@@ -87,7 +89,15 @@ public class XiangqiBuilder : IXiangqiBuilder
 	/// </summary>
 	/// <returns>An instance of the <see cref="XiangqiGame"/> class.</returns>
 	public XiangqiGame Build()
-		=> XiangqiGame.Create(
+	{
+		// Default image generation service
+		ImageCache imageCache = new();
+		ImageConfig imageConfig = new();
+		ImageResourcePathManager imageResourcePathManager = new(imageConfig);
+		IImageGenerationService imageGenerationService = new ImageGenerationService(imageResourcePathManager, imageCache);
+
+		return XiangqiGame.Create(
+			imageGenerationService,
 			_initialFen,
 			_redPlayer,
 			_blackPlayer,
@@ -98,6 +108,7 @@ public class XiangqiBuilder : IXiangqiBuilder
 			_moveRecord,
 			_gameName,
 			_moveNotationType);
+	}
 
 	/// <summary>
 	/// Sets the configuration for the red player.

@@ -13,6 +13,7 @@ using XiangqiCore.Move.MoveObject;
 using XiangqiCore.Move.MoveObjects;
 using XiangqiCore.Move.NotationParsers;
 using XiangqiCore.Pieces;
+using XiangqiCore.Services.ImageGeneration;
 
 namespace XiangqiCore.Game;
 
@@ -33,6 +34,7 @@ public class XiangqiGame
 	/// <param name="competition">The competition.</param>
 	/// <param name="result">The game result.</param>
 	internal XiangqiGame(
+		IImageGenerationService imageGenerationService,
 		string initialFenString,
 		Side sideToMove,
 		Player redPlayer,
@@ -41,6 +43,8 @@ public class XiangqiGame
 		GameResult result,
 		string gameName)
 	{
+		_imageGenerationService = imageGenerationService;
+
 		InitialFenString = initialFenString;
 		SideToMove = sideToMove;
 		RedPlayer = redPlayer;
@@ -65,6 +69,8 @@ public class XiangqiGame
 			GameName = gameName;
 		}
 	}
+
+	private readonly IImageGenerationService _imageGenerationService;
 
 	/// <summary>
 	/// Gets the initial FEN string when the game is first created.
@@ -156,6 +162,7 @@ public class XiangqiGame
 	/// <param name="moveRecord">The move record.</param>
 	/// <returns>A new instance of the <see cref="XiangqiGame"/> class.</returns>
 	internal static XiangqiGame Create(
+		IImageGenerationService imageGenerationService,
 		string initialFenString,
 		Player redPlayer,
 		Player blackPlayer,
@@ -174,6 +181,7 @@ public class XiangqiGame
 		Side sideToMoveFromFen = FenHelper.GetSideToMoveFromFen(initialFenString);
 
 		XiangqiGame createdGameInstance = new(
+			imageGenerationService,
 			initialFenString,
 			sideToMoveFromFen,
 			redPlayer,
@@ -341,37 +349,12 @@ public class XiangqiGame
 		await fileStream.WriteAsync(pgnBytes, cancellationToken);
 	}
 
-	/// <summary>
-	/// Shared logic for generating an image
-	/// </summary>
-	/// <param name="filePath"></param>
-	/// <param name="moveCount"></param>
-	/// <param name="imageConfig"></param>
-	/// <returns></returns>
-	private Image<Rgba32> GenerateImageCore(
-		string filePath,
-		int moveCount = 0,
-		ImageConfig? imageConfig = null)
-	{
-		string targetFen = InitialFenString;
-
-		if (moveCount > 0)
-			targetFen = MoveHistory.Skip(Math.Max(moveCount - 1, 0)).First().FenAfterMove;
-
-		Piece[,] position = FenHelper.CreatePositionFromFen(targetFen);
-
-		byte[] bytes = position.GenerateBoardImage(imageConfig);
-
-		return Image.Load<Rgba32>(bytes);
-	}
-
 	public void GenerateImage(string filePath, int moveCount = 0, ImageConfig? config = null)
 	{
 		string preparedFilePath = PrepareFilePath(filePath, "jpg");
+		string targetFen = moveCount == 0 ? InitialFenString : MoveHistory[moveCount].FenAfterMove;
 
-		using Image<Rgba32> image = GenerateImageCore(filePath, moveCount, config);
-
-		image.Save(preparedFilePath);
+		_imageGenerationService.GenerateImage(preparedFilePath, targetFen, config);
 	}
 
 	public async Task GenerateImageAsync(
@@ -381,92 +364,20 @@ public class XiangqiGame
 		CancellationToken cancellationToken = default)
 	{
 		string preparedFilePath = PrepareFilePath(filePath, "jpg");
+		string targetFen = moveCount == 0 ? InitialFenString : MoveHistory[moveCount].FenAfterMove;
 
-		using Image<Rgba32> image = GenerateImageCore(filePath, moveCount, config);
-
-		await image.SaveAsync(preparedFilePath, cancellationToken);
+		await _imageGenerationService.GenerateImageAsync(
+			preparedFilePath, 
+			targetFen, 
+			config, 
+			cancellationToken);
 	}
 
-	/// <summary>
-	/// Shared Logic for generating GIF
-	/// </summary>
-	/// <param name="filePath"></param>
-	/// <param name="config"></param>
-	/// <param name="frameDelayInSecond"></param>
-	/// <returns></returns>
-	private Image<Rgba32> GenerateGifCore(string filePath,
-		ImageConfig? config = null,
-		decimal frameDelayInSecond = 1)
-	{
-		config ??= new ImageConfig();
-
-		List<string> fens = [InitialFenString, .. MoveHistory.Select(x => x.FenAfterMove)];
-
-		// Note : Will have to dispose the image after use
-		Image<Rgba32> gif = new(width: ImageConfig.DefaultBoardWidth, height: ImageConfig.DefaultBoardHeight);
-		GifMetadata gifMetaData = gif.Metadata.GetGifMetadata();
-
-		// Infinite loop
-		gifMetaData.RepeatCount = 0;
-
-		int frameDelayInCentiSeconds = (int)Math.Ceiling(frameDelayInSecond * 100);
-
-		// Set the delay until the next image is displayed.
-		GifFrameMetadata metadata = gif.Frames.RootFrame.Metadata.GetGifMetadata();
-		metadata.FrameDelay = frameDelayInCentiSeconds;
-
-		for (int i = 0; i < fens.Count; i++)
-		{
-			string fen = fens[i];
-
-			Coordinate? previousPosition = null;
-			Coordinate? currentPosition = null;
-
-			// If the move indicator is enabled and it is not the initial FEN
-			if (config.UseMoveIndicator && i > 0)
-			{
-				previousPosition = MoveHistory[i - 1].StartingPosition;
-				currentPosition = MoveHistory[i - 1].Destination;
-			}
-
-			byte[] imageBytes = FenHelper.CreatePositionFromFen(fen).GenerateBoardImage(
-				config,
-				previousPosition: previousPosition,
-				currentPosition: currentPosition);
-
-			using Image<Rgba32> image = Image.Load<Rgba32>(imageBytes);
-			var frame = image.Frames.CloneFrame(0);
-
-			// Set the delay until the next image is displayed.
-			metadata = image.Frames.RootFrame.Metadata.GetGifMetadata();
-			metadata.FrameDelay = frameDelayInCentiSeconds;
-
-			gif.Frames.AddFrame(image.Frames.RootFrame);
-		}
-
-		return gif;
-	}
-
-	public void GenerateGif(string filePath, 
-		ImageConfig? config = null,
-		decimal frameDelayInSecond = 1)
+	public void GenerateGif(string filePath, ImageConfig? config = null)
 	{
 		string preparedFilePath = PrepareFilePath(filePath, "gif");
-
-		Image<Rgba32> gif = GenerateGifCore(filePath, config, frameDelayInSecond);
-
-		try
-		{
-			gif.SaveAsGif(preparedFilePath);
-		}
-		catch (Exception)
-		{
-			throw;
-		}
-		finally
-		{
-			gif.Dispose();
-		}
+		
+		_imageGenerationService.GenerateGif(preparedFilePath, MoveHistory.ToList(), config);
 	}
 
 	public async Task GenerateGifAsync(string filePath,
@@ -476,20 +387,11 @@ public class XiangqiGame
 	{
 		string preparedFilePath = PrepareFilePath(filePath, "gif");
 
-		Image<Rgba32> gif = GenerateGifCore(filePath, config, frameDelayInSecond);
-
-		try
-		{
-			await gif.SaveAsGifAsync(preparedFilePath, cancellationToken);
-		}
-		catch (Exception)
-		{
-			throw;
-		}
-		finally
-		{
-			gif.Dispose();
-		}
+		await _imageGenerationService.GenerateGifAsync(
+			preparedFilePath, 
+			MoveHistory.ToList(), 
+			config,
+			cancellationToken);
 	}
 
 	private void AddPgnTag(StringBuilder pgnBuilder, PgnTagType pgnTagKey, string pgnTagValue)

@@ -2,18 +2,19 @@
 using SixLabors.ImageSharp.PixelFormats;
 using System.Collections.Concurrent;
 using System.Reflection;
+using XiangqiCore.Game;
 
 namespace XiangqiCore.Misc.Images;
 
-public static class ImageCache
+public class ImageCache
 {
-	private static readonly ConcurrentDictionary<string, Image<Rgba32>> _imageCache = [];
+	private readonly ConcurrentDictionary<string, Image<Rgba32>> _imageCache = [];
 
-	public static Image<Rgba32> GetImage(string resourceName)
+	public Image<Rgba32> GetImage(string resourceName)
 	{
 		if (!_imageCache.TryGetValue(resourceName, out var image))
 		{
-			using Stream stream = Assembly.GetExecutingAssembly().GetManifestResourceStream(resourceName)
+			using Stream stream = Assembly.GetAssembly(typeof(XiangqiBuilder))!.GetManifestResourceStream(resourceName)
 				?? throw new FileNotFoundException($"Resource '{resourceName}' not found.");
 
 			image = Image.Load<Rgba32>(stream);

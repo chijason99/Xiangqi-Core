@@ -182,12 +182,10 @@ public static class FileGenerationTests
 			ImageConfig config = new()
 			{
 				UseMoveIndicator = true,
+				FrameDelayInSecond = 1
 			};
 
-			game.GenerateGif(
-				filePath,
-				config,
-				frameDelayInSecond: 1);
+			game.GenerateGif(filePath, config);
 
 			// Assert
 			Assert.True(File.Exists(filePath), "GIF file was not created.");
