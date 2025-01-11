@@ -1,6 +1,6 @@
 ﻿namespace XiangqiCore.Misc.Images;
 
-public class ImageConfig
+public record ImageConfig
 {
 	public static int DefaultBoardWidth => 450;
 	public static int DefaultBoardHeight => 500;
@@ -19,4 +19,7 @@ public class ImageConfig
 
 	// The delay between each frame in the GIF in seconds
 	public int FrameDelayInSecond { get; set; } = 1;
+
+	// The move number to generate the image for
+	public int MoveNumber { get; set; } = 0;
 }

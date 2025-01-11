@@ -5,15 +5,16 @@ using SixLabors.ImageSharp.PixelFormats;
 using SixLabors.ImageSharp.Processing;
 using XiangqiCore.Misc;
 using XiangqiCore.Misc.Images;
+using XiangqiCore.Misc.Images.Interfaces;
 using XiangqiCore.Move.MoveObjects;
 using XiangqiCore.Pieces;
 using XiangqiCore.Pieces.PieceTypes;
 
 namespace XiangqiCore.Services.ImageGeneration;
 
-public class ImageGenerationService(ImageResourcePathManager imageResourcePathManager, ImageCache imageCache) : IImageGenerationService
+public class ImageGenerationService(IImageResourcePathManager imageResourcePathManager, ImageCache imageCache) : IImageGenerationService
 {
-	private readonly ImageResourcePathManager _imageResourcePathManager = imageResourcePathManager;
+	private readonly IImageResourcePathManager _imageResourcePathManager = imageResourcePathManager;
 	private readonly ImageCache _imageCache = imageCache;
 
 	public void GenerateGif(string filePath, List<MoveHistoryObject> moveHistory, ImageConfig? imageConfig = null)

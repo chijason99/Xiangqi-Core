@@ -90,14 +90,7 @@ public class XiangqiBuilder : IXiangqiBuilder
 	/// <returns>An instance of the <see cref="XiangqiGame"/> class.</returns>
 	public XiangqiGame Build()
 	{
-		// Default image generation service
-		ImageCache imageCache = new();
-		ImageConfig imageConfig = new();
-		ImageResourcePathManager imageResourcePathManager = new(imageConfig);
-		IImageGenerationService imageGenerationService = new ImageGenerationService(imageResourcePathManager, imageCache);
-
-		return XiangqiGame.Create(
-			imageGenerationService,
+			return XiangqiGame.Create(
 			_initialFen,
 			_redPlayer,
 			_blackPlayer,

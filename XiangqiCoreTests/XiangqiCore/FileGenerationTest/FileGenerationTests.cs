@@ -1,12 +1,32 @@
-﻿using System.Collections.Concurrent;
+﻿using Moq;
+using System.Collections.Concurrent;
 using System.Text;
 using XiangqiCore.Game;
 using XiangqiCore.Misc.Images;
+using XiangqiCore.Misc.Images.Interfaces;
+using XiangqiCore.Move.MoveObjects;
+using XiangqiCore.Services.ImageGeneration;
 
 namespace xiangqi_core_test.XiangqiCore.FileGenerationTest;
 
 public static class FileGenerationTests
 {
+	internal static IImageGenerationService GetDefaultImageGenerationService()
+	{
+		IImageResourcePathManager imageResourcePathManager = new ImageResourcePathManager();
+		ImageCache imageCache = new();
+
+		return new ImageGenerationService(imageResourcePathManager, imageCache);
+	}
+
+	internal static string CreateTempDirectory(string folderName)
+	{
+		string tempDirectory = Path.Combine(Path.GetTempPath(), folderName);
+		Directory.CreateDirectory(tempDirectory);
+
+		return tempDirectory;
+	}
+
 	[Theory]
 	[InlineData(11, 10)]
 	[InlineData(21, 20)]
@@ -14,14 +34,15 @@ public static class FileGenerationTests
 	public static async Task GenerateImagesAsync_ShouldCreateFilesCorrectly(int toIndex, int expectedImageCount)
 	{
 		// Arrange
-		string tempDirectory = Path.Combine(Path.GetTempPath(), "XiangqiImageAsyncCreationTests");
-		Directory.CreateDirectory(tempDirectory);
+		string tempDirectory = CreateTempDirectory("XiangqiImageAsyncCreationTests");
 
 		const string gameName = "马炮单缺仕例胜马单缺象";
 		const string fen = "5kb2/4a4/5a3/3Nn4/9/6B2/9/3K1A3/C8/2B6 w - - 0 0";
 
 		string csvFilePath = Path.Combine(tempDirectory, $"{gameName}.csv");
 		ConcurrentBag<string> fens = [];
+
+		IImageGenerationService imageGenerationService = GetDefaultImageGenerationService();
 
 		try
 		{
@@ -45,6 +66,7 @@ public static class FileGenerationTests
 				string filePath = Path.Combine(tempDirectory, $"{game.GameName}_{i}.jpg");
 
 				await game.GenerateImageAsync(
+					imageGenerationService,
 					filePath,
 					config: config,
 					cancellationToken: cancellationToken);
@@ -80,8 +102,7 @@ public static class FileGenerationTests
 	public static async Task GenerateGifAsync_ShouldCreateFilesCorrectly()
 	{
 		// Arrange
-		string tempDirectory = Path.Combine(Path.GetTempPath(), "XiangqiGifAsyncCreationTests");
-		Directory.CreateDirectory(tempDirectory);
+		string tempDirectory = CreateTempDirectory("XiangqiGifAsyncCreationTests");
 
 		try
 		{
@@ -114,10 +135,12 @@ public static class FileGenerationTests
 				UseMoveIndicator = true,
 			};
 
+			IImageGenerationService imageGenerationService = GetDefaultImageGenerationService();
+
 			await game.GenerateGifAsync(
+				imageGenerationService,
 				filePath,
 				config,
-				frameDelayInSecond: 1,
 				cancellationToken: default);
 
 			// Assert
@@ -138,8 +161,7 @@ public static class FileGenerationTests
 	public static void GenerateGif_ShouldCreateFilesCorrectly()
 	{
 		// Arrange
-		string tempDirectory = Path.Combine(Path.GetTempPath(), "XiangqiGifCreationTests");
-		Directory.CreateDirectory(tempDirectory);
+		string tempDirectory = CreateTempDirectory("XiangqiGifCreationTests");
 
 		try
 		{
@@ -185,7 +207,9 @@ public static class FileGenerationTests
 				FrameDelayInSecond = 1
 			};
 
-			game.GenerateGif(filePath, config);
+			IImageGenerationService imageGenerationService = GetDefaultImageGenerationService();
+
+			game.GenerateGif(imageGenerationService, filePath, config);
 
 			// Assert
 			Assert.True(File.Exists(filePath), "GIF file was not created.");
@@ -205,8 +229,7 @@ public static class FileGenerationTests
 	public static void GenerateImage_ShouldCreateFilesCorrectly()
 	{
 		// Arrange
-		string tempDirectory = Path.Combine(Path.GetTempPath(), "XiangqiImageCreationTests");
-		Directory.CreateDirectory(tempDirectory);
+		string tempDirectory = CreateTempDirectory("XiangqiImageCreationTests");
 
 		try
 		{
@@ -229,7 +252,9 @@ public static class FileGenerationTests
 					UseBlackAndWhiteBoard = true,
 				};
 
-				game.GenerateImage(filePath, config: config);
+				IImageGenerationService imageGenerationService = GetDefaultImageGenerationService();
+
+				game.GenerateImage(imageGenerationService, filePath, config: config);
 
 				// Assert
 				Assert.True(File.Exists(filePath), "Image file was not created.");
@@ -250,8 +275,7 @@ public static class FileGenerationTests
 	public static void GeneratePgn_ShouldCreateFilesCorrectly()
 	{
 		// Arrange
-		string tempDirectory = Path.Combine(Path.GetTempPath(), "XiangqiPgnCreationTests");
-		Directory.CreateDirectory(tempDirectory);
+		string tempDirectory = CreateTempDirectory("XiangqiPgnCreationTests");
 
 		try
 		{
@@ -306,8 +330,7 @@ public static class FileGenerationTests
 	public static async Task GeneratePgnAsync_ShouldCreateFilesCorrectly()
 	{
 		// Arrange
-		string tempDirectory = Path.Combine(Path.GetTempPath(), "XiangqiPgnAsyncCreationTests");
-		Directory.CreateDirectory(tempDirectory);
+		string tempDirectory = CreateTempDirectory("XiangqiPgnAsyncCreationTests");
 
 		try
 		{
@@ -347,5 +370,122 @@ public static class FileGenerationTests
 		{
 			Directory.Delete(tempDirectory, true);
 		}
+	}
+
+	[Fact]
+	public static async Task GenerateImageAsyncFromXiangqiGame_ShouldCallGenerateImageAsync()
+	{
+		// Arrange
+		Mock<IImageGenerationService> imageGenerationServiceMock = new();
+		string tempDirectory = CreateTempDirectory("XiangqiImageAsyncMoqTests");
+
+		imageGenerationServiceMock.Setup(x => x.GenerateImageAsync(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<ImageConfig>(), It.IsAny<CancellationToken>()))
+			.Returns(Task.CompletedTask);
+
+		XiangqiBuilder builder = new();
+		XiangqiGame game = builder.WithDefaultConfiguration().Build();
+
+		// Act
+		await game.GenerateImageAsync(imageGenerationServiceMock.Object, $"{tempDirectory}/test1.jpg");
+			imageGenerationServiceMock.Verify(x => 
+				x.GenerateImageAsync(
+					It.IsAny<string>(), 
+					It.IsAny<string>(), 
+					It.IsAny<ImageConfig>(), 
+					It.IsAny<CancellationToken>()), 
+				Times.Once);
+	}
+
+	[Fact]
+	public static void GenerateImageFromXiangqiGame_ShouldCallGenerateImage()
+	{
+		// Arrange
+		Mock<IImageGenerationService> imageGenerationServiceMock = new();
+		string tempDirectory = CreateTempDirectory("XiangqiImageMoqTests");
+
+		imageGenerationServiceMock.Setup(x => 
+			x.GenerateImage(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<ImageConfig>()));
+
+		XiangqiBuilder builder = new();
+		XiangqiGame game = builder.WithDefaultConfiguration().Build();
+
+		// Act
+		game.GenerateImage(imageGenerationServiceMock.Object, $"{tempDirectory}/test1.jpg");
+
+		imageGenerationServiceMock.Verify(x =>
+			x.GenerateImage(
+				It.IsAny<string>(),
+				It.IsAny<string>(),
+				It.IsAny<ImageConfig>()),
+			Times.Once);
+	}
+
+	[Fact]
+	public static void GenerateGifFromXiangqiGame_ShouldCallGenerateGif()
+	{
+		// Arrange
+		Mock<IImageGenerationService> imageGenerationServiceMock = new();
+		string tempDirectory = CreateTempDirectory("XiangqiGifMoqTests");
+
+		imageGenerationServiceMock.Setup(x =>
+			x.GenerateGif(
+				It.IsAny<string>(), 
+				It.IsAny<IEnumerable<string>>(), 
+				It.IsAny<ImageConfig>()));
+
+		imageGenerationServiceMock.Setup(x =>
+			x.GenerateGif(
+				It.IsAny<string>(), 
+				It.IsAny<List<MoveHistoryObject>>(), 
+				It.IsAny<ImageConfig>()));
+
+		XiangqiBuilder builder = new();
+		XiangqiGame game = builder.WithDefaultConfiguration().Build();
+
+		// Act
+		game.GenerateGif(imageGenerationServiceMock.Object, $"{tempDirectory}/test1.gif");
+
+		imageGenerationServiceMock.Verify(x =>
+			x.GenerateGif(
+				It.IsAny<string>(),
+				It.IsAny<List<MoveHistoryObject>>(),
+				It.IsAny<ImageConfig>()),
+			Times.Once);
+	}
+
+	[Fact]
+	public static async Task GenerateGifAsyncFromXiangqiGame_ShouldCallGenerateGifAsync()
+	{
+		// Arrange
+		Mock<IImageGenerationService> imageGenerationServiceMock = new();
+		string tempDirectory = CreateTempDirectory("XiangqiGifAsyncMoqTests");
+
+		imageGenerationServiceMock.Setup(x =>
+			x.GenerateGifAsync(
+				It.IsAny<string>(),
+				It.IsAny<IEnumerable<string>>(),
+				It.IsAny<ImageConfig>(),
+				It.IsAny<CancellationToken>()));
+
+		imageGenerationServiceMock.Setup(x =>
+			x.GenerateGifAsync(
+				It.IsAny<string>(),
+				It.IsAny<List<MoveHistoryObject>>(),
+				It.IsAny<ImageConfig>(),
+				It.IsAny<CancellationToken>()));
+
+		XiangqiBuilder builder = new();
+		XiangqiGame game = builder.WithDefaultConfiguration().Build();
+
+		// Act
+		await game.GenerateGifAsync(imageGenerationServiceMock.Object, $"{tempDirectory}/test1.gif");
+
+		imageGenerationServiceMock.Verify(x =>
+			x.GenerateGifAsync(
+				It.IsAny<string>(),
+				It.IsAny<List<MoveHistoryObject>>(),
+				It.IsAny<ImageConfig>(),
+				It.IsAny<CancellationToken>()),
+			Times.Once);
 	}
 }

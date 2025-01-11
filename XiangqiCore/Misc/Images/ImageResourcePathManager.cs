@@ -1,18 +1,19 @@
-﻿using XiangqiCore.Pieces.PieceTypes;
+﻿using XiangqiCore.Misc.Images.Interfaces;
+using XiangqiCore.Pieces.PieceTypes;
 
 namespace XiangqiCore.Misc.Images;
 
-public class ImageResourcePathManager(ImageConfig imageConfig)
+public class ImageResourcePathManager : IImageResourcePathManager
 {
-	private readonly ImageConfig _imageConfig = imageConfig;
-
 	private const string BLACK_AND_WHITE_PATH = ".black_and_white";
 	private const string COLOURED_PATH = ".coloured";
 	private const string CHINESE_PATH = ".chinese";
 	private const string WESTERN_PATH = ".western";
 
-	public string GetPieceResourcePath(PieceType pieceType, Side side)
+	public string GetPieceResourcePath(PieceType pieceType, Side side, ImageConfig imageConfig)
 	{
+		ArgumentNullException.ThrowIfNull(imageConfig, nameof(imageConfig));
+
 		if (pieceType == PieceType.None)
 			throw new ArgumentException("Cannot get resource path for PieceType.None");
 
@@ -23,14 +24,14 @@ public class ImageResourcePathManager(ImageConfig imageConfig)
 
 		string stylePath = CHINESE_PATH;
 
-		if (_imageConfig.UseWesternPieces)
+		if (imageConfig.UseWesternPieces)
 			stylePath = WESTERN_PATH;
 
 		path += stylePath;
 
 		string colourPath = COLOURED_PATH;
 
-		if (_imageConfig.UseBlackAndWhitePieces)
+		if (imageConfig.UseBlackAndWhitePieces)
 			colourPath = BLACK_AND_WHITE_PATH;
 
 		path += colourPath;
@@ -43,13 +44,15 @@ public class ImageResourcePathManager(ImageConfig imageConfig)
 		return path;
 	}
 
-	public string GetBoardResourcePath()
+	public string GetBoardResourcePath(ImageConfig imageConfig)
 	{
+		ArgumentNullException.ThrowIfNull(imageConfig, nameof(imageConfig));
+
 		string path = "XiangqiCore.Assets.Boards";
 
 		string colouorPath = COLOURED_PATH;
 
-		if (_imageConfig.UseBlackAndWhiteBoard)
+		if (imageConfig.UseBlackAndWhiteBoard)
 			colouorPath = BLACK_AND_WHITE_PATH;
 
 		path += colouorPath;
@@ -59,13 +62,15 @@ public class ImageResourcePathManager(ImageConfig imageConfig)
 		return path;
 	}
 
-	public string GetMoveIndicatorResourcePath()
+	public string GetMoveIndicatorResourcePath(ImageConfig imageConfig)
 	{
+		ArgumentNullException.ThrowIfNull(imageConfig, nameof(imageConfig));
+
 		string path = "XiangqiCore.Assets.MoveIndicators";
 
 		string colourPath = COLOURED_PATH;
 
-		if (_imageConfig.UseBlackAndWhiteBoard)
+		if (imageConfig.UseBlackAndWhiteBoard)
 			colourPath = BLACK_AND_WHITE_PATH;
 
 		path += colourPath;

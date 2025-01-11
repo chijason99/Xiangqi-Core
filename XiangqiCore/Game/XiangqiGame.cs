@@ -1,8 +1,5 @@
 ﻿using SixLabors.ImageSharp;
-using SixLabors.ImageSharp.Formats.Gif;
-using SixLabors.ImageSharp.PixelFormats;
 using System.Text;
-using XiangqiCore.Attributes;
 using XiangqiCore.Boards;
 using XiangqiCore.Exceptions;
 using XiangqiCore.Extension;
@@ -34,7 +31,6 @@ public class XiangqiGame
 	/// <param name="competition">The competition.</param>
 	/// <param name="result">The game result.</param>
 	internal XiangqiGame(
-		IImageGenerationService imageGenerationService,
 		string initialFenString,
 		Side sideToMove,
 		Player redPlayer,
@@ -43,8 +39,6 @@ public class XiangqiGame
 		GameResult result,
 		string gameName)
 	{
-		_imageGenerationService = imageGenerationService;
-
 		InitialFenString = initialFenString;
 		SideToMove = sideToMove;
 		RedPlayer = redPlayer;
@@ -69,8 +63,6 @@ public class XiangqiGame
 			GameName = gameName;
 		}
 	}
-
-	private readonly IImageGenerationService _imageGenerationService;
 
 	/// <summary>
 	/// Gets the initial FEN string when the game is first created.
@@ -162,7 +154,6 @@ public class XiangqiGame
 	/// <param name="moveRecord">The move record.</param>
 	/// <returns>A new instance of the <see cref="XiangqiGame"/> class.</returns>
 	internal static XiangqiGame Create(
-		IImageGenerationService imageGenerationService,
 		string initialFenString,
 		Player redPlayer,
 		Player blackPlayer,
@@ -181,7 +172,6 @@ public class XiangqiGame
 		Side sideToMoveFromFen = FenHelper.GetSideToMoveFromFen(initialFenString);
 
 		XiangqiGame createdGameInstance = new(
-			imageGenerationService,
 			initialFenString,
 			sideToMoveFromFen,
 			redPlayer,
@@ -261,7 +251,6 @@ public class XiangqiGame
 	/// </summary>
 	/// <param name="targetNotationType">The target notation type.</param>
 	/// <returns>The move history in the specified notation type.</returns>
-	[BetaMethod("Currently only supports converting MoveNotationType from Chinese/English to UCCI. The translation would not work for Chinese -> English or English -> Chinese")]
 	public string ExportMoveHistory(MoveNotationType targetNotationType = MoveNotationType.TraditionalChinese)
 	{
 		List<string> movesOfEachRound = [];
@@ -349,45 +338,50 @@ public class XiangqiGame
 		await fileStream.WriteAsync(pgnBytes, cancellationToken);
 	}
 
-	public void GenerateImage(string filePath, int moveCount = 0, ImageConfig? config = null)
+	public void GenerateImage(IImageGenerationService imageGenerationSerivce, string filePath, ImageConfig? config = null)
 	{
-		string preparedFilePath = PrepareFilePath(filePath, "jpg");
-		string targetFen = moveCount == 0 ? InitialFenString : MoveHistory[moveCount].FenAfterMove;
+		config ??= new ImageConfig();
 
-		_imageGenerationService.GenerateImage(preparedFilePath, targetFen, config);
+		string preparedFilePath = PrepareFilePath(filePath, "jpg");
+		string targetFen = config.MoveNumber == 0 ? InitialFenString : MoveHistory[config.MoveNumber].FenAfterMove;
+
+		imageGenerationSerivce.GenerateImage(preparedFilePath, targetFen, config);
 	}
 
 	public async Task GenerateImageAsync(
+		IImageGenerationService imageGenerationService,
 		string filePath, 
-		int moveCount = 0,
 		ImageConfig? config = null,
 		CancellationToken cancellationToken = default)
 	{
-		string preparedFilePath = PrepareFilePath(filePath, "jpg");
-		string targetFen = moveCount == 0 ? InitialFenString : MoveHistory[moveCount].FenAfterMove;
+		config ??= new ImageConfig();
 
-		await _imageGenerationService.GenerateImageAsync(
+		string preparedFilePath = PrepareFilePath(filePath, "jpg");
+		string targetFen = config.MoveNumber == 0 ? InitialFenString : MoveHistory[config.MoveNumber].FenAfterMove;
+
+		await imageGenerationService.GenerateImageAsync(
 			preparedFilePath, 
 			targetFen, 
 			config, 
 			cancellationToken);
 	}
 
-	public void GenerateGif(string filePath, ImageConfig? config = null)
+	public void GenerateGif(IImageGenerationService imageGenerationService, string filePath, ImageConfig? config = null)
 	{
 		string preparedFilePath = PrepareFilePath(filePath, "gif");
-		
-		_imageGenerationService.GenerateGif(preparedFilePath, MoveHistory.ToList(), config);
+
+		imageGenerationService.GenerateGif(preparedFilePath, MoveHistory.ToList(), config);
 	}
 
-	public async Task GenerateGifAsync(string filePath,
+	public async Task GenerateGifAsync(
+		IImageGenerationService imageGenerationService, 
+		string filePath,
 		ImageConfig? config = null,
-		decimal frameDelayInSecond = 1, 
 		CancellationToken cancellationToken = default)
 	{
 		string preparedFilePath = PrepareFilePath(filePath, "gif");
 
-		await _imageGenerationService.GenerateGifAsync(
+		await imageGenerationService.GenerateGifAsync(
 			preparedFilePath, 
 			MoveHistory.ToList(), 
 			config,
