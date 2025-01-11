@@ -6,6 +6,7 @@ using XiangqiCore.Misc.Images;
 using XiangqiCore.Misc.Images.Interfaces;
 using XiangqiCore.Move.MoveObjects;
 using XiangqiCore.Services.ImageGeneration;
+using XiangqiCore.Services.PgnGeneration;
 
 namespace xiangqi_core_test.XiangqiCore.FileGenerationTest;
 
@@ -18,6 +19,8 @@ public static class FileGenerationTests
 
 		return new ImageGenerationService(imageResourcePathManager, imageCache);
 	}
+
+	internal static IPgnGenerationService GetDefaultPgnGenerationService() => new PgnGenerationService();
 
 	internal static string CreateTempDirectory(string folderName)
 	{
@@ -276,6 +279,7 @@ public static class FileGenerationTests
 	{
 		// Arrange
 		string tempDirectory = CreateTempDirectory("XiangqiPgnCreationTests");
+		IPgnGenerationService pgnGenerationService = GetDefaultPgnGenerationService();
 
 		try
 		{
@@ -310,10 +314,10 @@ public static class FileGenerationTests
 
 			string filePath = Path.Combine(tempDirectory, $"{game.GameName}.pgn");
 
-			game.GeneratePgnFile(filePath);
+			game.GeneratePgnFile(pgnGenerationService, filePath);
 
 			// Assert
-			Assert.True(File.Exists(filePath), "GIF file was not created.");
+			Assert.True(File.Exists(filePath), "PGN file was not created.");
 		}
 		catch (Exception ex)
 		{
@@ -331,6 +335,7 @@ public static class FileGenerationTests
 	{
 		// Arrange
 		string tempDirectory = CreateTempDirectory("XiangqiPgnAsyncCreationTests");
+		IPgnGenerationService pgnGenerationService = GetDefaultPgnGenerationService();
 
 		try
 		{
@@ -356,10 +361,10 @@ public static class FileGenerationTests
 
 			string filePath = Path.Combine(tempDirectory, $"{game.GameName}.pgn");
 
-			await game.GeneratePgnFileAsync(filePath, cancellationToken: default);
+			await game.GeneratePgnFileAsync(pgnGenerationService, filePath, cancellationToken: default);
 
 			// Assert
-			Assert.True(File.Exists(filePath), "GIF file was not created.");
+			Assert.True(File.Exists(filePath), "PGN file was not created.");
 		}
 		catch (Exception ex)
 		{

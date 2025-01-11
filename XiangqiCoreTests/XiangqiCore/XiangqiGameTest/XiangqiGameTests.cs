@@ -4,6 +4,7 @@ using XiangqiCore.Extension;
 using XiangqiCore.Game;
 using XiangqiCore.Misc;
 using XiangqiCore.Move;
+using XiangqiCore.Services.PgnGeneration;
 
 namespace xiangqi_core_test.XiangqiCore.XiangqiGameTest;
 public static class XiangqiGameTests
@@ -123,31 +124,32 @@ public static class XiangqiGameTests
 		// Arrange
 		XiangqiBuilder builder = new();
 		DateTime competitionDate = new(year, month, day);
+		IPgnGenerationService pgnService = new PgnGenerationService();
 
 		XiangqiGame game = builder
-							.WithStartingFen(startingFen)
-							.WithRedPlayer(player =>
-							{
-								player.Name = redPlayer;
-								player.Team = redTeam;
-							})
-							.WithBlackPlayer(player =>
-							{
-								player.Name = blackPlayer;
-								player.Team = blackTeam;
-							})
-							.WithCompetition(option =>
-							{
-								option
-									.WithGameDate(competitionDate)
-									.WithLocation(venue)
-									.WithName(comp);
-							})
-							.WithGameResult(result)
-							.Build();
+			.WithStartingFen(startingFen)
+			.WithRedPlayer(player =>
+			{
+				player.Name = redPlayer;
+				player.Team = redTeam;
+			})
+			.WithBlackPlayer(player =>
+			{
+				player.Name = blackPlayer;
+				player.Team = blackTeam;
+			})
+			.WithCompetition(option =>
+			{
+				option
+					.WithGameDate(competitionDate)
+					.WithLocation(venue)
+					.WithName(comp);
+			})
+			.WithGameResult(result)
+			.Build();
 
 		// Act
-		string pgnString = game.ExportGameAsPgnString();
+		string pgnString = game.ExportGameAsPgnString(pgnService);
 
 		// Assert
 		pgnString.Should().Contain("[Game \"Chinese Chess\"]");
