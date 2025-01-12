@@ -3,7 +3,7 @@ using XiangqiCore.Move.MoveObjects;
 
 namespace XiangqiCore.Services.ImageGeneration;
 
-public interface IImageGenerationService
+public interface IXiangqiImageGenerationService
 {
 	public void GenerateImage(string filePath, string fen, ImageConfig? imageConfig = null);
 

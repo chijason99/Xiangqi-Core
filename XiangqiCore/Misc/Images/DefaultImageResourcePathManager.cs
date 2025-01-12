@@ -3,7 +3,7 @@ using XiangqiCore.Pieces.PieceTypes;
 
 namespace XiangqiCore.Misc.Images;
 
-public class ImageResourcePathManager : IImageResourcePathManager
+public class DefaultImageResourcePathManager : IImageResourcePathManager
 {
 	private const string BLACK_AND_WHITE_PATH = ".black_and_white";
 	private const string COLOURED_PATH = ".coloured";

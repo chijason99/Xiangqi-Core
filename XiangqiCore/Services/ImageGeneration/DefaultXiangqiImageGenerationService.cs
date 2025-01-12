@@ -12,10 +12,24 @@ using XiangqiCore.Pieces.PieceTypes;
 
 namespace XiangqiCore.Services.ImageGeneration;
 
-public class ImageGenerationService(IImageResourcePathManager imageResourcePathManager, ImageCache imageCache) : IImageGenerationService
+public class DefaultXiangqiImageGenerationService : IXiangqiImageGenerationService
 {
-	private readonly IImageResourcePathManager _imageResourcePathManager = imageResourcePathManager;
-	private readonly ImageCache _imageCache = imageCache;
+	public DefaultXiangqiImageGenerationService()
+	{
+		_imageResourcePathManager = new DefaultImageResourcePathManager();
+		_imageCache = new ImageCache();
+	}
+
+	public DefaultXiangqiImageGenerationService(
+		IImageResourcePathManager imageResourcePathManager,
+		ImageCache imageCache)
+	{
+		_imageResourcePathManager = imageResourcePathManager;
+		_imageCache = imageCache;
+	}
+
+	private readonly IImageResourcePathManager _imageResourcePathManager;
+	private readonly ImageCache _imageCache;
 
 	public void GenerateGif(string filePath, List<MoveHistoryObject> moveHistory, ImageConfig? imageConfig = null)
 	{

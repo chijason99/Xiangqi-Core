@@ -6,12 +6,9 @@ using XiangqiCore.Move;
 
 namespace XiangqiCore.Services.PgnGeneration;
 
-/// <summary>
-/// The default implementation of the <see cref="IPgnGenerationService"/> interface.
-/// </summary>
-public class PgnGenerationService : IPgnGenerationService
+public class DefaultPgnGenerationService : IPgnGenerationService
 {
-	public void GeneratePgn(
+	public void SavePgnToFile(
 		string filePath, 
 		XiangqiGame game, 
 		MoveNotationType moveNotationType = MoveNotationType.TraditionalChinese)
@@ -27,7 +24,7 @@ public class PgnGenerationService : IPgnGenerationService
 		fileStream.Write(pgnBytes);
 	}
 
-	public async Task GeneratePgnAsync(
+	public async Task SavePgnToFileAsync(
 		string filePath, 
 		XiangqiGame game, 
 		MoveNotationType moveNotationType = MoveNotationType.TraditionalChinese, 

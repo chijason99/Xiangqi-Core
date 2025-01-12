@@ -124,7 +124,7 @@ public static class XiangqiGameTests
 		// Arrange
 		XiangqiBuilder builder = new();
 		DateTime competitionDate = new(year, month, day);
-		IPgnGenerationService pgnService = new PgnGenerationService();
+		IPgnGenerationService pgnService = new DefaultPgnGenerationService();
 
 		XiangqiGame game = builder
 			.WithStartingFen(startingFen)
@@ -149,7 +149,7 @@ public static class XiangqiGameTests
 			.Build();
 
 		// Act
-		string pgnString = game.ExportGameAsPgnString(pgnService);
+		string pgnString = game.GeneratePgn(pgnService);
 
 		// Assert
 		pgnString.Should().Contain("[Game \"Chinese Chess\"]");

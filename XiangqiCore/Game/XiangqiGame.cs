@@ -283,40 +283,50 @@ public class XiangqiGame
 	}
 
 	/// <summary>
-	/// Exports the game as PGN (Portable Game Notation) format.
+	/// Exports the game as PGN (Portable Game Notation) format with your own PgnGenerationService injection.
 	/// </summary>
 	/// <returns>The PGN string of the game</returns>
-	public string ExportGameAsPgnString(IPgnGenerationService pgnGenerationService, MoveNotationType moveNotationType = MoveNotationType.TraditionalChinese)
-		=> pgnGenerationService.GeneratePgnString(this, moveNotationType);
+	public string GeneratePgn(
+		IPgnGenerationService? pgnGenerationService = null, 
+		MoveNotationType moveNotationType = MoveNotationType.TraditionalChinese)
+	{
+		pgnGenerationService ??= new DefaultPgnGenerationService();
 
-	public void GeneratePgnFile(
-		IPgnGenerationService pgnGenerationService, 
+		return pgnGenerationService.GeneratePgnString(this, moveNotationType);
+	}
+
+	public void SavePgnToFile(
 		string filePath, 
+		IPgnGenerationService? pgnGenerationService = null, 
 		MoveNotationType moveNotationType = MoveNotationType.TraditionalChinese)
 	{
 		string preparedFilePath = FilePathHelper.PrepareFilePath(filePath, "pgn", GameName);
+		pgnGenerationService ??= new DefaultPgnGenerationService();
 
-		pgnGenerationService.GeneratePgn(preparedFilePath, this, moveNotationType);
+		pgnGenerationService.SavePgnToFile(preparedFilePath, this, moveNotationType);
 	}
 
-	public async Task GeneratePgnFileAsync(
-		IPgnGenerationService pgnGenerationService, 
+	public async Task SavePgnToFileAsync(
 		string filePath,
+		IPgnGenerationService? pgnGenerationService = null, 
 		MoveNotationType moveNotationType = MoveNotationType.TraditionalChinese,
 		CancellationToken cancellationToken = default)
 	{
 		string preparedFilePath = FilePathHelper.PrepareFilePath(filePath, "pgn", GameName);
+		pgnGenerationService ??= new DefaultPgnGenerationService();
 
-		await pgnGenerationService.GeneratePgnAsync(
+		await pgnGenerationService.SavePgnToFileAsync(
 			preparedFilePath, 
 			this, 
 			moveNotationType, 
 			cancellationToken);
 	}
 
-	public void GenerateImage(IImageGenerationService imageGenerationSerivce, string filePath, ImageConfig? config = null)
+	public void SaveImageToFile(
+		string filePath, IXiangqiImageGenerationService? imageGenerationSerivce = null,  ImageConfig? config = null)
 	{
 		config ??= new ImageConfig();
+		imageGenerationSerivce ??= new DefaultXiangqiImageGenerationService();
 
 		string preparedFilePath = FilePathHelper.PrepareFilePath(filePath, "jpg", GameName);
 		string targetFen = config.MoveNumber == 0 ? InitialFenString : MoveHistory[config.MoveNumber].FenAfterMove;
@@ -324,8 +334,8 @@ public class XiangqiGame
 		imageGenerationSerivce.GenerateImage(preparedFilePath, targetFen, config);
 	}
 
-	public async Task GenerateImageAsync(
-		IImageGenerationService imageGenerationService,
+	public async Task SaveImageToFileAsync(
+		IXiangqiImageGenerationService imageGenerationService,
 		string filePath, 
 		ImageConfig? config = null,
 		CancellationToken cancellationToken = default)
@@ -342,15 +352,15 @@ public class XiangqiGame
 			cancellationToken);
 	}
 
-	public void GenerateGif(IImageGenerationService imageGenerationService, string filePath, ImageConfig? config = null)
+	public void SaveGifToFile(IXiangqiImageGenerationService imageGenerationService, string filePath, ImageConfig? config = null)
 	{
 		string preparedFilePath = FilePathHelper.PrepareFilePath(filePath, "gif", GameName);
 
 		imageGenerationService.GenerateGif(preparedFilePath, MoveHistory.ToList(), config);
 	}
 
-	public async Task GenerateGifAsync(
-		IImageGenerationService imageGenerationService, 
+	public async Task SaveGifToFileAsync(
+		IXiangqiImageGenerationService imageGenerationService, 
 		string filePath,
 		ImageConfig? config = null,
 		CancellationToken cancellationToken = default)
