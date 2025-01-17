@@ -8,9 +8,10 @@ using XiangqiCore.Misc.Images;
 using XiangqiCore.Move;
 using XiangqiCore.Move.MoveObject;
 using XiangqiCore.Move.MoveObjects;
-using XiangqiCore.Move.NotationParsers;
 using XiangqiCore.Pieces;
 using XiangqiCore.Services.ImageGeneration;
+using XiangqiCore.Services.MoveParsing;
+using XiangqiCore.Services.MoveTransalation;
 using XiangqiCore.Services.PgnGeneration;
 
 namespace XiangqiCore.Game;
@@ -38,7 +39,11 @@ public class XiangqiGame
 		Player blackPlayer,
 		Competition competition,
 		GameResult result,
-		string gameName)
+		string gameName,
+		IMoveTranslationService moveTranslationService,
+		IMoveParsingService moveParsingService,
+		IXiangqiImageGenerationService xiangqiImageGenerationService,
+		IPgnGenerationService pgnGenerationService)
 	{
 		InitialFenString = initialFenString;
 		SideToMove = sideToMove;
@@ -46,6 +51,11 @@ public class XiangqiGame
 		BlackPlayer = blackPlayer;
 		Competition = competition;
 		GameResult = result;
+
+		_moveParsingService = moveParsingService;
+		_moveTranslationService = moveTranslationService;
+		_xiangqiImageGenerationService = xiangqiImageGenerationService;
+		_pgnGenerationService = pgnGenerationService;
 
 		if (string.IsNullOrWhiteSpace(gameName))
 		{
@@ -64,6 +74,11 @@ public class XiangqiGame
 			GameName = gameName;
 		}
 	}
+
+	private readonly IMoveTranslationService _moveTranslationService;
+	private readonly IMoveParsingService _moveParsingService;
+	private readonly IXiangqiImageGenerationService _xiangqiImageGenerationService;
+	private readonly IPgnGenerationService _pgnGenerationService;
 
 	/// <summary>
 	/// Gets the initial FEN string when the game is first created.
@@ -159,6 +174,10 @@ public class XiangqiGame
 		Player redPlayer,
 		Player blackPlayer,
 		Competition competition,
+		IMoveTranslationService moveTranslationService,
+		IMoveParsingService moveParsingService,
+		IXiangqiImageGenerationService xiangqiImageGenerationService,
+		IPgnGenerationService pgnGenerationService,
 		bool useBoardConfig = false,
 		BoardConfig? boardConfig = null,
 		GameResult gameResult = GameResult.Unknown,
@@ -179,7 +198,11 @@ public class XiangqiGame
 			blackPlayer,
 			competition,
 			gameResult,
-			gameName)
+			gameName,
+			moveTranslationService,
+			moveParsingService,
+			xiangqiImageGenerationService,
+			pgnGenerationService)
 		{
 			Board = useBoardConfig ? new Board(boardConfig!) : new Board(initialFenString),
 			RoundNumber = FenHelper.GetRoundNumber(initialFenString),
@@ -231,8 +254,7 @@ public class XiangqiGame
 	{
 		try
 		{
-			INotationParser parser = NotationParserFactory.GetParser(moveNotationType);
-			ParsedMoveObject parsedMoveObject = parser.Parse(moveNotation);
+			ParsedMoveObject parsedMoveObject = _moveParsingService.ParseMove(moveNotation, moveNotationType);
 
 			MoveHistoryObject moveHistoryObject = Board.MakeMove(parsedMoveObject, SideToMove);
 			moveHistoryObject.UpdateMoveNotation(moveNotation, moveNotationType);
@@ -262,7 +284,7 @@ public class XiangqiGame
 				{
 					moveHistoryItem.RoundNumber,
 					moveHistoryItem.MovingSide,
-					MoveNotation = moveHistoryItem.TranslateTo(targetNotationType)
+					MoveNotation = _moveTranslationService.TranslateMove(moveHistoryItem, targetNotationType)
 				})
 			.GroupBy(moveHistoryItem => moveHistoryItem.RoundNumber)
 			.OrderBy(roundGroup => roundGroup.Key);
@@ -286,36 +308,28 @@ public class XiangqiGame
 	/// Exports the game as PGN (Portable Game Notation) format with your own PgnGenerationService injection.
 	/// </summary>
 	/// <returns>The PGN string of the game</returns>
-	public string GeneratePgn(
-		IPgnGenerationService? pgnGenerationService = null, 
-		MoveNotationType moveNotationType = MoveNotationType.TraditionalChinese)
+	public string GeneratePgn(MoveNotationType moveNotationType = MoveNotationType.TraditionalChinese)
 	{
-		pgnGenerationService ??= new DefaultPgnGenerationService();
-
-		return pgnGenerationService.GeneratePgnString(this, moveNotationType);
+		return _pgnGenerationService.GeneratePgnString(this, moveNotationType);
 	}
 
 	public void SavePgnToFile(
 		string filePath, 
-		IPgnGenerationService? pgnGenerationService = null, 
 		MoveNotationType moveNotationType = MoveNotationType.TraditionalChinese)
 	{
 		string preparedFilePath = FilePathHelper.PrepareFilePath(filePath, "pgn", GameName);
-		pgnGenerationService ??= new DefaultPgnGenerationService();
 
-		pgnGenerationService.SavePgnToFile(preparedFilePath, this, moveNotationType);
+		_pgnGenerationService.SavePgnToFile(preparedFilePath, this, moveNotationType);
 	}
 
 	public async Task SavePgnToFileAsync(
 		string filePath,
-		IPgnGenerationService? pgnGenerationService = null, 
 		MoveNotationType moveNotationType = MoveNotationType.TraditionalChinese,
 		CancellationToken cancellationToken = default)
 	{
 		string preparedFilePath = FilePathHelper.PrepareFilePath(filePath, "pgn", GameName);
-		pgnGenerationService ??= new DefaultPgnGenerationService();
 
-		await pgnGenerationService.SavePgnToFileAsync(
+		await _pgnGenerationService.SavePgnToFileAsync(
 			preparedFilePath, 
 			this, 
 			moveNotationType, 
@@ -323,19 +337,17 @@ public class XiangqiGame
 	}
 
 	public void SaveImageToFile(
-		string filePath, IXiangqiImageGenerationService? imageGenerationSerivce = null,  ImageConfig? config = null)
+		string filePath, ImageConfig? config = null)
 	{
 		config ??= new ImageConfig();
-		imageGenerationSerivce ??= new DefaultXiangqiImageGenerationService();
 
 		string preparedFilePath = FilePathHelper.PrepareFilePath(filePath, "jpg", GameName);
 		string targetFen = config.MoveNumber == 0 ? InitialFenString : MoveHistory[config.MoveNumber].FenAfterMove;
 
-		imageGenerationSerivce.GenerateImage(preparedFilePath, targetFen, config);
+		_xiangqiImageGenerationService.GenerateImage(preparedFilePath, targetFen, config);
 	}
 
 	public async Task SaveImageToFileAsync(
-		IXiangqiImageGenerationService imageGenerationService,
 		string filePath, 
 		ImageConfig? config = null,
 		CancellationToken cancellationToken = default)
@@ -345,29 +357,28 @@ public class XiangqiGame
 		string preparedFilePath = FilePathHelper.PrepareFilePath(filePath, "jpg", GameName);
 		string targetFen = config.MoveNumber == 0 ? InitialFenString : MoveHistory[config.MoveNumber].FenAfterMove;
 
-		await imageGenerationService.GenerateImageAsync(
+		await _xiangqiImageGenerationService.GenerateImageAsync(
 			preparedFilePath, 
 			targetFen, 
 			config, 
 			cancellationToken);
 	}
 
-	public void SaveGifToFile(IXiangqiImageGenerationService imageGenerationService, string filePath, ImageConfig? config = null)
+	public void SaveGifToFile(string filePath, ImageConfig? config = null)
 	{
 		string preparedFilePath = FilePathHelper.PrepareFilePath(filePath, "gif", GameName);
 
-		imageGenerationService.GenerateGif(preparedFilePath, MoveHistory.ToList(), config);
+		_xiangqiImageGenerationService.GenerateGif(preparedFilePath, MoveHistory.ToList(), config);
 	}
 
 	public async Task SaveGifToFileAsync(
-		IXiangqiImageGenerationService imageGenerationService, 
 		string filePath,
 		ImageConfig? config = null,
 		CancellationToken cancellationToken = default)
 	{
 		string preparedFilePath = FilePathHelper.PrepareFilePath(filePath, "gif", GameName);
 
-		await imageGenerationService.GenerateGifAsync(
+		await _xiangqiImageGenerationService.GenerateGifAsync(
 			preparedFilePath, 
 			MoveHistory.ToList(), 
 			config,
@@ -411,7 +422,7 @@ public class XiangqiGame
 
 	private void SaveMoveRecordToHistory(string moveRecord, MoveNotationType moveNotationType)
 	{
-		List<string> moves = GameRecordParser.Parse(moveRecord);
+		List<string> moves = _moveParsingService.ParseGameRecord(moveRecord);
 
 		foreach (string move in moves)
 		{

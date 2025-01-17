@@ -3,6 +3,7 @@ using XiangqiCore.Extension;
 using XiangqiCore.Game;
 using XiangqiCore.Misc;
 using XiangqiCore.Move;
+using XiangqiCore.Services.MoveParsing;
 
 namespace XiangqiCore.Services.PgnGeneration;
 
@@ -41,7 +42,9 @@ public class DefaultPgnGenerationService : IPgnGenerationService
 		await fileStream.WriteAsync(pgnBytes, cancellationToken);
 	}
 
-	public string GeneratePgnString(XiangqiGame game, MoveNotationType moveNotationType = MoveNotationType.TraditionalChinese)
+	public string GeneratePgnString(
+		XiangqiGame game, 
+		MoveNotationType moveNotationType = MoveNotationType.TraditionalChinese)
 	{
 		StringBuilder pgnStringBuilder = new();
 
