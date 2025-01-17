@@ -33,9 +33,9 @@ public class XiangqiBuilder : IXiangqiBuilder
 	private string _moveRecord { get; set; } = "";
 	private MoveNotationType _moveNotationType { get; set; } = MoveNotationType.TraditionalChinese;
 
-	private IMoveTranslationService _moveTranslationService { get; set; } = new DefaultMoveTransalationService();
+	private IMoveTranslationService _moveTranslationService { get; set; } = new DefaultMoveTranslationService();
 
-	private IMoveParsingService _moveParsingService { get; set; } = new DefaultMoveParingService();
+	private IMoveParsingService _moveParsingService { get; set; } = new DefaultMoveParsingService();
 
 	private IPgnGenerationService _pgnGenerationService { get; set; } = new DefaultPgnGenerationService();
 

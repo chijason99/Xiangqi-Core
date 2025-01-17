@@ -5,14 +5,14 @@ using XiangqiCore.Move.NotationParsers.Implementations;
 
 namespace XiangqiCore.Services.MoveParsing;
 
-public partial class DefaultMoveParingService : IMoveParsingService
+public partial class DefaultMoveParsingService : IMoveParsingService
 {
 	private readonly TraditionalChineseNotationParser _traitionalChineseNotationParser;
 	private readonly SimplifiedChineseNotationParser _simplifiedChineseNotationParser;
 	private readonly EnglishNotationParser _englishNotationParser;
 	private readonly UcciNotationParser _ucciNotationParser;
 
-	public DefaultMoveParingService()
+	public DefaultMoveParsingService()
 	{
 		_traitionalChineseNotationParser = new();
 		_simplifiedChineseNotationParser = new();

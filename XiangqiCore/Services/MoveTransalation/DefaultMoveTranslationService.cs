@@ -4,14 +4,14 @@ using XiangqiCore.Move.NotationTranslators.Implementations;
 
 namespace XiangqiCore.Services.MoveTransalation;
 
-public class DefaultMoveTransalationService : IMoveTranslationService
+public class DefaultMoveTranslationService : IMoveTranslationService
 {
 	private readonly TraditionalChineseNotationTranslator _traitionalChineseNotationTranslator;
 	private readonly SimplifiedChineseNotationTranslator _simplifiedChineseNotationTranslator;
 	private readonly EnglishNotationTranslator _englishNotationTranslator;
 	private readonly UcciNotationTranslator _ucciNotationTranslator;
 
-	public DefaultMoveTransalationService()
+	public DefaultMoveTranslationService()
 	{
 		_traitionalChineseNotationTranslator = new();
 		_simplifiedChineseNotationTranslator = new();
