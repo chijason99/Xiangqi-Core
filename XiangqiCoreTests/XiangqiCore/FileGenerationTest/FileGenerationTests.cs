@@ -1,21 +1,12 @@
-﻿using Moq;
-using System.Collections.Concurrent;
+﻿using System.Collections.Concurrent;
 using System.Text;
 using XiangqiCore.Game;
 using XiangqiCore.Misc.Images;
-using XiangqiCore.Move.MoveObjects;
-using XiangqiCore.Services.ImageGeneration;
-using XiangqiCore.Services.PgnGeneration;
 
 namespace xiangqi_core_test.XiangqiCore.FileGenerationTest;
 
 public static class FileGenerationTests
 {
-	internal static IXiangqiImageGenerationService GetDefaultImageGenerationService()
-		=> new DefaultXiangqiImageGenerationService();
-
-	internal static IPgnGenerationService GetDefaultPgnGenerationService() => new DefaultPgnGenerationService();
-
 	internal static string CreateTempDirectory(string folderName)
 	{
 		string tempDirectory = Path.Combine(Path.GetTempPath(), folderName);
@@ -38,8 +29,6 @@ public static class FileGenerationTests
 
 		string csvFilePath = Path.Combine(tempDirectory, $"{gameName}.csv");
 		ConcurrentBag<string> fens = [];
-
-		IXiangqiImageGenerationService imageGenerationService = GetDefaultImageGenerationService();
 
 		try
 		{
