@@ -22,6 +22,4 @@ public record ImageConfig
 
 	// The move number to generate the image for
 	public int MoveNumber { get; set; } = 0;
-
-	public static ImageConfig Default => new();
 }
