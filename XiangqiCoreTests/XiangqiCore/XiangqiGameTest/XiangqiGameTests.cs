@@ -4,7 +4,6 @@ using XiangqiCore.Extension;
 using XiangqiCore.Game;
 using XiangqiCore.Misc;
 using XiangqiCore.Move;
-using XiangqiCore.Services.PgnGeneration;
 
 namespace xiangqi_core_test.XiangqiCore.XiangqiGameTest;
 public static class XiangqiGameTests
@@ -29,6 +28,18 @@ public static class XiangqiGameTests
         }
     }
 
+	public static IEnumerable<object []> UndoMoveMethodTestData
+	{
+		get
+		{
+			yield return new object [] { new UndoMoveMethodTestData(
+				"r3kabr1/4a4/4bc2n/p1p1C1p1p/2c6/6P2/P1P1P3P/C1N5B/9/1RBAKA2R w - - 0 0",
+				"\r\n  1. 車一進一  炮３進３    2. 車一平八  車１平４\r\n  3. 炮九進四  車８進６    4. 炮九進三  車４進２\r\n  5. 車八進八  車４退２    6. 炮九平六  車８平５\r\n  7. 仕四進五  車５退３    8. 炮六平四  士５退４\r\n  9. 炮四平六  炮６退１   10. 車八進八",
+				NumberOfMovesToUndo: 3,
+				ExpectedFen: "1R1akCb2/9/4bc2n/2p1r1p1p/9/6P2/P1P5P/2c5B/4A4/1RBAK4 w - - 1 8",
+				ExpectedMoveHistoryCount: 16) };
+		}
+	}
 
 	[Theory]
 	[MemberData(nameof(MoveMethodWithCoordinatesTestData))]
@@ -165,6 +176,33 @@ public static class XiangqiGameTests
 		pgnString.Should().Contain($"[Site \"{venue}\"]");
 		pgnString.Should().Contain($"[Result \"{EnumHelper<GameResult>.GetDisplayName(result)}\"]");
 	}
+
+	[Theory]
+	[MemberData(nameof(UndoMoveMethodTestData))]
+	public static void GameStateShouldBeModifiedCorrectly_WhenCallingUndoMoveMethod(UndoMoveMethodTestData data)
+	{
+		// Arrange
+		XiangqiBuilder builder = new();
+
+		XiangqiGame game = builder
+							.WithStartingFen(data.StartingFen)
+							.WithMoveRecord(data.MoveRecord)
+							.Build();
+
+		// Act
+		game.UndoMove(numberOfMovesToUndo: data.NumberOfMovesToUndo);
+
+		// Assert
+		game.CurrentFen.Should().Be(data.ExpectedFen);
+		game.MoveHistory.Count.Should().Be(data.ExpectedMoveHistoryCount);
+	}
 }
 
 public record MoveMethodTestData(string StartingFen, Coordinate StartingPosition, Coordinate Destination, bool ExpectedResult);
+
+public record UndoMoveMethodTestData(
+	string StartingFen, 
+	string MoveRecord, 
+	int NumberOfMovesToUndo, 
+	string ExpectedFen, 
+	int ExpectedMoveHistoryCount);
