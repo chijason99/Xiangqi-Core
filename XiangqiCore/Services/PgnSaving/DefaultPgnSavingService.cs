@@ -20,7 +20,7 @@ public class DefaultPgnSavingService : IPgnSavingService
 		_pgnGenerationService = new DefaultPgnGenerationService();
 	}
 
-	public void SavePgnToFile(
+	public void Save(
 		string filePath,
 		XiangqiGame game,
 		MoveNotationType moveNotationType = MoveNotationType.TraditionalChinese)
@@ -31,7 +31,7 @@ public class DefaultPgnSavingService : IPgnSavingService
 		FileHelper.WriteBytesToFile(sanitizedFilePath, pgnBytes);
 	}
 
-	public async Task SavePgnToFileAsync(
+	public async Task SaveAsync(
 		string filePath,
 		XiangqiGame game,
 		MoveNotationType moveNotationType = MoveNotationType.TraditionalChinese,

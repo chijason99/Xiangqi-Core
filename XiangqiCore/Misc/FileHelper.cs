@@ -58,4 +58,12 @@ public static class FileHelper
 			throw new IOException($"Failed to write to file {filePath}", ex);
 		}
 	}
+
+	public static string CreateTempDirectory(string folderName)
+	{
+		string tempDirectory = Path.Combine(Path.GetTempPath(), folderName);
+		Directory.CreateDirectory(tempDirectory);
+
+		return tempDirectory;
+	}
 }

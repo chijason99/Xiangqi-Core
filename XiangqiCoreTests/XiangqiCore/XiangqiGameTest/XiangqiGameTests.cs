@@ -98,9 +98,10 @@ public static class XiangqiGameTests
 		}
 
 		int startingRoundNumberCounter = initialMoveRoundNumber;
+		IPgnGenerationService pgnGenerationService = new DefaultPgnGenerationService();
 
 		// Act
-		string pgnGameRecord = game.ExportMoveHistory();
+		string pgnGameRecord = pgnGenerationService.ExportMoveHistory(game);
 
 		// Assert
 		foreach (string move in moves)
@@ -147,8 +148,10 @@ public static class XiangqiGameTests
 			.WithGameResult(result)
 			.Build();
 
+		IPgnGenerationService pgnGenerationService = new DefaultPgnGenerationService();
+
 		// Act
-		string pgnString = game.GeneratePgn();
+		string pgnString = pgnGenerationService.GeneratePgnString(game);
 
 		// Assert
 		pgnString.Should().Contain("[Game \"Chinese Chess\"]");

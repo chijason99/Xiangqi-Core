@@ -1,22 +1,16 @@
 ﻿using XiangqiCore.Game;
+using XiangqiCore.Misc;
+using XiangqiCore.Services.PgnSaving;
 
 namespace xiangqi_core_test.XiangqiCore.FileGenerationTest;
 
-public static class FileGenerationTests
+public static class PgnGenerationTests
 {
-	internal static string CreateTempDirectory(string folderName)
-	{
-		string tempDirectory = Path.Combine(Path.GetTempPath(), folderName);
-		Directory.CreateDirectory(tempDirectory);
-
-		return tempDirectory;
-	}
-	
 	[Fact]
 	public static void GeneratePgn_ShouldCreateFilesCorrectly()
 	{
 		// Arrange
-		string tempDirectory = CreateTempDirectory("XiangqiPgnCreationTests");
+		string tempDirectory = FileHelper.CreateTempDirectory("XiangqiPgnCreationTests");
 
 		try
 		{
@@ -49,9 +43,11 @@ public static class FileGenerationTests
 ")
 				.Build();
 
+			IPgnSavingService pgnSavingService = new DefaultPgnSavingService();
 			string filePath = Path.Combine(tempDirectory, $"{game.GameName}.pgn");
 
-			game.SavePgnToFile(filePath);
+			// Act
+			pgnSavingService.Save(filePath, game);
 
 			// Assert
 			Assert.True(File.Exists(filePath), "PGN file was not created.");
@@ -71,7 +67,7 @@ public static class FileGenerationTests
 	public static async Task GeneratePgnAsync_ShouldCreateFilesCorrectly()
 	{
 		// Arrange
-		string tempDirectory = CreateTempDirectory("XiangqiPgnAsyncCreationTests");
+		string tempDirectory = FileHelper.CreateTempDirectory("XiangqiPgnAsyncCreationTests");
 
 		try
 		{
@@ -96,8 +92,10 @@ public static class FileGenerationTests
 				.Build();
 
 			string filePath = Path.Combine(tempDirectory, $"{game.GameName}.pgn");
+			IPgnSavingService pgnSavingService = new DefaultPgnSavingService();
 
-			await game.SavePgnToFileAsync(filePath, cancellationToken: default);
+			// Act
+			await pgnSavingService.SaveAsync(filePath, game, cancellationToken: default);
 
 			// Assert
 			Assert.True(File.Exists(filePath), "PGN file was not created.");

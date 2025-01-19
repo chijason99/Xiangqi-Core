@@ -11,7 +11,7 @@ public interface IPgnSavingService
 	/// <param name="filePath">Please include the file extension .pgn in the file path provided</param>
 	/// <param name="game"></param>
 	/// <param name="moveNotationType"></param>
-	public void SavePgnToFile(string filePath, XiangqiGame game, MoveNotationType moveNotationType = MoveNotationType.TraditionalChinese);
+	public void Save(string filePath, XiangqiGame game, MoveNotationType moveNotationType = MoveNotationType.TraditionalChinese);
 
 	/// <summary>
 	/// Save the game to a PGN file asynchronously.
@@ -21,5 +21,5 @@ public interface IPgnSavingService
 	/// <param name="moveNotationType"></param>
 	/// <param name="cancellationToken"></param>
 	/// <returns></returns>
-	public Task SavePgnToFileAsync(string filePath, XiangqiGame game, MoveNotationType moveNotationType = MoveNotationType.TraditionalChinese, CancellationToken cancellationToken = default);
+	public Task SaveAsync(string filePath, XiangqiGame game, MoveNotationType moveNotationType = MoveNotationType.TraditionalChinese, CancellationToken cancellationToken = default);
 }
