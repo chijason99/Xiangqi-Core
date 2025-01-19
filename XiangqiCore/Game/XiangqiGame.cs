@@ -250,41 +250,6 @@ public class XiangqiGame
 		}
 	}
 
-	/// <summary>
-	/// Exports the move history in the specified notation type.
-	/// </summary>
-	/// <param name="targetNotationType">The target notation type.</param>
-	/// <returns>The move history in the specified notation type.</returns>
-	public string ExportMoveHistory(MoveNotationType targetNotationType = MoveNotationType.TraditionalChinese)
-	{
-		List<string> movesOfEachRound = [];
-
-		var groupedMoveHitories = _moveHistory
-			.Select(moveHistoryItem =>
-				new
-				{
-					moveHistoryItem.RoundNumber,
-					moveHistoryItem.MovingSide,
-					MoveNotation = _moveTranslationService.TranslateMove(moveHistoryItem, targetNotationType)
-				})
-			.GroupBy(moveHistoryItem => moveHistoryItem.RoundNumber)
-			.OrderBy(roundGroup => roundGroup.Key);
-
-		foreach (var roundGroup in groupedMoveHitories)
-		{
-			StringBuilder roundMoves = new();
-
-			string? moveNotationFromRed = roundGroup.SingleOrDefault(move => move.MovingSide == Side.Red)?.MoveNotation ?? "...";
-			string? moveNotationFromBlack = roundGroup.SingleOrDefault(move => move.MovingSide == Side.Black)?.MoveNotation;
-
-			roundMoves.Append($"{roundGroup.Key}. {moveNotationFromRed}  {moveNotationFromBlack}");
-
-			movesOfEachRound.Add(roundMoves.ToString());
-		};
-
-		return string.Join("\n", movesOfEachRound);
-	}
-
 	private void IncrementRoundNumberIfNeeded()
 	{
 		if (SideToMove == Side.Red && (MoveHistory.Count != 0 || RoundNumber != 1))

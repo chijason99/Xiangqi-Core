@@ -3,11 +3,24 @@ using XiangqiCore.Extension;
 using XiangqiCore.Game;
 using XiangqiCore.Misc;
 using XiangqiCore.Move;
+using XiangqiCore.Services.MoveTransalation;
 
 namespace XiangqiCore.Services.PgnGeneration;
 
 public class DefaultPgnGenerationService : IPgnGenerationService
 {
+	private readonly IMoveTranslationService _moveTranslationService;
+
+	public DefaultPgnGenerationService(IMoveTranslationService moveTranslationService)
+	{
+		_moveTranslationService = moveTranslationService;
+	}
+
+	public DefaultPgnGenerationService()
+	{
+		_moveTranslationService = new DefaultMoveTranslationService();
+	}
+
 	public byte[] GeneratePgn(XiangqiGame game, MoveNotationType moveNotationType = MoveNotationType.TraditionalChinese)
 	{
 		Encoding gb2312Encoding = CodePagesEncodingProvider.Instance.GetEncoding(936) ?? Encoding.UTF8;
@@ -33,10 +46,40 @@ public class DefaultPgnGenerationService : IPgnGenerationService
 		pgnStringBuilder.AppendLine(CreatePgnTag(PgnTagType.Result, game.GameResultString));
 		pgnStringBuilder.AppendLine(CreatePgnTag(PgnTagType.FEN, game.InitialFenString));
 
-		string moveHistory = game.ExportMoveHistory(moveNotationType);
+		string moveHistory = ExportMoveHistory(game, moveNotationType);
 		pgnStringBuilder.AppendLine(moveHistory);
 
 		return pgnStringBuilder.ToString();
+	}
+
+	public string ExportMoveHistory(XiangqiGame game, MoveNotationType targetNotationType = MoveNotationType.TraditionalChinese)
+	{
+		List<string> movesOfEachRound = [];
+
+		var groupedMoveHitories = game.MoveHistory
+			.Select(moveHistoryItem =>
+				new
+				{
+					moveHistoryItem.RoundNumber,
+					moveHistoryItem.MovingSide,
+					MoveNotation = _moveTranslationService.TranslateMove(moveHistoryItem, targetNotationType)
+				})
+			.GroupBy(moveHistoryItem => moveHistoryItem.RoundNumber)
+			.OrderBy(roundGroup => roundGroup.Key);
+
+		foreach (var roundGroup in groupedMoveHitories)
+		{
+			StringBuilder roundMoves = new();
+
+			string? moveNotationFromRed = roundGroup.SingleOrDefault(move => move.MovingSide == Side.Red)?.MoveNotation ?? "...";
+			string? moveNotationFromBlack = roundGroup.SingleOrDefault(move => move.MovingSide == Side.Black)?.MoveNotation;
+
+			roundMoves.Append($"{roundGroup.Key}. {moveNotationFromRed}  {moveNotationFromBlack}");
+
+			movesOfEachRound.Add(roundMoves.ToString());
+		};
+
+		return string.Join("\n", movesOfEachRound);
 	}
 
 	private string CreatePgnTag(PgnTagType pgnTagKey, string pgnTagValue)

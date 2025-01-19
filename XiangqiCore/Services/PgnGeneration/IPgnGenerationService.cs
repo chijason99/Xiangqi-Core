@@ -20,4 +20,12 @@ public interface IPgnGenerationService
 	/// <param name="moveNotationType"></param>
 	/// <returns></returns>
 	public string GeneratePgnString(XiangqiGame game, MoveNotationType moveNotationType = MoveNotationType.TraditionalChinese);
+
+	/// <summary>
+	/// Export the move history of the game.
+	/// </summary>
+	/// <param name="game"></param>
+	/// <param name="targetNotationType"></param>
+	/// <returns></returns>
+	public string ExportMoveHistory(XiangqiGame game, MoveNotationType targetNotationType = MoveNotationType.TraditionalChinese);
 }
