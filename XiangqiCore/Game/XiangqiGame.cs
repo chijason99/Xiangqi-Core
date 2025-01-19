@@ -4,7 +4,6 @@ using XiangqiCore.Boards;
 using XiangqiCore.Exceptions;
 using XiangqiCore.Extension;
 using XiangqiCore.Misc;
-using XiangqiCore.Misc.Images;
 using XiangqiCore.Move;
 using XiangqiCore.Move.MoveObject;
 using XiangqiCore.Move.MoveObjects;
@@ -284,38 +283,6 @@ public class XiangqiGame
 		};
 
 		return string.Join("\n", movesOfEachRound);
-	}
-
-	/// <summary>
-	/// Exports the game as PGN (Portable Game Notation) format with your own PgnGenerationService injection.
-	/// </summary>
-	/// <returns>The PGN string of the game</returns>
-	public string GeneratePgn(MoveNotationType moveNotationType = MoveNotationType.TraditionalChinese)
-	{
-		return _pgnGenerationService.GeneratePgnString(this, moveNotationType);
-	}
-
-	public void SavePgnToFile(
-		string filePath, 
-		MoveNotationType moveNotationType = MoveNotationType.TraditionalChinese)
-	{
-		string preparedFilePath = FileHelper.PrepareFilePath(filePath, "pgn", GameName);
-
-		_pgnGenerationService.SavePgnToFile(preparedFilePath, this, moveNotationType);
-	}
-
-	public async Task SavePgnToFileAsync(
-		string filePath,
-		MoveNotationType moveNotationType = MoveNotationType.TraditionalChinese,
-		CancellationToken cancellationToken = default)
-	{
-		string preparedFilePath = FileHelper.PrepareFilePath(filePath, "pgn", GameName);
-
-		await _pgnGenerationService.SavePgnToFileAsync(
-			preparedFilePath, 
-			this, 
-			moveNotationType, 
-			cancellationToken);
 	}
 
 	private void IncrementRoundNumberIfNeeded()

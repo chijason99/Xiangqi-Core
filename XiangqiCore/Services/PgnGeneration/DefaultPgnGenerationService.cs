@@ -3,43 +3,17 @@ using XiangqiCore.Extension;
 using XiangqiCore.Game;
 using XiangqiCore.Misc;
 using XiangqiCore.Move;
-using XiangqiCore.Services.MoveParsing;
 
 namespace XiangqiCore.Services.PgnGeneration;
 
 public class DefaultPgnGenerationService : IPgnGenerationService
 {
-	public void SavePgnToFile(
-		string filePath, 
-		XiangqiGame game, 
-		MoveNotationType moveNotationType = MoveNotationType.TraditionalChinese)
+	public byte[] GeneratePgn(XiangqiGame game, MoveNotationType moveNotationType = MoveNotationType.TraditionalChinese)
 	{
 		Encoding gb2312Encoding = CodePagesEncodingProvider.Instance.GetEncoding(936) ?? Encoding.UTF8;
 		string pgnString = GeneratePgnString(game, moveNotationType);
 
-		byte[] pgnBytes = gb2312Encoding.GetBytes(pgnString);
-
-		using FileStream fileStream = new(filePath, FileMode.Create, FileAccess.Write);
-		using StreamWriter streamWriter = new(fileStream);
-
-		fileStream.Write(pgnBytes);
-	}
-
-	public async Task SavePgnToFileAsync(
-		string filePath, 
-		XiangqiGame game, 
-		MoveNotationType moveNotationType = MoveNotationType.TraditionalChinese, 
-		CancellationToken cancellationToken = default)
-	{
-		Encoding gb2312Encoding = CodePagesEncodingProvider.Instance.GetEncoding(936) ?? Encoding.UTF8;
-		string pgnString = GeneratePgnString(game, moveNotationType);
-
-		byte[] pgnBytes = gb2312Encoding.GetBytes(pgnString);
-
-		using FileStream fileStream = new(filePath, FileMode.Create, FileAccess.Write);
-		using StreamWriter streamWriter = new(fileStream);
-
-		await fileStream.WriteAsync(pgnBytes, cancellationToken);
+		return gb2312Encoding.GetBytes(pgnString);
 	}
 
 	public string GeneratePgnString(
