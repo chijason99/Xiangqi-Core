@@ -76,5 +76,5 @@ public class DefaultGifSavingService : IGifSavingService
 	}
 
 	private string PrepareFilePath(string filePath)
-		=> FileHelper.PrepareFilePath(filePath, ".gif", defaultFileName: DEFAULT_FILE_NAME);
+		=> FileHelper.PrepareFilePath(filePath, "gif", defaultFileName: DEFAULT_FILE_NAME);
 }

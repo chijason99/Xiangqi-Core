@@ -94,5 +94,5 @@ public class DefaultImageSavingService : IImageSavingService
 	}
 
 	private string PrepareFilePath(string filePath)
-		=> FileHelper.PrepareFilePath(filePath, ".jpg", defaultFileName: DEFAULT_FILE_NAME);
+		=> FileHelper.PrepareFilePath(filePath, "jpg", defaultFileName: DEFAULT_FILE_NAME);
 }
