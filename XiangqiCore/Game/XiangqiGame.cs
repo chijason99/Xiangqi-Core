@@ -39,11 +39,7 @@ public class XiangqiGame
 		Player blackPlayer,
 		Competition competition,
 		GameResult result,
-		string gameName,
-		IMoveTranslationService moveTranslationService,
-		IMoveParsingService moveParsingService,
-		IXiangqiImageGenerationService xiangqiImageGenerationService,
-		IPgnGenerationService pgnGenerationService)
+		string gameName)
 	{
 		InitialFenString = initialFenString;
 		SideToMove = sideToMove;
@@ -51,11 +47,6 @@ public class XiangqiGame
 		BlackPlayer = blackPlayer;
 		Competition = competition;
 		GameResult = result;
-
-		_moveParsingService = moveParsingService;
-		_moveTranslationService = moveTranslationService;
-		_xiangqiImageGenerationService = xiangqiImageGenerationService;
-		_pgnGenerationService = pgnGenerationService;
 
 		if (string.IsNullOrWhiteSpace(gameName))
 		{
@@ -74,11 +65,6 @@ public class XiangqiGame
 			GameName = gameName;
 		}
 	}
-
-	private readonly IMoveTranslationService _moveTranslationService;
-	private readonly IMoveParsingService _moveParsingService;
-	private readonly IXiangqiImageGenerationService _xiangqiImageGenerationService;
-	private readonly IPgnGenerationService _pgnGenerationService;
 
 	/// <summary>
 	/// Gets the initial FEN string when the game is first created.
@@ -176,7 +162,7 @@ public class XiangqiGame
 		Competition competition,
 		IMoveTranslationService moveTranslationService,
 		IMoveParsingService moveParsingService,
-		IXiangqiImageGenerationService xiangqiImageGenerationService,
+		IImageGenerationService xiangqiImageGenerationService,
 		IPgnGenerationService pgnGenerationService,
 		bool useBoardConfig = false,
 		BoardConfig? boardConfig = null,
@@ -198,11 +184,7 @@ public class XiangqiGame
 			blackPlayer,
 			competition,
 			gameResult,
-			gameName,
-			moveTranslationService,
-			moveParsingService,
-			xiangqiImageGenerationService,
-			pgnGenerationService)
+			gameName)
 		{
 			Board = useBoardConfig ? new Board(boardConfig!) : new Board(initialFenString),
 			RoundNumber = FenHelper.GetRoundNumber(initialFenString),

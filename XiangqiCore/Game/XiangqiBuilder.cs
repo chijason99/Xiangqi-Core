@@ -39,7 +39,7 @@ public class XiangqiBuilder : IXiangqiBuilder
 
 	private IPgnGenerationService _pgnGenerationService { get; set; } = new DefaultPgnGenerationService();
 
-	private IXiangqiImageGenerationService _imageGenerationService { get; set; } = new DefaultXiangqiImageGenerationService();
+	private IImageGenerationService _imageGenerationService { get; set; } = new DefaultImageGenerationService();
 
 
 	private string _gameName { get; set; } = "";
@@ -133,7 +133,7 @@ public class XiangqiBuilder : IXiangqiBuilder
 	/// </summary>
 	/// <param name="imageGenerationService"></param>
 	/// <returns></returns>
-	public XiangqiBuilder WithImageGenerationService(IXiangqiImageGenerationService imageGenerationService)
+	public XiangqiBuilder WithImageGenerationService(IImageGenerationService imageGenerationService)
 	{
 		_imageGenerationService = imageGenerationService;
 		return this;

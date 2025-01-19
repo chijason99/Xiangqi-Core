@@ -1,0 +1,17 @@
+﻿using XiangqiCore.Misc.Images;
+using XiangqiCore.Move.MoveObjects;
+using XiangqiCore.Pieces;
+
+namespace XiangqiCore.Services.ImageGeneration;
+
+public interface IImageGenerationService
+{
+	public byte[] GenerateImage(string fen, ImageConfig? imageConfig = null);
+	public Task<byte[]> GenerateImageAsync(string fen, ImageConfig? imageConfig = null, CancellationToken cancellationToken = default);
+
+	public byte[] GenerateImage(MoveHistoryObject moveHistoryObject, ImageConfig? imageConfig = null);
+	public Task<byte[]> GenerateImageAsync(MoveHistoryObject moveHistoryObject, ImageConfig? imageConfig = null, CancellationToken cancellationToken = default));
+
+	public byte[] GenerateImage(Piece[,] position, ImageConfig? imageConfig = null);
+	public Task<byte[]> GenerateImageAsync(Piece[,] position, ImageConfig? imageConfig = null, CancellationToken cancellationToken = default));
+}

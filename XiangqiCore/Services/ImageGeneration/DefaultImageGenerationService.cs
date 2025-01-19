@@ -3,6 +3,7 @@ using SixLabors.ImageSharp.Formats.Gif;
 using SixLabors.ImageSharp.Formats.Png;
 using SixLabors.ImageSharp.PixelFormats;
 using SixLabors.ImageSharp.Processing;
+using XiangqiCore.Game;
 using XiangqiCore.Misc;
 using XiangqiCore.Misc.Images;
 using XiangqiCore.Misc.Images.Interfaces;
@@ -12,15 +13,15 @@ using XiangqiCore.Pieces.PieceTypes;
 
 namespace XiangqiCore.Services.ImageGeneration;
 
-public class DefaultXiangqiImageGenerationService : IXiangqiImageGenerationService
+public class DefaultImageGenerationService : IImageGenerationService
 {
-	public DefaultXiangqiImageGenerationService()
+	public DefaultImageGenerationService()
 	{
 		_imageResourcePathManager = new DefaultImageResourcePathManager();
 		_imageCache = new ImageCache();
 	}
 
-	public DefaultXiangqiImageGenerationService(
+	public DefaultImageGenerationService(
 		IImageResourcePathManager imageResourcePathManager,
 		ImageCache imageCache)
 	{
@@ -31,7 +32,7 @@ public class DefaultXiangqiImageGenerationService : IXiangqiImageGenerationServi
 	private readonly IImageResourcePathManager _imageResourcePathManager;
 	private readonly ImageCache _imageCache;
 
-	public void GenerateGif(string filePath, List<MoveHistoryObject> moveHistory, ImageConfig? imageConfig = null)
+	public void SaveGifToFile(string filePath, List<MoveHistoryObject> moveHistory, ImageConfig? imageConfig = null)
 	{
 		Image<Rgba32> gif = GenerateGifCore(moveHistory: moveHistory);
 
@@ -49,7 +50,7 @@ public class DefaultXiangqiImageGenerationService : IXiangqiImageGenerationServi
 		}
 	}
 
-	public async Task GenerateGifAsync(
+	public async Task SaveGifToFileAsync(
 		string filePath, 
 		List<MoveHistoryObject> moveHistory,
 		ImageConfig? imageConfig = null,
@@ -71,7 +72,7 @@ public class DefaultXiangqiImageGenerationService : IXiangqiImageGenerationServi
 		}
 	}
 
-	public void GenerateGif(string filePath, IEnumerable<string> fens, ImageConfig? imageConfig = null)
+	public void SaveGifToFile(string filePath, IEnumerable<string> fens, ImageConfig? imageConfig = null)
 	{
 		Image<Rgba32> gif = GenerateGifCore(fens: fens);
 
@@ -89,7 +90,7 @@ public class DefaultXiangqiImageGenerationService : IXiangqiImageGenerationServi
 		}
 	}
 
-	public async Task GenerateGifAsync(
+	public async Task SaveGifToFileAsync(
 		string filePath, 
 		IEnumerable<string> fens,
 		ImageConfig? imageConfig = null,
@@ -111,27 +112,18 @@ public class DefaultXiangqiImageGenerationService : IXiangqiImageGenerationServi
 		}
 	}
 
-	public void GenerateImage(string filePath, string fen, ImageConfig? imageConfig = null)
+	public void SaveImageToFile(string filePath, string fen, ImageConfig? imageConfig = null)
 	{
-		Image<Rgba32> image = GenerateImageCore(fen);
+		using Image<Rgba32> image = GenerateImageCore(fen);
 
 		image.Save(filePath);
 	}
 
-	public async Task GenerateImageAsync(string filePath, string fen, ImageConfig? imageConfig = null, CancellationToken cancellationToken = default)
+	public async Task SaveImageToFileAsync(string filePath, string fen, ImageConfig? imageConfig = null, CancellationToken cancellationToken = default)
 	{
-		Image<Rgba32> image = GenerateImageCore(fen);
+		using Image<Rgba32> image = GenerateImageCore(fen);
 
 		await image.SaveAsync(filePath, cancellationToken);
-	}
-
-	private Image<Rgba32> GenerateImageCore(string fen)
-	{
-		Piece[,] position = FenHelper.CreatePositionFromFen(fen);
-
-		byte[] bytes = GenerateBoardImage(position);
-
-		return Image.Load<Rgba32>(bytes);
 	}
 
 	private Image<Rgba32> GenerateGifCore(IEnumerable<string>? fens = null, List<MoveHistoryObject>? moveHistory = null, ImageConfig? imageConfig = null)
@@ -172,7 +164,7 @@ public class DefaultXiangqiImageGenerationService : IXiangqiImageGenerationServi
 
 			Piece[,] position = FenHelper.CreatePositionFromFen(fen);
 
-			byte[] imageBytes = GenerateBoardImage(
+			byte[] imageBytes = Ge(
 				position,
 				previousPosition: previousPosition,
 				currentPosition: currentPosition);
@@ -190,13 +182,13 @@ public class DefaultXiangqiImageGenerationService : IXiangqiImageGenerationServi
 		return gif;
 	}
 
-	public byte[] GenerateBoardImage(Piece[,] position, Coordinate? previousPosition = null, Coordinate? currentPosition = null, ImageConfig? imageConfig = null)
+	private Image<Rgba32> GenerateBoardImageCore(Piece[,] position, Coordinate? previousPosition = null, Coordinate? currentPosition = null, ImageConfig? imageConfig = null)
 	{
 		PreloadImages();
 
 		imageConfig ??= new();
 
-		using Image<Rgba32> boardImage = _imageCache.GetImage(_imageResourcePathManager.GetBoardResourcePath());
+		Image<Rgba32> boardImage = _imageCache.GetImage(_imageResourcePathManager.GetBoardResourcePath());
 
 		boardImage.Mutate(x => x.Resize(ImageConfig.DefaultBoardWidth, ImageConfig.DefaultBoardHeight));
 
@@ -234,10 +226,7 @@ public class DefaultXiangqiImageGenerationService : IXiangqiImageGenerationServi
 			}
 		}
 
-		using MemoryStream memoryStream = new();
-		boardImage.Save(memoryStream, new PngEncoder());
-
-		return memoryStream.ToArray();
+		return boardImage;
 	}
 
 	private void PreloadImages()
@@ -287,5 +276,39 @@ public class DefaultXiangqiImageGenerationService : IXiangqiImageGenerationServi
 		}
 
 		return (xCoordinate, yCoordinate);
+	}
+
+	public byte[] GenerateImage(string fen, ImageConfig? imageConfig = null)
+	{
+		Piece[,] position = FenHelper.CreatePositionFromFen(fen);
+
+		using Image<Rgba32> image = GenerateBoardImageCore(position);
+		using MemoryStream memoryStream = new();
+
+		image.Save(memoryStream, new PngEncoder());
+
+		return memoryStream.ToArray();
+	}
+
+	public async Task<byte[]> GenerateImageAsync(string fen, ImageConfig? imageConfig = null, CancellationToken cancellationToken = default)
+	{
+		Piece[,] position = FenHelper.CreatePositionFromFen(fen);
+
+		using Image<Rgba32> image = GenerateBoardImageCore(position);
+		using MemoryStream memoryStream = new();
+
+		await image.SaveAsync(memoryStream, new PngEncoder());
+
+		return memoryStream.ToArray();
+	}
+
+	public void SaveGifToFile(string filePath, XiangqiGame game, ImageConfig? imageConfig = null)
+	{
+		throw new NotImplementedException();
+	}
+
+	public Task SaveGifToFileAsync(string filePath, XiangqiGame game, ImageConfig? imageConfig = null, CancellationToken cancellationToken = default)
+	{
+		throw new NotImplementedException();
 	}
 }

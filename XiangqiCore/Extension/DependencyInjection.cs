@@ -10,7 +10,7 @@ public static class DependencyInjection
 {
 	public static IServiceCollection AddXiangqiCore(this IServiceCollection services)
 	{
-		services.AddScoped<IXiangqiImageGenerationService, DefaultXiangqiImageGenerationService>();
+		services.AddScoped<IImageGenerationService, DefaultImageGenerationService>();
 		services.AddScoped<IPgnGenerationService, DefaultPgnGenerationService>();
 		services.AddScoped<IMoveParsingService, DefaultMoveParsingService>();
 		services.AddScoped<IMoveTranslationService, DefaultMoveTranslationService>();
@@ -25,7 +25,7 @@ public static class DependencyInjection
 
 		services.AddScoped<IMoveTranslationService>(provider => options.MoveTranslationService ?? new DefaultMoveTranslationService());
 		services.AddScoped<IPgnGenerationService>(provider => options.PgnGenerationService ?? new DefaultPgnGenerationService());
-		services.AddScoped<IXiangqiImageGenerationService>(provider => options.ImageGenerationService ?? new DefaultXiangqiImageGenerationService());
+		services.AddScoped<IImageGenerationService>(provider => options.ImageGenerationService ?? new DefaultImageGenerationService());
 		services.AddScoped<IMoveParsingService>(provider => options.MoveParsingService ?? new DefaultMoveParsingService());
 
 		return services;
@@ -36,6 +36,6 @@ public class XiangqiServiceOptions
 {
 	public IMoveTranslationService? MoveTranslationService { get; set; }
 	public IPgnGenerationService? PgnGenerationService { get; set; }
-	public IXiangqiImageGenerationService? ImageGenerationService { get; set; }
+	public IImageGenerationService? ImageGenerationService { get; set; }
 	public IMoveParsingService? MoveParsingService { get; set; }
 }

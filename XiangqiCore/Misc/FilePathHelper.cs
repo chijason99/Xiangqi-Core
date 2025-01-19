@@ -1,16 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace XiangqiCore.Misc;
+﻿namespace XiangqiCore.Misc;
 
 public static class FilePathHelper
 {
-	public static string PrepareFilePath(string filePath, string fileExtension, string defaultFileName = "Unknown")
+	public static string PrepareFilePath(string filePath, string expectedExtension, string defaultFileName = "Unknown")
 	{
-		ArgumentException.ThrowIfNullOrWhiteSpace(fileExtension, nameof(fileExtension));
+		ArgumentException.ThrowIfNullOrWhiteSpace(expectedExtension, nameof(expectedExtension));
 
 		if (!Path.IsPathFullyQualified(filePath))
 			throw new ArgumentException("The specified file path is not fully qualified.");
@@ -19,13 +13,13 @@ public static class FilePathHelper
 		string fileName = Path.GetFileName(filePath);
 
 		if (string.IsNullOrWhiteSpace(fileName))
-			fileName = $"{defaultFileName}.{fileExtension}";
+			fileName = $"{defaultFileName}.{expectedExtension}";
 		else
 		{
 			string providedExtension = Path.GetExtension(fileName);
 
-			if (!string.Equals(providedExtension, $".{fileExtension}", StringComparison.OrdinalIgnoreCase))
-				throw new ArgumentException($"The file extension '{providedExtension}' does not match the expected extension '.{fileExtension}'.");
+			if (!string.Equals(providedExtension, $".{expectedExtension}", StringComparison.OrdinalIgnoreCase))
+				throw new ArgumentException($"The file extension '{providedExtension}' does not match the expected extension '.{expectedExtension}'.");
 		}
 
 		if (!Directory.Exists(directoryPath))
