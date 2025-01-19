@@ -1,8 +1,5 @@
 ﻿using SixLabors.ImageSharp;
-using SixLabors.ImageSharp.Formats.Gif;
-using SixLabors.ImageSharp.PixelFormats;
 using System.Text;
-using XiangqiCore.Attributes;
 using XiangqiCore.Boards;
 using XiangqiCore.Exceptions;
 using XiangqiCore.Extension;
@@ -11,8 +8,11 @@ using XiangqiCore.Misc.Images;
 using XiangqiCore.Move;
 using XiangqiCore.Move.MoveObject;
 using XiangqiCore.Move.MoveObjects;
-using XiangqiCore.Move.NotationParsers;
 using XiangqiCore.Pieces;
+using XiangqiCore.Services.ImageGeneration;
+using XiangqiCore.Services.MoveParsing;
+using XiangqiCore.Services.MoveTransalation;
+using XiangqiCore.Services.PgnGeneration;
 
 namespace XiangqiCore.Game;
 
@@ -39,7 +39,11 @@ public class XiangqiGame
 		Player blackPlayer,
 		Competition competition,
 		GameResult result,
-		string gameName)
+		string gameName,
+		IMoveTranslationService moveTranslationService,
+		IMoveParsingService moveParsingService,
+		IXiangqiImageGenerationService xiangqiImageGenerationService,
+		IPgnGenerationService pgnGenerationService)
 	{
 		InitialFenString = initialFenString;
 		SideToMove = sideToMove;
@@ -47,6 +51,11 @@ public class XiangqiGame
 		BlackPlayer = blackPlayer;
 		Competition = competition;
 		GameResult = result;
+
+		_moveParsingService = moveParsingService;
+		_moveTranslationService = moveTranslationService;
+		_xiangqiImageGenerationService = xiangqiImageGenerationService;
+		_pgnGenerationService = pgnGenerationService;
 
 		if (string.IsNullOrWhiteSpace(gameName))
 		{
@@ -65,6 +74,11 @@ public class XiangqiGame
 			GameName = gameName;
 		}
 	}
+
+	private readonly IMoveTranslationService _moveTranslationService;
+	private readonly IMoveParsingService _moveParsingService;
+	private readonly IXiangqiImageGenerationService _xiangqiImageGenerationService;
+	private readonly IPgnGenerationService _pgnGenerationService;
 
 	/// <summary>
 	/// Gets the initial FEN string when the game is first created.
@@ -160,6 +174,10 @@ public class XiangqiGame
 		Player redPlayer,
 		Player blackPlayer,
 		Competition competition,
+		IMoveTranslationService moveTranslationService,
+		IMoveParsingService moveParsingService,
+		IXiangqiImageGenerationService xiangqiImageGenerationService,
+		IPgnGenerationService pgnGenerationService,
 		bool useBoardConfig = false,
 		BoardConfig? boardConfig = null,
 		GameResult gameResult = GameResult.Unknown,
@@ -180,7 +198,11 @@ public class XiangqiGame
 			blackPlayer,
 			competition,
 			gameResult,
-			gameName)
+			gameName,
+			moveTranslationService,
+			moveParsingService,
+			xiangqiImageGenerationService,
+			pgnGenerationService)
 		{
 			Board = useBoardConfig ? new Board(boardConfig!) : new Board(initialFenString),
 			RoundNumber = FenHelper.GetRoundNumber(initialFenString),
@@ -232,8 +254,7 @@ public class XiangqiGame
 	{
 		try
 		{
-			INotationParser parser = NotationParserFactory.GetParser(moveNotationType);
-			ParsedMoveObject parsedMoveObject = parser.Parse(moveNotation);
+			ParsedMoveObject parsedMoveObject = _moveParsingService.ParseMove(moveNotation, moveNotationType);
 
 			MoveHistoryObject moveHistoryObject = Board.MakeMove(parsedMoveObject, SideToMove);
 			moveHistoryObject.UpdateMoveNotation(moveNotation, moveNotationType);
@@ -253,7 +274,6 @@ public class XiangqiGame
 	/// </summary>
 	/// <param name="targetNotationType">The target notation type.</param>
 	/// <returns>The move history in the specified notation type.</returns>
-	[BetaMethod("Currently only supports converting MoveNotationType from Chinese/English to UCCI. The translation would not work for Chinese -> English or English -> Chinese")]
 	public string ExportMoveHistory(MoveNotationType targetNotationType = MoveNotationType.TraditionalChinese)
 	{
 		List<string> movesOfEachRound = [];
@@ -264,7 +284,7 @@ public class XiangqiGame
 				{
 					moveHistoryItem.RoundNumber,
 					moveHistoryItem.MovingSide,
-					MoveNotation = moveHistoryItem.TranslateTo(targetNotationType)
+					MoveNotation = _moveTranslationService.TranslateMove(moveHistoryItem, targetNotationType)
 				})
 			.GroupBy(moveHistoryItem => moveHistoryItem.RoundNumber)
 			.OrderBy(roundGroup => roundGroup.Key);
@@ -285,217 +305,84 @@ public class XiangqiGame
 	}
 
 	/// <summary>
-	/// Exports the game as PGN (Portable Game Notation) format.
+	/// Exports the game as PGN (Portable Game Notation) format with your own PgnGenerationService injection.
 	/// </summary>
 	/// <returns>The PGN string of the game</returns>
-	public string ExportGameAsPgnString()
+	public string GeneratePgn(MoveNotationType moveNotationType = MoveNotationType.TraditionalChinese)
 	{
-		StringBuilder pgnBuilder = new();
-
-		AddPgnTag(pgnBuilder, PgnTagType.Game, "Chinese Chess");
-		AddPgnTag(pgnBuilder, PgnTagType.Event, Competition.Name);
-		AddPgnTag(pgnBuilder, PgnTagType.Site, Competition.Location);
-		AddPgnTag(pgnBuilder, PgnTagType.Date, Competition.GameDate?.ToString("yyyy.MM.dd") ?? string.Empty);
-		AddPgnTag(pgnBuilder, PgnTagType.Red, RedPlayer.Name);
-		AddPgnTag(pgnBuilder, PgnTagType.RedTeam, RedPlayer.Team);
-		AddPgnTag(pgnBuilder, PgnTagType.Black, BlackPlayer.Name);
-		AddPgnTag(pgnBuilder, PgnTagType.BlackTeam, BlackPlayer.Team);
-		AddPgnTag(pgnBuilder, PgnTagType.Result, GameResultString);
-		AddPgnTag(pgnBuilder, PgnTagType.FEN, InitialFenString);
-
-		pgnBuilder.AppendLine(ExportMoveHistory());
-
-		return pgnBuilder.ToString();
+		return _pgnGenerationService.GeneratePgnString(this, moveNotationType);
 	}
 
-	private byte[] GeneratePgnFileCore()
-	{
-		Encoding gb2312Encoding = CodePagesEncodingProvider.Instance.GetEncoding(936) ?? Encoding.UTF8;
-
-		string pgnString = ExportGameAsPgnString();
-
-		return gb2312Encoding.GetBytes(pgnString);
-	}
-
-	public void GeneratePgnFile(string filePath)
-	{
-		string preparedFilePath = PrepareFilePath(filePath, "pgn");
-		
-		byte[] pgnBytes = GeneratePgnFileCore();
-
-		using FileStream fileStream = new(preparedFilePath, FileMode.Create, FileAccess.Write);
-		using StreamWriter streamWriter = new(fileStream);
-
-		fileStream.Write(pgnBytes);
-	}
-
-	public async Task GeneratePgnFileAsync(string filePath, CancellationToken cancellationToken = default)
-	{
-		string preparedFilePath = PrepareFilePath(filePath, "pgn");
-
-		byte[] pgnBytes = GeneratePgnFileCore();
-
-		using FileStream fileStream = new(preparedFilePath, FileMode.Create, FileAccess.Write);
-		using StreamWriter streamWriter = new(fileStream);
-		
-		await fileStream.WriteAsync(pgnBytes, cancellationToken);
-	}
-
-	/// <summary>
-	/// Shared logic for generating an image
-	/// </summary>
-	/// <param name="filePath"></param>
-	/// <param name="moveCount"></param>
-	/// <param name="imageConfig"></param>
-	/// <returns></returns>
-	private Image<Rgba32> GenerateImageCore(
-		string filePath,
-		int moveCount = 0,
-		ImageConfig? imageConfig = null)
-	{
-		string targetFen = InitialFenString;
-
-		if (moveCount > 0)
-			targetFen = MoveHistory.Skip(Math.Max(moveCount - 1, 0)).First().FenAfterMove;
-
-		Piece[,] position = FenHelper.CreatePositionFromFen(targetFen);
-
-		byte[] bytes = position.GenerateBoardImage(imageConfig);
-
-		return Image.Load<Rgba32>(bytes);
-	}
-
-	public void GenerateImage(string filePath, int moveCount = 0, ImageConfig? config = null)
-	{
-		string preparedFilePath = PrepareFilePath(filePath, "jpg");
-
-		using Image<Rgba32> image = GenerateImageCore(filePath, moveCount, config);
-
-		image.Save(preparedFilePath);
-	}
-
-	public async Task GenerateImageAsync(
+	public void SavePgnToFile(
 		string filePath, 
-		int moveCount = 0,
-		ImageConfig? config = null,
+		MoveNotationType moveNotationType = MoveNotationType.TraditionalChinese)
+	{
+		string preparedFilePath = FilePathHelper.PrepareFilePath(filePath, "pgn", GameName);
+
+		_pgnGenerationService.SavePgnToFile(preparedFilePath, this, moveNotationType);
+	}
+
+	public async Task SavePgnToFileAsync(
+		string filePath,
+		MoveNotationType moveNotationType = MoveNotationType.TraditionalChinese,
 		CancellationToken cancellationToken = default)
 	{
-		string preparedFilePath = PrepareFilePath(filePath, "jpg");
+		string preparedFilePath = FilePathHelper.PrepareFilePath(filePath, "pgn", GameName);
 
-		using Image<Rgba32> image = GenerateImageCore(filePath, moveCount, config);
-
-		await image.SaveAsync(preparedFilePath, cancellationToken);
+		await _pgnGenerationService.SavePgnToFileAsync(
+			preparedFilePath, 
+			this, 
+			moveNotationType, 
+			cancellationToken);
 	}
 
-	/// <summary>
-	/// Shared Logic for generating GIF
-	/// </summary>
-	/// <param name="filePath"></param>
-	/// <param name="config"></param>
-	/// <param name="frameDelayInSecond"></param>
-	/// <returns></returns>
-	private Image<Rgba32> GenerateGifCore(string filePath,
-		ImageConfig? config = null,
-		decimal frameDelayInSecond = 1)
+	public void SaveImageToFile(
+		string filePath, ImageConfig? config = null)
 	{
 		config ??= new ImageConfig();
 
-		List<string> fens = [InitialFenString, .. MoveHistory.Select(x => x.FenAfterMove)];
+		string preparedFilePath = FilePathHelper.PrepareFilePath(filePath, "jpg", GameName);
+		string targetFen = config.MoveNumber == 0 ? InitialFenString : MoveHistory[config.MoveNumber].FenAfterMove;
 
-		// Note : Will have to dispose the image after use
-		Image<Rgba32> gif = new(width: ImageConfig.DefaultBoardWidth, height: ImageConfig.DefaultBoardHeight);
-		GifMetadata gifMetaData = gif.Metadata.GetGifMetadata();
-
-		// Infinite loop
-		gifMetaData.RepeatCount = 0;
-
-		int frameDelayInCentiSeconds = (int)Math.Ceiling(frameDelayInSecond * 100);
-
-		// Set the delay until the next image is displayed.
-		GifFrameMetadata metadata = gif.Frames.RootFrame.Metadata.GetGifMetadata();
-		metadata.FrameDelay = frameDelayInCentiSeconds;
-
-		for (int i = 0; i < fens.Count; i++)
-		{
-			string fen = fens[i];
-
-			Coordinate? previousPosition = null;
-			Coordinate? currentPosition = null;
-
-			// If the move indicator is enabled and it is not the initial FEN
-			if (config.UseMoveIndicator && i > 0)
-			{
-				previousPosition = MoveHistory[i - 1].StartingPosition;
-				currentPosition = MoveHistory[i - 1].Destination;
-			}
-
-			byte[] imageBytes = FenHelper.CreatePositionFromFen(fen).GenerateBoardImage(
-				config,
-				previousPosition: previousPosition,
-				currentPosition: currentPosition);
-
-			using Image<Rgba32> image = Image.Load<Rgba32>(imageBytes);
-			var frame = image.Frames.CloneFrame(0);
-
-			// Set the delay until the next image is displayed.
-			metadata = image.Frames.RootFrame.Metadata.GetGifMetadata();
-			metadata.FrameDelay = frameDelayInCentiSeconds;
-
-			gif.Frames.AddFrame(image.Frames.RootFrame);
-		}
-
-		return gif;
+		_xiangqiImageGenerationService.GenerateImage(preparedFilePath, targetFen, config);
 	}
 
-	public void GenerateGif(string filePath, 
+	public async Task SaveImageToFileAsync(
+		string filePath, 
 		ImageConfig? config = null,
-		decimal frameDelayInSecond = 1)
-	{
-		string preparedFilePath = PrepareFilePath(filePath, "gif");
-
-		Image<Rgba32> gif = GenerateGifCore(filePath, config, frameDelayInSecond);
-
-		try
-		{
-			gif.SaveAsGif(preparedFilePath);
-		}
-		catch (Exception)
-		{
-			throw;
-		}
-		finally
-		{
-			gif.Dispose();
-		}
-	}
-
-	public async Task GenerateGifAsync(string filePath,
-		ImageConfig? config = null,
-		decimal frameDelayInSecond = 1, 
 		CancellationToken cancellationToken = default)
 	{
-		string preparedFilePath = PrepareFilePath(filePath, "gif");
+		config ??= new ImageConfig();
 
-		Image<Rgba32> gif = GenerateGifCore(filePath, config, frameDelayInSecond);
+		string preparedFilePath = FilePathHelper.PrepareFilePath(filePath, "jpg", GameName);
+		string targetFen = config.MoveNumber == 0 ? InitialFenString : MoveHistory[config.MoveNumber].FenAfterMove;
 
-		try
-		{
-			await gif.SaveAsGifAsync(preparedFilePath, cancellationToken);
-		}
-		catch (Exception)
-		{
-			throw;
-		}
-		finally
-		{
-			gif.Dispose();
-		}
+		await _xiangqiImageGenerationService.GenerateImageAsync(
+			preparedFilePath, 
+			targetFen, 
+			config, 
+			cancellationToken);
 	}
 
-	private void AddPgnTag(StringBuilder pgnBuilder, PgnTagType pgnTagKey, string pgnTagValue)
+	public void SaveGifToFile(string filePath, ImageConfig? config = null)
 	{
-		string pgnTagDisplayName = EnumHelper<PgnTagType>.GetDisplayName(pgnTagKey);
-		pgnBuilder.AppendLine($"[{pgnTagDisplayName} \"{pgnTagValue}\"]");
+		string preparedFilePath = FilePathHelper.PrepareFilePath(filePath, "gif", GameName);
+
+		_xiangqiImageGenerationService.GenerateGif(preparedFilePath, MoveHistory.ToList(), config);
+	}
+
+	public async Task SaveGifToFileAsync(
+		string filePath,
+		ImageConfig? config = null,
+		CancellationToken cancellationToken = default)
+	{
+		string preparedFilePath = FilePathHelper.PrepareFilePath(filePath, "gif", GameName);
+
+		await _xiangqiImageGenerationService.GenerateGifAsync(
+			preparedFilePath, 
+			MoveHistory.ToList(), 
+			config,
+			cancellationToken);
 	}
 
 	private void IncrementRoundNumberIfNeeded()
@@ -535,7 +422,7 @@ public class XiangqiGame
 
 	private void SaveMoveRecordToHistory(string moveRecord, MoveNotationType moveNotationType)
 	{
-		List<string> moves = GameRecordParser.Parse(moveRecord);
+		List<string> moves = _moveParsingService.ParseGameRecord(moveRecord);
 
 		foreach (string move in moves)
 		{
@@ -544,38 +431,5 @@ public class XiangqiGame
 			if (!isSuccessful)
 				break;
 		}
-	}
-
-	private string PrepareFilePath(string filePath, string fileExtension)
-	{
-		ArgumentException.ThrowIfNullOrWhiteSpace(fileExtension, nameof(fileExtension));
-
-		if (!Path.IsPathFullyQualified(filePath))
-			throw new ArgumentException("The specified file path is not fully qualified.");
-
-		string directoryPath = Path.GetDirectoryName(filePath);
-		string fileName = Path.GetFileName(filePath);
-
-		if (string.IsNullOrWhiteSpace(fileName))
-			fileName = $"{GameName}.{fileExtension}";
-		else
-		{
-			string providedExtension = Path.GetExtension(fileName);
-
-			if (!string.Equals(providedExtension, $".{fileExtension}", StringComparison.OrdinalIgnoreCase))
-				throw new ArgumentException($"The file extension '{providedExtension}' does not match the expected extension '.{fileExtension}'.");
-		}
-
-		if (!Directory.Exists(directoryPath))
-			Directory.CreateDirectory(directoryPath);
-
-		char[] invalidFileCharacters = Path.GetInvalidFileNameChars();
-
-		string sanitizedFileName = string.Concat(fileName.Select(character =>
-		{
-			return invalidFileCharacters.Contains(character) ? '_' : character;
-		}));
-
-		return Path.Combine(directoryPath, sanitizedFileName);
 	}
 }

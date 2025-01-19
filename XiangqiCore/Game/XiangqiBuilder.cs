@@ -3,6 +3,10 @@ using XiangqiCore.Attributes;
 using XiangqiCore.Boards;
 using XiangqiCore.Misc;
 using XiangqiCore.Move;
+using XiangqiCore.Services.ImageGeneration;
+using XiangqiCore.Services.MoveParsing;
+using XiangqiCore.Services.MoveTransalation;
+using XiangqiCore.Services.PgnGeneration;
 
 namespace XiangqiCore.Game;
 
@@ -28,6 +32,15 @@ public class XiangqiBuilder : IXiangqiBuilder
 
 	private string _moveRecord { get; set; } = "";
 	private MoveNotationType _moveNotationType { get; set; } = MoveNotationType.TraditionalChinese;
+
+	private IMoveTranslationService _moveTranslationService { get; set; } = new DefaultMoveTranslationService();
+
+	private IMoveParsingService _moveParsingService { get; set; } = new DefaultMoveParsingService();
+
+	private IPgnGenerationService _pgnGenerationService { get; set; } = new DefaultPgnGenerationService();
+
+	private IXiangqiImageGenerationService _imageGenerationService { get; set; } = new DefaultXiangqiImageGenerationService();
+
 
 	private string _gameName { get; set; } = "";
 
@@ -83,21 +96,71 @@ public class XiangqiBuilder : IXiangqiBuilder
 	}
 
 	/// <summary>
+	/// Sets the move parsing service for the Xiangqi game.
+	/// </summary>
+	/// <param name="moveParsingService"></param>
+	/// <returns></returns>
+	public XiangqiBuilder WithMoveParsingService(IMoveParsingService moveParsingService)
+	{
+		_moveParsingService = moveParsingService;
+		return this;
+	}
+
+	/// <summary>
+	/// Sets the move translation service for the Xiangqi game.
+	/// </summary>
+	/// <param name="moveTranslationService"></param>
+	/// <returns></returns>
+	public XiangqiBuilder WithMoveTranslationService(IMoveTranslationService moveTranslationService)
+	{
+		_moveTranslationService = moveTranslationService;
+		return this;
+	}
+
+	/// <summary>
+	/// Sets the PGN generation service for the Xiangqi game.
+	/// </summary>
+	/// <param name="pgnGenerationService"></param>
+	/// <returns></returns>
+	public XiangqiBuilder WithPgnGenerationService(IPgnGenerationService pgnGenerationService)
+	{
+		_pgnGenerationService = pgnGenerationService;
+		return this;
+	}
+
+	/// <summary>
+	/// Sets the image generation service for the Xiangqi game.
+	/// </summary>
+	/// <param name="imageGenerationService"></param>
+	/// <returns></returns>
+	public XiangqiBuilder WithImageGenerationService(IXiangqiImageGenerationService imageGenerationService)
+	{
+		_imageGenerationService = imageGenerationService;
+		return this;
+	}
+
+	/// <summary>
 	/// Builds an instance of the Xiangqi game asynchronously.
 	/// </summary>
 	/// <returns>An instance of the <see cref="XiangqiGame"/> class.</returns>
 	public XiangqiGame Build()
-		=> XiangqiGame.Create(
+	{
+		return XiangqiGame.Create(
 			_initialFen,
 			_redPlayer,
 			_blackPlayer,
 			_competition,
+			_moveTranslationService,
+			_moveParsingService,
+			_imageGenerationService,
+			_pgnGenerationService,
 			_useBoardConfig,
 			_boardConfig,
 			_gameResult,
 			_moveRecord,
 			_gameName,
 			_moveNotationType);
+	}
 
 	/// <summary>
 	/// Sets the configuration for the red player.

@@ -7,6 +7,14 @@ namespace xiangqi_core_test.XiangqiCore.FileGenerationTest;
 
 public static class FileGenerationTests
 {
+	internal static string CreateTempDirectory(string folderName)
+	{
+		string tempDirectory = Path.Combine(Path.GetTempPath(), folderName);
+		Directory.CreateDirectory(tempDirectory);
+
+		return tempDirectory;
+	}
+
 	[Theory]
 	[InlineData(11, 10)]
 	[InlineData(21, 20)]
@@ -14,8 +22,7 @@ public static class FileGenerationTests
 	public static async Task GenerateImagesAsync_ShouldCreateFilesCorrectly(int toIndex, int expectedImageCount)
 	{
 		// Arrange
-		string tempDirectory = Path.Combine(Path.GetTempPath(), "XiangqiImageAsyncCreationTests");
-		Directory.CreateDirectory(tempDirectory);
+		string tempDirectory = CreateTempDirectory("XiangqiImageAsyncCreationTests");
 
 		const string gameName = "马炮单缺仕例胜马单缺象";
 		const string fen = "5kb2/4a4/5a3/3Nn4/9/6B2/9/3K1A3/C8/2B6 w - - 0 0";
@@ -44,7 +51,7 @@ public static class FileGenerationTests
 
 				string filePath = Path.Combine(tempDirectory, $"{game.GameName}_{i}.jpg");
 
-				await game.GenerateImageAsync(
+				await game.SaveImageToFileAsync(
 					filePath,
 					config: config,
 					cancellationToken: cancellationToken);
@@ -80,8 +87,7 @@ public static class FileGenerationTests
 	public static async Task GenerateGifAsync_ShouldCreateFilesCorrectly()
 	{
 		// Arrange
-		string tempDirectory = Path.Combine(Path.GetTempPath(), "XiangqiGifAsyncCreationTests");
-		Directory.CreateDirectory(tempDirectory);
+		string tempDirectory = CreateTempDirectory("XiangqiGifAsyncCreationTests");
 
 		try
 		{
@@ -114,10 +120,9 @@ public static class FileGenerationTests
 				UseMoveIndicator = true,
 			};
 
-			await game.GenerateGifAsync(
+			await game.SaveGifToFileAsync(
 				filePath,
 				config,
-				frameDelayInSecond: 1,
 				cancellationToken: default);
 
 			// Assert
@@ -138,8 +143,7 @@ public static class FileGenerationTests
 	public static void GenerateGif_ShouldCreateFilesCorrectly()
 	{
 		// Arrange
-		string tempDirectory = Path.Combine(Path.GetTempPath(), "XiangqiGifCreationTests");
-		Directory.CreateDirectory(tempDirectory);
+		string tempDirectory = CreateTempDirectory("XiangqiGifCreationTests");
 
 		try
 		{
@@ -182,12 +186,10 @@ public static class FileGenerationTests
 			ImageConfig config = new()
 			{
 				UseMoveIndicator = true,
+				FrameDelayInSecond = 1
 			};
 
-			game.GenerateGif(
-				filePath,
-				config,
-				frameDelayInSecond: 1);
+			game.SaveGifToFile(filePath, config);
 
 			// Assert
 			Assert.True(File.Exists(filePath), "GIF file was not created.");
@@ -207,8 +209,7 @@ public static class FileGenerationTests
 	public static void GenerateImage_ShouldCreateFilesCorrectly()
 	{
 		// Arrange
-		string tempDirectory = Path.Combine(Path.GetTempPath(), "XiangqiImageCreationTests");
-		Directory.CreateDirectory(tempDirectory);
+		string tempDirectory = CreateTempDirectory("XiangqiImageCreationTests");
 
 		try
 		{
@@ -231,7 +232,7 @@ public static class FileGenerationTests
 					UseBlackAndWhiteBoard = true,
 				};
 
-				game.GenerateImage(filePath, config: config);
+				game.SaveImageToFile(filePath, config: config);
 
 				// Assert
 				Assert.True(File.Exists(filePath), "Image file was not created.");
@@ -252,8 +253,7 @@ public static class FileGenerationTests
 	public static void GeneratePgn_ShouldCreateFilesCorrectly()
 	{
 		// Arrange
-		string tempDirectory = Path.Combine(Path.GetTempPath(), "XiangqiPgnCreationTests");
-		Directory.CreateDirectory(tempDirectory);
+		string tempDirectory = CreateTempDirectory("XiangqiPgnCreationTests");
 
 		try
 		{
@@ -288,10 +288,10 @@ public static class FileGenerationTests
 
 			string filePath = Path.Combine(tempDirectory, $"{game.GameName}.pgn");
 
-			game.GeneratePgnFile(filePath);
+			game.SavePgnToFile(filePath);
 
 			// Assert
-			Assert.True(File.Exists(filePath), "GIF file was not created.");
+			Assert.True(File.Exists(filePath), "PGN file was not created.");
 		}
 		catch (Exception ex)
 		{
@@ -308,8 +308,7 @@ public static class FileGenerationTests
 	public static async Task GeneratePgnAsync_ShouldCreateFilesCorrectly()
 	{
 		// Arrange
-		string tempDirectory = Path.Combine(Path.GetTempPath(), "XiangqiPgnAsyncCreationTests");
-		Directory.CreateDirectory(tempDirectory);
+		string tempDirectory = CreateTempDirectory("XiangqiPgnAsyncCreationTests");
 
 		try
 		{
@@ -335,10 +334,10 @@ public static class FileGenerationTests
 
 			string filePath = Path.Combine(tempDirectory, $"{game.GameName}.pgn");
 
-			await game.GeneratePgnFileAsync(filePath, cancellationToken: default);
+			await game.SavePgnToFileAsync(filePath, cancellationToken: default);
 
 			// Assert
-			Assert.True(File.Exists(filePath), "GIF file was not created.");
+			Assert.True(File.Exists(filePath), "PGN file was not created.");
 		}
 		catch (Exception ex)
 		{
