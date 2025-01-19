@@ -112,75 +112,6 @@ public class DefaultImageGenerationService : IImageGenerationService
 		}
 	}
 
-	public void SaveImageToFile(string filePath, string fen, ImageConfig? imageConfig = null)
-	{
-		using Image<Rgba32> image = GenerateImageCore(fen);
-
-		image.Save(filePath);
-	}
-
-	public async Task SaveImageToFileAsync(string filePath, string fen, ImageConfig? imageConfig = null, CancellationToken cancellationToken = default)
-	{
-		using Image<Rgba32> image = GenerateImageCore(fen);
-
-		await image.SaveAsync(filePath, cancellationToken);
-	}
-
-	private Image<Rgba32> GenerateGifCore(IEnumerable<string>? fens = null, List<MoveHistoryObject>? moveHistory = null, ImageConfig? imageConfig = null)
-	{
-		if (fens is null && moveHistory is null)
-			throw new ArgumentNullException("Both fens and moveHistory cannot be null");
-
-		imageConfig ??= new();
-
-		List<string> fensList = moveHistory is not null ? [.. moveHistory.Select(x => x.FenAfterMove)] : fens!.ToList();
-
-		// Note : Will have to dispose the image after use
-		Image<Rgba32> gif = new(width: ImageConfig.DefaultBoardWidth, height: ImageConfig.DefaultBoardHeight);
-		GifMetadata gifMetaData = gif.Metadata.GetGifMetadata();
-
-		// Infinite loop
-		gifMetaData.RepeatCount = 0;
-
-		int frameDelayInCentiSeconds = (int)Math.Ceiling((decimal)imageConfig!.FrameDelayInSecond * 100);
-
-		// Set the delay until the next image is displayed.
-		GifFrameMetadata metadata = gif.Frames.RootFrame.Metadata.GetGifMetadata();
-		metadata.FrameDelay = frameDelayInCentiSeconds;
-
-		for (int i = 0; i < fensList.Count; i++)
-		{
-			string fen = fensList[i];
-
-			Coordinate? previousPosition = null;
-			Coordinate? currentPosition = null;
-
-			// If the move indicator is enabled and it is not the initial FEN
-			if (imageConfig.UseMoveIndicator && i > 0 && moveHistory is not null)
-			{
-				previousPosition = moveHistory[i - 1].StartingPosition;
-				currentPosition = moveHistory[i - 1].Destination;
-			}
-
-			Piece[,] position = FenHelper.CreatePositionFromFen(fen);
-
-			byte[] imageBytes = Ge(
-				position,
-				previousPosition: previousPosition,
-				currentPosition: currentPosition);
-
-			using Image<Rgba32> image = Image.Load<Rgba32>(imageBytes);
-			var frame = image.Frames.CloneFrame(0);
-
-			// Set the delay until the next image is displayed.
-			metadata = image.Frames.RootFrame.Metadata.GetGifMetadata();
-			metadata.FrameDelay = frameDelayInCentiSeconds;
-
-			gif.Frames.AddFrame(image.Frames.RootFrame);
-		}
-
-		return gif;
-	}
 
 	private Image<Rgba32> GenerateBoardImageCore(Piece[,] position, Coordinate? previousPosition = null, Coordinate? currentPosition = null, ImageConfig? imageConfig = null)
 	{
@@ -300,15 +231,5 @@ public class DefaultImageGenerationService : IImageGenerationService
 		await image.SaveAsync(memoryStream, new PngEncoder());
 
 		return memoryStream.ToArray();
-	}
-
-	public void SaveGifToFile(string filePath, XiangqiGame game, ImageConfig? imageConfig = null)
-	{
-		throw new NotImplementedException();
-	}
-
-	public Task SaveGifToFileAsync(string filePath, XiangqiGame game, ImageConfig? imageConfig = null, CancellationToken cancellationToken = default)
-	{
-		throw new NotImplementedException();
 	}
 }

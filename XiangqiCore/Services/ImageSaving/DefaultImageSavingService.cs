@@ -21,11 +21,15 @@ public class DefaultImageSavingService : IImageSavingService
 		_imageGenerationService = imageGenerationService;
 	}
 
-	public void SaveImageToFile(string filePath, string fen, ImageConfig? imageConfig = null)
+	public void SaveImageToFile(string filePath, string fen, Coordinate? previousLocation = null, Coordinate? currentLocation = null, ImageConfig? imageConfig = null)
 	{
 		string sanitizedFilePath = PrepareFilePath(filePath);
 
-		byte[] imageInBytes = _imageGenerationService.GenerateImage(fen, imageConfig);
+		byte[] imageInBytes = _imageGenerationService.GenerateImage(
+			fen, 
+			previousLocation: previousLocation, 
+			currentLocation: currentLocation, 
+			imageConfig);
 
 		WriteBytesToFile(sanitizedFilePath, imageInBytes);
 	}
@@ -39,20 +43,29 @@ public class DefaultImageSavingService : IImageSavingService
 		WriteBytesToFile(sanitizedFilePath, imageInBytes);
 	}
 
-	public void SaveImageToFile(string filePath, Piece[,] position, ImageConfig? imageConfig = null)
+	public void SaveImageToFile(string filePath, Piece[,] position, Coordinate? previousLocation = null, Coordinate? currentLocation = null, ImageConfig? imageConfig = null)
 	{
 		string sanitizedFilePath = PrepareFilePath(filePath);
 
-		byte[] imageInBytes = _imageGenerationService.GenerateImage(position, imageConfig);
+		byte[] imageInBytes = _imageGenerationService.GenerateImage(
+			position,
+			previousLocation: previousLocation,
+			currentLocation: currentLocation,
+			imageConfig);
 
 		WriteBytesToFile(sanitizedFilePath, imageInBytes);
 	}
 
-	public async Task SaveImageToFileAsync(string filePath, string fen, ImageConfig? imageConfig = null, CancellationToken cancellationToken = default)
+	public async Task SaveImageToFileAsync(string filePath, string fen, Coordinate? previousLocation = null, Coordinate? currentLocation = null, ImageConfig? imageConfig = null, CancellationToken cancellationToken = default)
 	{
 		string sanitizedFilePath = PrepareFilePath(filePath);
 
-		byte[] imageInBytes = await _imageGenerationService.GenerateImageAsync(fen, imageConfig, cancellationToken);
+		byte[] imageInBytes = await _imageGenerationService.GenerateImageAsync(
+			fen,
+			previousLocation: previousLocation,
+			currentLocation: currentLocation,
+			imageConfig, 
+			cancellationToken);
 
 		await WriteBytesToFileAsync(sanitizedFilePath, imageInBytes, cancellationToken);
 	}
@@ -66,11 +79,16 @@ public class DefaultImageSavingService : IImageSavingService
 		await WriteBytesToFileAsync(sanitizedFilePath, imageInBytes, cancellationToken);
 	}
 
-	public async Task SaveImageToFileAsync(string filePath, Piece[,] position, ImageConfig? imageConfig = null, CancellationToken cancellationToken = default)
+	public async Task SaveImageToFileAsync(string filePath, Piece[,] position, Coordinate? previousLocation = null, Coordinate? currentLocation = null, ImageConfig? imageConfig = null, CancellationToken cancellationToken = default)
 	{
 		string sanitizedFilePath = PrepareFilePath(filePath);
 
-		byte[] imageInBytes = await _imageGenerationService.GenerateImageAsync(position, imageConfig, cancellationToken);
+		byte[] imageInBytes = await _imageGenerationService.GenerateImageAsync(
+			position,
+			previousLocation: previousLocation,
+			currentLocation: currentLocation,
+			imageConfig, 
+			cancellationToken);
 
 		await WriteBytesToFileAsync(sanitizedFilePath, imageInBytes, cancellationToken);
 	}
