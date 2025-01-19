@@ -21,7 +21,7 @@ public class DefaultGifSavingService : IGifSavingService
 		_gifGenerationService = gifGenerationService;
 	}
 
-	public void SaveGifToFile(string filePath, IEnumerable<string> fens, ImageConfig? imageConfig = null)
+	public void Save(string filePath, IEnumerable<string> fens, ImageConfig? imageConfig = null)
 	{
 		string sanitizedFilePath = PrepareFilePath(filePath);
 		byte[] gifBytes = _gifGenerationService.GenerateGif(fens, imageConfig);
@@ -29,7 +29,7 @@ public class DefaultGifSavingService : IGifSavingService
 		FileHelper.WriteBytesToFile(sanitizedFilePath, gifBytes);
 	}
 
-	public void SaveGifToFile(string filePath, List<MoveHistoryObject> moveHistory, ImageConfig? imageConfig = null)
+	public void Save(string filePath, List<MoveHistoryObject> moveHistory, ImageConfig? imageConfig = null)
 	{
 		string sanitizedFilePath = PrepareFilePath(filePath);
 		byte[] gifBytes = _gifGenerationService.GenerateGif(moveHistory, imageConfig);
@@ -37,7 +37,7 @@ public class DefaultGifSavingService : IGifSavingService
 		FileHelper.WriteBytesToFile(sanitizedFilePath, gifBytes);
 	}
 
-	public void SaveGifToFile(string filePath, XiangqiGame game, ImageConfig? imageConfig = null)
+	public void Save(string filePath, XiangqiGame game, ImageConfig? imageConfig = null)
 	{
 		string sanitizedFilePath = PrepareFilePath(filePath);
 		byte[] gifBytes = _gifGenerationService.GenerateGif(game, imageConfig);
@@ -45,7 +45,7 @@ public class DefaultGifSavingService : IGifSavingService
 		FileHelper.WriteBytesToFile(sanitizedFilePath, gifBytes);
 	}
 
-	public async Task SaveGifToFileAsync(string filePath, IEnumerable<string> fens, ImageConfig? imageConfig = null, CancellationToken cancellationToken = default)
+	public async Task SaveAsync(string filePath, IEnumerable<string> fens, ImageConfig? imageConfig = null, CancellationToken cancellationToken = default)
 	{
 		string sanitizedFilePath = PrepareFilePath(filePath);
 		byte[] gifBytes = await _gifGenerationService.GenerateGifAsync(fens, imageConfig, cancellationToken);
@@ -53,7 +53,7 @@ public class DefaultGifSavingService : IGifSavingService
 		await FileHelper.WriteBytesToFileAsync(sanitizedFilePath, gifBytes, cancellationToken);
 	}
 
-	public async Task SaveGifToFileAsync(string filePath, List<MoveHistoryObject> moveHistory, ImageConfig? imageConfig = null, CancellationToken cancellationToken = default)
+	public async Task SaveAsync(string filePath, List<MoveHistoryObject> moveHistory, ImageConfig? imageConfig = null, CancellationToken cancellationToken = default)
 	{
 		string sanitizedFilePath = PrepareFilePath(filePath);
 		byte[] gifBytes = await _gifGenerationService.GenerateGifAsync(
@@ -64,7 +64,7 @@ public class DefaultGifSavingService : IGifSavingService
 		await FileHelper.WriteBytesToFileAsync(sanitizedFilePath, gifBytes, cancellationToken);
 	}
 
-	public async Task SaveGifToFileAsync(string filePath, XiangqiGame game, ImageConfig? imageConfig = null, CancellationToken cancellationToken = default)
+	public async Task SaveAsync(string filePath, XiangqiGame game, ImageConfig? imageConfig = null, CancellationToken cancellationToken = default)
 	{
 		string sanitizedFilePath = PrepareFilePath(filePath);
 		byte[] gifBytes = await _gifGenerationService.GenerateGifAsync(

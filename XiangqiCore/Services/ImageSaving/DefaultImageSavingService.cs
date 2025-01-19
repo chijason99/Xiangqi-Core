@@ -21,7 +21,7 @@ public class DefaultImageSavingService : IImageSavingService
 		_imageGenerationService = imageGenerationService;
 	}
 
-	public void SaveImageToFile(string filePath, string fen, Coordinate? previousLocation = null, Coordinate? currentLocation = null, ImageConfig? imageConfig = null)
+	public void Save(string filePath, string fen, Coordinate? previousLocation = null, Coordinate? currentLocation = null, ImageConfig? imageConfig = null)
 	{
 		string sanitizedFilePath = PrepareFilePath(filePath);
 
@@ -34,7 +34,7 @@ public class DefaultImageSavingService : IImageSavingService
 		FileHelper.WriteBytesToFile(sanitizedFilePath, imageInBytes);
 	}
 
-	public void SaveImageToFile(string filePath, MoveHistoryObject moveHistoryObject, ImageConfig? imageConfig = null)
+	public void Save(string filePath, MoveHistoryObject moveHistoryObject, ImageConfig? imageConfig = null)
 	{
 		string sanitizedFilePath = PrepareFilePath(filePath);
 
@@ -43,7 +43,7 @@ public class DefaultImageSavingService : IImageSavingService
 		FileHelper.WriteBytesToFile(sanitizedFilePath, imageInBytes);
 	}
 
-	public void SaveImageToFile(string filePath, Piece[,] position, Coordinate? previousLocation = null, Coordinate? currentLocation = null, ImageConfig? imageConfig = null)
+	public void Save(string filePath, Piece[,] position, Coordinate? previousLocation = null, Coordinate? currentLocation = null, ImageConfig? imageConfig = null)
 	{
 		string sanitizedFilePath = PrepareFilePath(filePath);
 
@@ -56,7 +56,7 @@ public class DefaultImageSavingService : IImageSavingService
 		FileHelper.WriteBytesToFile(sanitizedFilePath, imageInBytes);
 	}
 
-	public async Task SaveImageToFileAsync(string filePath, string fen, Coordinate? previousLocation = null, Coordinate? currentLocation = null, ImageConfig? imageConfig = null, CancellationToken cancellationToken = default)
+	public async Task SaveAsync(string filePath, string fen, Coordinate? previousLocation = null, Coordinate? currentLocation = null, ImageConfig? imageConfig = null, CancellationToken cancellationToken = default)
 	{
 		string sanitizedFilePath = PrepareFilePath(filePath);
 
@@ -70,7 +70,7 @@ public class DefaultImageSavingService : IImageSavingService
 		await FileHelper.WriteBytesToFileAsync(sanitizedFilePath, imageInBytes, cancellationToken);
 	}
 
-	public async Task SaveImageToFileAsync(string filePath, MoveHistoryObject moveHistoryObject, ImageConfig? imageConfig = null, CancellationToken cancellationToken = default)
+	public async Task SaveAsync(string filePath, MoveHistoryObject moveHistoryObject, ImageConfig? imageConfig = null, CancellationToken cancellationToken = default)
 	{
 		string sanitizedFilePath = PrepareFilePath(filePath);
 
@@ -79,7 +79,7 @@ public class DefaultImageSavingService : IImageSavingService
 		await FileHelper.WriteBytesToFileAsync(sanitizedFilePath, imageInBytes, cancellationToken);
 	}
 
-	public async Task SaveImageToFileAsync(string filePath, Piece[,] position, Coordinate? previousLocation = null, Coordinate? currentLocation = null, ImageConfig? imageConfig = null, CancellationToken cancellationToken = default)
+	public async Task SaveAsync(string filePath, Piece[,] position, Coordinate? previousLocation = null, Coordinate? currentLocation = null, ImageConfig? imageConfig = null, CancellationToken cancellationToken = default)
 	{
 		string sanitizedFilePath = PrepareFilePath(filePath);
 
