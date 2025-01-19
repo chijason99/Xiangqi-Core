@@ -1,17 +1,12 @@
-﻿using SixLabors.ImageSharp;
-using System.Text;
-using XiangqiCore.Boards;
+﻿using XiangqiCore.Boards;
 using XiangqiCore.Exceptions;
 using XiangqiCore.Extension;
 using XiangqiCore.Misc;
 using XiangqiCore.Move;
-using XiangqiCore.Move.MoveObject;
+using XiangqiCore.Move.Commands;
 using XiangqiCore.Move.MoveObjects;
 using XiangqiCore.Pieces;
-using XiangqiCore.Services.ImageGeneration;
 using XiangqiCore.Services.MoveParsing;
-using XiangqiCore.Services.MoveTransalation;
-using XiangqiCore.Services.PgnGeneration;
 
 namespace XiangqiCore.Game;
 
@@ -38,7 +33,8 @@ public class XiangqiGame
 		Player blackPlayer,
 		Competition competition,
 		GameResult result,
-		string gameName)
+		string gameName,
+		IMoveParsingService moveParsingService)
 	{
 		InitialFenString = initialFenString;
 		SideToMove = sideToMove;
@@ -46,6 +42,7 @@ public class XiangqiGame
 		BlackPlayer = blackPlayer;
 		Competition = competition;
 		GameResult = result;
+		_moveParsingService = moveParsingService;
 
 		if (string.IsNullOrWhiteSpace(gameName))
 		{
@@ -64,6 +61,13 @@ public class XiangqiGame
 			GameName = gameName;
 		}
 	}
+
+	/// <summary>
+	/// The move command invoker responsible for executing/undoing move commands.
+	/// </summary>
+	private readonly MoveCommandInvoker _moveCommandInvoker = new();
+
+	private readonly IMoveParsingService _moveParsingService;
 
 	/// <summary>
 	/// Gets the initial FEN string when the game is first created.
@@ -159,10 +163,7 @@ public class XiangqiGame
 		Player redPlayer,
 		Player blackPlayer,
 		Competition competition,
-		IMoveTranslationService moveTranslationService,
 		IMoveParsingService moveParsingService,
-		IImageGenerationService xiangqiImageGenerationService,
-		IPgnGenerationService pgnGenerationService,
 		bool useBoardConfig = false,
 		BoardConfig? boardConfig = null,
 		GameResult gameResult = GameResult.Unknown,
@@ -183,7 +184,8 @@ public class XiangqiGame
 			blackPlayer,
 			competition,
 			gameResult,
-			gameName)
+			gameName,
+			moveParsingService)
 		{
 			Board = useBoardConfig ? new Board(boardConfig!) : new Board(initialFenString),
 			RoundNumber = FenHelper.GetRoundNumber(initialFenString),
@@ -211,18 +213,9 @@ public class XiangqiGame
 	/// <returns><c>true</c> if the move is valid and successful; otherwise, <c>false</c>.</returns>
 	public bool MakeMove(Coordinate startingPosition, Coordinate destination)
 	{
-		try
-		{
-			MoveHistoryObject moveHistoryObject = Board.MakeMove(startingPosition, destination, SideToMove);
+		CoordinateMoveCommand coordinateMoveCommand = new(Board, startingPosition, destination, SideToMove);
 
-			UpdateGameInfo(moveHistoryObject);
-
-			return true;
-		}
-		catch (Exception ex)
-		{
-			return false;
-		}
+		return MakeMove(coordinateMoveCommand);
 	}
 
 	/// <summary>
@@ -230,21 +223,31 @@ public class XiangqiGame
 	/// </summary>
 	/// <param name="moveNotation">The move notation.</param>
 	/// <param name="moveNotationType">The type of move notation.</param>
+	/// <param name="moveParsingService">The move parsing service used to create the MoveCommand. By default it would be using the Xiangqi Core default implementation</param>
 	/// <returns><c>true</c> if the move is valid and successful; otherwise, <c>false</c>.</returns>
 	public bool MakeMove(string moveNotation, MoveNotationType moveNotationType)
 	{
+		NotationMoveCommand notationMoveCommand = new (
+			_moveParsingService, 
+			Board, 
+			moveNotation,
+			SideToMove,
+			moveNotationType);
+
+		return MakeMove(notationMoveCommand);
+	}
+
+	public bool MakeMove(IMoveCommand moveCommand)
+	{
 		try
 		{
-			ParsedMoveObject parsedMoveObject = _moveParsingService.ParseMove(moveNotation, moveNotationType);
-
-			MoveHistoryObject moveHistoryObject = Board.MakeMove(parsedMoveObject, SideToMove);
-			moveHistoryObject.UpdateMoveNotation(moveNotation, moveNotationType);
+			MoveHistoryObject moveHistoryObject = _moveCommandInvoker.ExecuteCommand(moveCommand);
 
 			UpdateGameInfo(moveHistoryObject);
 
 			return true;
 		}
-		catch (Exception ex)
+		catch (Exception)
 		{
 			return false;
 		}

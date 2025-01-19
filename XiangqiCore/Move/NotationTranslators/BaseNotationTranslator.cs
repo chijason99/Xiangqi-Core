@@ -1,6 +1,7 @@
 ﻿using XiangqiCore.Extension;
 using XiangqiCore.Misc;
 using XiangqiCore.Move.MoveObjects;
+using XiangqiCore.Move.NotationParsers;
 using XiangqiCore.Pieces.PieceTypes;
 
 namespace XiangqiCore.Move.NotationTranslators;
