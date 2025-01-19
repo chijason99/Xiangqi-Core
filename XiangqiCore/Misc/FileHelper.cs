@@ -1,6 +1,6 @@
 ﻿namespace XiangqiCore.Misc;
 
-public static class FilePathHelper
+public static class FileHelper
 {
 	public static string PrepareFilePath(string filePath, string expectedExtension, string defaultFileName = "Unknown")
 	{
@@ -33,5 +33,29 @@ public static class FilePathHelper
 		}));
 
 		return Path.Combine(directoryPath, sanitizedFileName);
+	}
+
+	public static void WriteBytesToFile(string filePath, byte[] bytes)
+	{
+		try
+		{
+			File.WriteAllBytes(filePath, bytes);
+		}
+		catch (Exception ex)
+		{
+			throw new IOException($"Failed to write to file {filePath}", ex);
+		}
+	}
+
+	public static async Task WriteBytesToFileAsync(string filePath, byte[] bytes, CancellationToken cancellationToken = default)
+	{
+		try
+		{
+			await File.WriteAllBytesAsync(filePath, bytes, cancellationToken);
+		}
+		catch (Exception ex)
+		{
+			throw new IOException($"Failed to write to file {filePath}", ex);
+		}
 	}
 }

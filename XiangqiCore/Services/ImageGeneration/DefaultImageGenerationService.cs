@@ -1,9 +1,7 @@
 ﻿using SixLabors.ImageSharp;
-using SixLabors.ImageSharp.Formats.Gif;
 using SixLabors.ImageSharp.Formats.Png;
 using SixLabors.ImageSharp.PixelFormats;
 using SixLabors.ImageSharp.Processing;
-using XiangqiCore.Game;
 using XiangqiCore.Misc;
 using XiangqiCore.Misc.Images;
 using XiangqiCore.Misc.Images.Interfaces;
@@ -31,87 +29,6 @@ public class DefaultImageGenerationService : IImageGenerationService
 
 	private readonly IImageResourcePathManager _imageResourcePathManager;
 	private readonly ImageCache _imageCache;
-
-	public void SaveGifToFile(string filePath, List<MoveHistoryObject> moveHistory, ImageConfig? imageConfig = null)
-	{
-		Image<Rgba32> gif = GenerateGifCore(moveHistory: moveHistory);
-
-		try
-		{
-			gif.SaveAsGif(filePath);
-		}
-		catch (Exception)
-		{
-			throw;
-		}
-		finally
-		{
-			gif.Dispose();
-		}
-	}
-
-	public async Task SaveGifToFileAsync(
-		string filePath, 
-		List<MoveHistoryObject> moveHistory,
-		ImageConfig? imageConfig = null,
-		CancellationToken cancellationToken = default)
-	{
-		Image<Rgba32> gif = GenerateGifCore(moveHistory: moveHistory);
-
-		try
-		{
-			await gif.SaveAsGifAsync(filePath, cancellationToken);
-		}
-		catch (Exception)
-		{
-			throw;
-		}
-		finally
-		{
-			gif.Dispose();
-		}
-	}
-
-	public void SaveGifToFile(string filePath, IEnumerable<string> fens, ImageConfig? imageConfig = null)
-	{
-		Image<Rgba32> gif = GenerateGifCore(fens: fens);
-
-		try
-		{
-			gif.SaveAsGif(filePath);
-		}
-		catch (Exception)
-		{
-			throw;
-		}
-		finally
-		{
-			gif.Dispose();
-		}
-	}
-
-	public async Task SaveGifToFileAsync(
-		string filePath, 
-		IEnumerable<string> fens,
-		ImageConfig? imageConfig = null,
-		CancellationToken cancellationToken = default)
-	{
-		Image<Rgba32> gif = GenerateGifCore(fens: fens);
-
-		try
-		{
-			await gif.SaveAsGifAsync(filePath, cancellationToken);
-		}
-		catch (Exception)
-		{
-			throw;
-		}
-		finally
-		{
-			gif.Dispose();
-		}
-	}
-
 
 	private Image<Rgba32> GenerateBoardImageCore(Piece[,] position, Coordinate? previousPosition = null, Coordinate? currentPosition = null, ImageConfig? imageConfig = null)
 	{
@@ -209,10 +126,54 @@ public class DefaultImageGenerationService : IImageGenerationService
 		return (xCoordinate, yCoordinate);
 	}
 
-	public byte[] GenerateImage(string fen, ImageConfig? imageConfig = null)
+	public byte[] GenerateImage(string fen,
+		Coordinate? previousLocation = null,
+		Coordinate? currentLocation = null, 
+		ImageConfig? imageConfig = null)
 	{
 		Piece[,] position = FenHelper.CreatePositionFromFen(fen);
 
+		return GenerateImage(
+			position,
+			previousLocation,
+			currentLocation,
+			imageConfig);
+	}
+
+	public async Task<byte[]> GenerateImageAsync(
+		string fen, 
+		Coordinate? previousLocation = null, 
+		Coordinate? currentLocation = null, 
+		ImageConfig? imageConfig = null, 
+		CancellationToken cancellationToken = default)
+	{
+		Piece[,] position = FenHelper.CreatePositionFromFen(fen);
+
+		return await GenerateImageAsync(
+			position, 
+			previousLocation, 
+			currentLocation, 
+			imageConfig, 
+			cancellationToken);
+	}
+
+	public byte[] GenerateImage(MoveHistoryObject moveHistoryObject, ImageConfig? imageConfig = null) 
+		=> GenerateImage(
+			moveHistoryObject.FenAfterMove,
+			moveHistoryObject.StartingPosition,
+			moveHistoryObject.Destination,
+			imageConfig);
+
+	public async Task<byte[]> GenerateImageAsync(MoveHistoryObject moveHistoryObject, ImageConfig? imageConfig = null, CancellationToken cancellationToken = default)
+		=> await GenerateImageAsync(
+			moveHistoryObject.FenAfterMove,
+			moveHistoryObject.StartingPosition,
+			moveHistoryObject.Destination,
+			imageConfig,
+			cancellationToken);
+
+	public byte[] GenerateImage(Piece[,] position, Coordinate? previousLocation = null, Coordinate? currentLocation = null, ImageConfig? imageConfig = null)
+	{
 		using Image<Rgba32> image = GenerateBoardImageCore(position);
 		using MemoryStream memoryStream = new();
 
@@ -221,14 +182,12 @@ public class DefaultImageGenerationService : IImageGenerationService
 		return memoryStream.ToArray();
 	}
 
-	public async Task<byte[]> GenerateImageAsync(string fen, ImageConfig? imageConfig = null, CancellationToken cancellationToken = default)
+	public async Task<byte[]> GenerateImageAsync(Piece[,] position, Coordinate? previousLocation = null, Coordinate? currentLocation = null, ImageConfig? imageConfig = null, CancellationToken cancellationToken = default)
 	{
-		Piece[,] position = FenHelper.CreatePositionFromFen(fen);
-
 		using Image<Rgba32> image = GenerateBoardImageCore(position);
 		using MemoryStream memoryStream = new();
 
-		await image.SaveAsync(memoryStream, new PngEncoder());
+		await image.SaveAsync(memoryStream, new PngEncoder(), cancellationToken);
 
 		return memoryStream.ToArray();
 	}

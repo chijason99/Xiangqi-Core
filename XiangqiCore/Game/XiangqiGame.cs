@@ -299,7 +299,7 @@ public class XiangqiGame
 		string filePath, 
 		MoveNotationType moveNotationType = MoveNotationType.TraditionalChinese)
 	{
-		string preparedFilePath = FilePathHelper.PrepareFilePath(filePath, "pgn", GameName);
+		string preparedFilePath = FileHelper.PrepareFilePath(filePath, "pgn", GameName);
 
 		_pgnGenerationService.SavePgnToFile(preparedFilePath, this, moveNotationType);
 	}
@@ -309,61 +309,12 @@ public class XiangqiGame
 		MoveNotationType moveNotationType = MoveNotationType.TraditionalChinese,
 		CancellationToken cancellationToken = default)
 	{
-		string preparedFilePath = FilePathHelper.PrepareFilePath(filePath, "pgn", GameName);
+		string preparedFilePath = FileHelper.PrepareFilePath(filePath, "pgn", GameName);
 
 		await _pgnGenerationService.SavePgnToFileAsync(
 			preparedFilePath, 
 			this, 
 			moveNotationType, 
-			cancellationToken);
-	}
-
-	public void SaveImageToFile(
-		string filePath, ImageConfig? config = null)
-	{
-		config ??= new ImageConfig();
-
-		string preparedFilePath = FilePathHelper.PrepareFilePath(filePath, "jpg", GameName);
-		string targetFen = config.MoveNumber == 0 ? InitialFenString : MoveHistory[config.MoveNumber].FenAfterMove;
-
-		_xiangqiImageGenerationService.GenerateImage(preparedFilePath, targetFen, config);
-	}
-
-	public async Task SaveImageToFileAsync(
-		string filePath, 
-		ImageConfig? config = null,
-		CancellationToken cancellationToken = default)
-	{
-		config ??= new ImageConfig();
-
-		string preparedFilePath = FilePathHelper.PrepareFilePath(filePath, "jpg", GameName);
-		string targetFen = config.MoveNumber == 0 ? InitialFenString : MoveHistory[config.MoveNumber].FenAfterMove;
-
-		await _xiangqiImageGenerationService.GenerateImageAsync(
-			preparedFilePath, 
-			targetFen, 
-			config, 
-			cancellationToken);
-	}
-
-	public void SaveGifToFile(string filePath, ImageConfig? config = null)
-	{
-		string preparedFilePath = FilePathHelper.PrepareFilePath(filePath, "gif", GameName);
-
-		_xiangqiImageGenerationService.GenerateGif(preparedFilePath, MoveHistory.ToList(), config);
-	}
-
-	public async Task SaveGifToFileAsync(
-		string filePath,
-		ImageConfig? config = null,
-		CancellationToken cancellationToken = default)
-	{
-		string preparedFilePath = FilePathHelper.PrepareFilePath(filePath, "gif", GameName);
-
-		await _xiangqiImageGenerationService.GenerateGifAsync(
-			preparedFilePath, 
-			MoveHistory.ToList(), 
-			config,
 			cancellationToken);
 	}
 
