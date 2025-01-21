@@ -462,8 +462,11 @@ XiangqiGame game =  builder.WithDefaultConfiguration().Build();
  game.MakeMove(new Coordinate(column: 5, row: 2), new Coordinate(column: 5, row: 3));
 ```
 
-#### `ExportMoveHistory()`
-Exports the move history of the game as a string.
+### `IPgnGenerationService`
+The `IPgnGenerationService` interface provides a set of APIs for exporting the game as a PGN string or file.
+
+#### `ExportMoveHistory(XiangqiGame game, MoveNotationType moveNotationType = MoveNotationType.TraditionalChinese)`
+Returns the move history of the game as a string. The moveNotationType is used to specify the type of move notation you want in the result. The default value is TraditionalChinese.
 
 ```c#
 using XiangqiCore.Game;
@@ -472,12 +475,13 @@ XiangqiBuilder builder = new ();
 
 XiangqiGame game =  builder.WithDefaultConfiguration().Build();
 
- game.MakeMove("炮二平五", MoveNotationType.Chinese);
- game.MakeMove("馬8進7", MoveNotationType.Chinese);
- game.MakeMove("馬二進三", MoveNotationType.Chinese);
- game.MakeMove("車9平8", MoveNotationType.Chinese);
+game.MakeMove("炮二平五", MoveNotationType.Chinese);
+game.MakeMove("馬8進7", MoveNotationType.Chinese);
+game.MakeMove("馬二進三", MoveNotationType.Chinese);
+game.MakeMove("車9平8", MoveNotationType.Chinese);
 
-string moveHistory = game.ExportMoveHistory();
+IPgnGenerationService pgnService = new DefaultPgnGenerationService();
+string moveHistory = pgnService.ExportMoveHistory(game);
 
 Console.WriteLine(moveHistory);
 
@@ -486,8 +490,8 @@ Console.WriteLine(moveHistory);
 // 2. 馬二進三 車9平8
 ```
 
-#### `ExportGameAsPgnString()`
-Exports the game as a PGN string.
+#### `GeneratePgnString(XiangqiGame game, MoveNotationType moveNotationType = MoveNotationType.TraditionalChinese)`
+Returns a PGN string. The moveNotationType is used to specify the type of move notation you want in the result. The default value is TraditionalChinese.
 
 ```c#
 using XiangqiCore.Game;
@@ -526,7 +530,9 @@ XiangqiGame game =  builder
 	.WithGameResult(GameResult.RedWin)
 	.Build();
 
-string pgnString = game.ExportGameAsPgnString();
+IPgnGenerationService pgnService = new DefaultPgnGenerationService();
+
+string pgnString = pgnService.GeneratePgnString(game);
 
 Console.WriteLine(pgnString);
 
@@ -584,8 +590,14 @@ Console.WriteLine(pgnString);
 // 41. 兵六進一
 ```
 
-#### `GeneratePgnFile(string filePath)`
-#### `GeneratePgnFileAsync(string filePath, CancellationToken cancellationToken = default)`
+#### `GeneratePgn(XiangqiGame game, MoveNotationType moveNotationType = MoveNotationType.TraditionalChinese)`
+Returns the PGN string as bytes array. The moveNotationType is used to specify the type of move notation you want in the result. The default value is TraditionalChinese.
+
+### IPgnSavingService
+The `IPgnSavingService` interface provides a set of APIs for exporting the game as a PGN file.
+
+#### `Save(string filePath, XiangqiGame game, MoveNotationType moveNotationType = MoveNotationType.TraditionalChinese)`
+#### `SaveAsync(string filePath, XiangqiGame game, MoveNotationType moveNotationType = MoveNotationType.TraditionalChinese, CancellationToken cancellationToken = default)`
 
 Exports the game as a PGN file to the specified filePath.
 If the file name is provided in the file path, please make sure you are using the PGN extension. If not provided, the PGN file would be default to use the GameName in the XiangqiGame class
@@ -609,11 +621,26 @@ XiangqiGame game =  builder
  game.MakeMove("馬二進三", MoveNotationType.Chinese);
  game.MakeMove("車9平8", MoveNotationType.Chinese);
 
- game.ExportGameAsPgnFile("game.pgn");
+ IPgnSavingService pgnService = new DefaultPgnSavingService();
+
+ await pgnService.SaveAsync("USERS/DOWNLOAD/test.pgn", game, cancellationToken: default);
 ```
 
-#### GenerateImage(string filePath, int moveCount = 0, ImageConfig? config = null,)
-#### GenerateImageAsync(string filePath, int moveCount = 0, ImageConfig? config = null, CancellationToken cancellationToken = default)
+### IImageGenerationService
+The `IImageGenerationService` interface provides a set of APIs for generating images of the game.
+
+#### `public byte[] GenerateImage(string fen, Coordinate? previousLocation = null, Coordinate? currentLocation = null, ImageConfig? imageConfig = null)`
+
+#### `public Task<byte[]> GenerateImageAsync(string fen, Coordinate? previousLocation = null, Coordinate? currentLocation = null, ImageConfig? imageConfig = null, CancellationToken cancellationToken = default)`
+
+#### `public byte[] GenerateImage(MoveHistoryObject moveHistoryObject, ImageConfig? imageConfig = null)`
+
+#### `public Task<byte[]> GenerateImageAsync(MoveHistoryObject moveHistoryObject, ImageConfig? imageConfig = null, CancellationToken cancellationToken = default)`
+
+#### `public byte[] GenerateImage(Piece[,] position, Coordinate? previousLocation = null, Coordinate? currentLocation = null, ImageConfig? imageConfig = null)`
+
+#### `public Task<byte[]> GenerateImageAsync(Piece[,] position, Coordinate? previousLocation = null, Coordinate? currentLocation = null, ImageConfig? imageConfig = null, CancellationToken cancellationToken = default)`
+
 Generates an image of the a board position for a specified move count and saves it to the specified file path.
 If the image name is provided in the file path, please make sure you are using the JPG extension. If not provided, the image would be default to use the GameName in the XiangqiGame class
 
@@ -645,11 +672,58 @@ ImageConfig config = new()
 	UseWesternPieces = true,
 };
 
-game.GenerateImage("C:\Users\User\Downloads", moveCount: 3);
+IImageGenerationService imageService = new DefaultImageGenerationService();
+
+await imageService.GenerateImage(game.CurrentFen, cancellationToken: default);
 ```
 
-####  `GenerateGif(string filePath, ImageConfig? config = null, decimal frameDelayInSecond = 1)`
-####  `GenerateGifAsync(string filePath, ImageConfig? config = null, decimal frameDelayInSecond = 1, CancellationToken cancellationToken = default)`
+### `IImageSavingService`
+The `IImageSavingService` interface provides a set of APIs for exporting the game as an image file.
+
+#### `public void Save(string filePath, string fen, Coordinate? previousLocation = null, Coordinate? currentLocation = null, ImageConfig? imageConfig = null)`
+
+#### `public Task SaveAsync(string filePath, string fen, Coordinate? previousLocation = null, Coordinate? currentLocation = null, ImageConfig? imageConfig = null, CancellationToken cancellationToken = default)`
+
+#### `public void Save(string filePath, MoveHistoryObject moveHistoryObject, ImageConfig? imageConfig = null)`
+
+#### `public Task SaveAsync(string filePath, MoveHistoryObject moveHistoryObject, ImageConfig? imageConfig = null, CancellationToken cancellationToken = default)`
+
+#### `public void Save(string filePath, Piece[,] position, Coordinate? previousLocation = null, Coordinate? currentLocation = null, ImageConfig? imageConfig = null)`
+
+#### `public Task SaveAsync(string filePath, Piece[,] position, Coordinate? previousLocation = null, Coordinate? currentLocation = null, ImageConfig? imageConfig = null, CancellationToken cancellationToken = default)`
+
+```c#
+using XiangqiCore.Game;
+
+XiangqiBuilder builder = new ();
+XiangqiGame game =  builder
+	.WithDefaultConfiguration()
+	.Build();
+
+game.MakeMove("炮二平五", MoveNotationType.Chinese);
+game.MakeMove("馬8進7", MoveNotationType.Chinese);
+game.MakeMove("馬二進三", MoveNotationType.Chinese);
+
+IImageSavingService imageService = new DefaultImageSavingService();
+
+await imageService.SaveAsync("USERS/DOWNLOAD/test.jpg", game.CurrentFen, cancellationToken: default);
+```
+
+
+### `IGifGenerationService`
+The `IGifGenerationService` interface provides a set of APIs for generating GIFs of the game.
+
+#### `public byte[] GenerateGif(IEnumerable<string> fens, ImageConfig? imageConfig = null)`
+
+#### `public Task<byte[]> GenerateGifAsync(IEnumerable<string> fens, ImageConfig? imageConfig = null, CancellationToken cancellationToken = default)`
+
+#### `public byte[] GenerateGif(List<MoveHistoryObject> moveHistory, ImageConfig? imageConfig = null)`
+
+#### `public Task<byte[]> GenerateGifAsync(List<MoveHistoryObject> moveHistory, ImageConfig? imageConfig = null, CancellationToken cancellationToken = default)`
+
+#### `public byte[] GenerateGif(XiangqiGame game, ImageConfig? imageConfig = null)`
+
+#### `public Task<byte[]> GenerateGifAsync(XiangqiGame game, ImageConfig? imageConfig = null, CancellationToken cancellationToken = default)`
 Generates a GIF of the game and saves it to the specified file path.
 If the image name is provided in the file path, please make sure you are using the GIF extension. If not provided, the image would be default to use the GameName in the XiangqiGame class
 
@@ -665,7 +739,43 @@ game.MakeMove("炮二平五", MoveNotationType.Chinese);
 game.MakeMove("馬8進7", MoveNotationType.Chinese);
 game.MakeMove("馬二進三", MoveNotationType.Chinese);
 
-game.GenerateGif("C:\Users\User\Downloads", frameDelayInSecond: 2);
+IGifGenerationService gifService = new DefaultGifGenerationService();
+
+await gifService.GenerateGifAsync(game, cancellationToken: default);
+```
+
+### `IGifSavingService`
+The `IGifSavingService` interface provides a set of APIs for exporting the game as a GIF file.
+
+#### `public void Save(string filePath, IEnumerable<string> fens, ImageConfig? imageConfig = null)`
+
+#### `public Task SaveAsync(string filePath, IEnumerable<string> fens, ImageConfig? imageConfig = null, CancellationToken cancellationToken = defaul`
+
+#### `public void Save(string filePath, List<MoveHistoryObject> moveHistory, ImageConfig? imageConfig = null)`
+
+#### `public Task SaveAsync(string filePath, List<MoveHistoryObject> moveHistory, ImageConfig? imageConfig = null, CancellationToken cancellationToken = defaul`
+
+#### `public void Save(string filePath, XiangqiGame game, ImageConfig? imageConfig = null)`
+
+#### `public Task SaveAsync(string filePath, XiangqiGame game, ImageConfig? imageConfig = null, CancellationToken cancellationToken = default)`
+
+```c#
+
+using XiangqiCore.Game;
+
+XiangqiBuilder builder = new ();
+
+XiangqiGame game =  builder
+	.WithDefaultConfiguration()
+	.Build();
+
+game.MakeMove("炮二平五", MoveNotationType.Chinese);
+game.MakeMove("馬8進7", MoveNotationType.Chinese);
+game.MakeMove("馬二進三", MoveNotationType.Chinese);
+
+IGifSavingService gifService = new DefaultGifSavingService();
+
+await gifService.SaveAsync("USERS/DOWNLOAD/test.gif", game, cancellationToken: default);
 ```
 
 ### Public Properties
