@@ -1,7 +1,6 @@
 ﻿using XiangqiCore.Extension;
 using XiangqiCore.Misc;
 using XiangqiCore.Move;
-using XiangqiCore.Move.MoveObject;
 using XiangqiCore.Move.MoveObjects;
 using XiangqiCore.Pieces;
 using XiangqiCore.Pieces.PieceTypes;
@@ -66,6 +65,19 @@ public class Board
 		_position.MakeMove(startingPosition, destination);
 
 		return moveHistory;
+	}
+
+	internal void UndoMove(MoveHistoryObject moveHistory)
+	{
+		Piece pieceMoved = PieceFactory.Create(moveHistory.PieceMoved, moveHistory.MovingSide, moveHistory.StartingPosition);
+		SetPieceAtPosition(moveHistory.StartingPosition, pieceMoved);
+
+		Piece pieceCaptured = new EmptyPiece();
+
+		if (moveHistory.IsCapture)
+			pieceCaptured = PieceFactory.Create(moveHistory.PieceCaptured, moveHistory.MovingSide.GetOppositeSide(), moveHistory.Destination);
+
+		SetPieceAtPosition(moveHistory.Destination, pieceCaptured);
 	}
 
 	private MoveHistoryObject CreateMoveHistory(Side sideToMove, Coordinate startingPosition, Coordinate destination, PieceOrder pieceOrder)

@@ -27,8 +27,10 @@ public class CoordinateMoveCommand(
 		return moveHistoryObject;
 	}
 
-	public void Undo()
+	public MoveHistoryObject Undo()
 	{
-		throw new NotImplementedException();
+		_board.UndoMove(MoveHistoryObject);
+
+		return MoveHistoryObject;
 	}
 }

@@ -129,7 +129,7 @@ public class XiangqiGame
 	/// </summary>
 	public int RoundNumber { get; private set; } = 0;
 
-	private List<MoveHistoryObject> _moveHistory { get; set; } = [];
+	private List<MoveHistoryObject> _moveHistory => _moveCommandInvoker.GetMoveHistories();
 
 	/// <summary>
 	/// Gets the move history.
@@ -253,9 +253,23 @@ public class XiangqiGame
 		}
 	}
 
+	public bool UndoMove(int numberOfMovesToUndo = 1)
+	{
+		try
+		{
+			MoveHistoryObject moveHistory = _moveCommandInvoker.UndoCommand(numberOfMovesToUndo);
+
+			return true;
+		}
+		catch (Exception)
+		{
+			return false;
+		}
+	}
+
 	private void IncrementRoundNumberIfNeeded()
 	{
-		if (SideToMove == Side.Red && (MoveHistory.Count != 0 || RoundNumber != 1))
+		if (SideToMove == Side.Red && (MoveHistory.Count > 1 || RoundNumber != 1))
 			RoundNumber++;
 	}
 
@@ -264,8 +278,6 @@ public class XiangqiGame
 	private void ResetNumberOfMovesWithoutCapture() => NumberOfMovesWithoutCapture = 0;
 
 	private void SwitchSideToMove() => SideToMove = SideToMove.GetOppositeSide();
-
-	private void AddMoveToHistory(MoveHistoryObject moveHistoryObj) => _moveHistory.Add(moveHistoryObj);
 
 	private void UpdateGameResult(GameResult result) => GameResult = result;
 
@@ -279,8 +291,6 @@ public class XiangqiGame
 		IncrementRoundNumberIfNeeded();
 
 		latestMove.UpdateFenWithGameInfo(RoundNumber, NumberOfMovesWithoutCapture);
-
-		AddMoveToHistory(latestMove);
 
 		if (latestMove.IsCheckmate)
 			UpdateGameResult(latestMove.MovingSide == Side.Red ? GameResult.RedWin : GameResult.BlackWin);
