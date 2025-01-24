@@ -243,7 +243,9 @@ public class XiangqiGame
 		{
 			MoveHistoryObject moveHistoryObject = _moveCommandInvoker.ExecuteCommand(moveCommand);
 
-			UpdateGameInfo(moveHistoryObject);
+			UpdateGameInfo();
+
+			moveHistoryObject.UpdateFenWithGameInfo(RoundNumber, NumberOfMovesWithoutCapture);
 
 			return true;
 		}
@@ -281,16 +283,16 @@ public class XiangqiGame
 
 	private void UpdateGameResult(GameResult result) => GameResult = result;
 
-	private void UpdateGameInfo(MoveHistoryObject latestMove)
+	private void UpdateGameInfo()
 	{
+		MoveHistoryObject latestMove = _moveHistory.Last();
+
 		if (latestMove.IsCapture)
 			ResetNumberOfMovesWithoutCapture();
 		else
 			IncrementNumberOfMovesWithoutCapture();
 
 		IncrementRoundNumberIfNeeded();
-
-		latestMove.UpdateFenWithGameInfo(RoundNumber, NumberOfMovesWithoutCapture);
 
 		if (latestMove.IsCheckmate)
 			UpdateGameResult(latestMove.MovingSide == Side.Red ? GameResult.RedWin : GameResult.BlackWin);
