@@ -241,11 +241,11 @@ public class XiangqiGame
 	{
 		try
 		{
-			MoveHistoryObject moveHistoryObject = _moveCommandInvoker.ExecuteCommand(moveCommand);
+			MoveHistoryObject latestMove = _moveCommandInvoker.ExecuteCommand(moveCommand);
 
-			UpdateGameInfo();
+			UpdateGameInfoAfterMove();
 
-			moveHistoryObject.UpdateFenWithGameInfo(RoundNumber, NumberOfMovesWithoutCapture);
+			latestMove.UpdateFenWithGameInfo(RoundNumber, NumberOfMovesWithoutCapture);
 
 			return true;
 		}
@@ -260,6 +260,8 @@ public class XiangqiGame
 		try
 		{
 			MoveHistoryObject moveHistory = _moveCommandInvoker.UndoCommand(numberOfMovesToUndo);
+
+			UpdateGameInfoAfterUndo();
 
 			return true;
 		}
@@ -283,7 +285,10 @@ public class XiangqiGame
 
 	private void UpdateGameResult(GameResult result) => GameResult = result;
 
-	private void UpdateGameInfo()
+	/// <summary>
+	/// Updates the game information after a move is made.
+	/// </summary>
+	private void UpdateGameInfoAfterMove()
 	{
 		MoveHistoryObject latestMove = _moveHistory.Last();
 
@@ -298,6 +303,18 @@ public class XiangqiGame
 			UpdateGameResult(latestMove.MovingSide == Side.Red ? GameResult.RedWin : GameResult.BlackWin);
 		else
 			SwitchSideToMove();
+	}
+
+	/// <summary>
+	/// Updates the game information according to the <see cref="MoveHistoryObject"/> after undoing a move.
+	/// </summary>
+	private void UpdateGameInfoAfterUndo()
+	{
+		RoundNumber = FenHelper.GetRoundNumber(CurrentFen);
+		NumberOfMovesWithoutCapture = FenHelper.GetNumberOfMovesWithoutCapture(CurrentFen);
+		SideToMove = FenHelper.GetSideToMoveFromFen(CurrentFen);
+
+		GameResult = GameResult.Unknown;
 	}
 
 	private void SaveMoveRecordToHistory(string moveRecord, MoveNotationType moveNotationType)
