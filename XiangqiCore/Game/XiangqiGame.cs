@@ -6,6 +6,7 @@ using XiangqiCore.Move;
 using XiangqiCore.Move.Commands;
 using XiangqiCore.Move.MoveObjects;
 using XiangqiCore.Pieces;
+using XiangqiCore.Pieces.PieceTypes;
 using XiangqiCore.Services.MoveParsing;
 
 namespace XiangqiCore.Game;
@@ -135,6 +136,23 @@ public class XiangqiGame
 	/// Gets the move history.
 	/// </summary>
 	public IReadOnlyList<MoveHistoryObject> MoveHistory => _moveHistory.AsReadOnly();
+
+	/// <summary>
+	/// Used for displaying the initial state of the game in the GIF.
+	/// </summary>
+	public MoveHistoryObject InitialState => new(
+		fenAfterMove: InitialFenString, 
+		fenBeforeMove: InitialFenString,
+		isCapture: false,
+		isCheck: false,
+		isCheckMate: GameResult != GameResult.Unknown && GameResult != GameResult.Draw,
+		pieceMoved: PieceType.None,
+		pieceCaptured: PieceType.None,
+		side: SideToMove,
+		startingPosition: Coordinate.Empty,
+		destination: Coordinate.Empty,
+		pieceOrder: PieceOrder.Unknown,
+		hasMultiplePieceOfSameTypeOnSameColumn: false);
 
 	/// <summary>
 	/// Gets the game result.

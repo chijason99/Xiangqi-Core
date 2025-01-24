@@ -53,7 +53,7 @@ public class DefaultImageGenerationService : IImageGenerationService
 
 		if (imageConfig.UseMoveIndicator)
 		{
-			if (previousPosition is not null)
+			if (previousPosition is not null && !previousPosition.Value.Equals(Coordinate.Empty))
 			{
 				using Image<Rgba32> moveIndicatorImage = _imageCache.GetImage(_imageResourcePathManager.GetMoveIndicatorResourcePath());
 
@@ -63,7 +63,7 @@ public class DefaultImageGenerationService : IImageGenerationService
 					new Point(xCoordinate * ImageConfig.DefaultSquareSize, yCoordinate * ImageConfig.DefaultSquareSize), 1f));
 			}
 
-			if (currentPosition is not null)
+			if (currentPosition is not null && !currentPosition.Value.Equals(Coordinate.Empty))
 			{
 				using Image<Rgba32> moveIndicatorImage = _imageCache.GetImage(_imageResourcePathManager.GetMoveIndicatorResourcePath());
 
