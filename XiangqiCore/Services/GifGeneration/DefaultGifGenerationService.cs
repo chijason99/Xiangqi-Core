@@ -56,8 +56,8 @@ public class DefaultGifGenerationService : IGifGenerationService
 			// If the move indicator is enabled and it is not the initial FEN
 			if (imageConfig.UseMoveIndicator && i > 0 && moveHistory is not null)
 			{
-				previousLocation = moveHistory[i - 1].StartingPosition;
-				currentLocation = moveHistory[i - 1].Destination;
+				previousLocation = moveHistory[i].StartingPosition;
+				currentLocation = moveHistory[i].Destination;
 			}
 
 			Piece[,] position = FenHelper.CreatePositionFromFen(fen);
@@ -82,10 +82,10 @@ public class DefaultGifGenerationService : IGifGenerationService
 	}
 
 	private async Task<Image<Rgba32>> GenerateGifCoreAsync(
-		IEnumerable<string>? fens = null, 
-		List<MoveHistoryObject>? moveHistory = null, 
-		ImageConfig? imageConfig = null,
-		CancellationToken cancellationToken = default)
+	IEnumerable<string>? fens = null,
+	List<MoveHistoryObject>? moveHistory = null,
+	ImageConfig? imageConfig = null,
+	CancellationToken cancellationToken = default)
 	{
 		if (fens is null && moveHistory is null)
 			throw new ArgumentNullException("Both fens and moveHistory cannot be null");
@@ -107,40 +107,47 @@ public class DefaultGifGenerationService : IGifGenerationService
 		GifFrameMetadata metadata = gif.Frames.RootFrame.Metadata.GetGifMetadata();
 		metadata.FrameDelay = frameDelayInCentiSeconds;
 
+		byte[][] imageBytesArray = new byte[fensList.Count][];
+
 		await Parallel.ForAsync(
-			fromInclusive: 0, 
-			toExclusive: fensList.Count, 
-			cancellationToken, 
-			async (i, ct) =>
+		fromInclusive: 0,
+		toExclusive: fensList.Count,
+		cancellationToken,
+		async (i, ct) =>
+		{
+			string fen = fensList[i];
+
+			Coordinate? previousLocation = null;
+			Coordinate? currentLocation = null;
+
+			// If the move indicator is enabled and it is not the initial FEN
+			if (imageConfig.UseMoveIndicator && i > 0 && moveHistory is not null)
 			{
-				string fen = fensList[i];
+				previousLocation = moveHistory[i].StartingPosition;
+				currentLocation = moveHistory[i].Destination;
+			}
 
-				Coordinate? previousLocation = null;
-				Coordinate? currentLocation = null;
+			byte[] imageBytes = await _imageGenerationService.GenerateImageAsync(
+						fen,
+						previousLocation: previousLocation,
+						currentLocation: currentLocation,
+						imageConfig,
+						cancellationToken);
 
-				// If the move indicator is enabled and it is not the initial FEN
-				if (imageConfig.UseMoveIndicator && i > 0 && moveHistory is not null)
-				{
-					previousLocation = moveHistory[i - 1].StartingPosition;
-					currentLocation = moveHistory[i - 1].Destination;
-				}
+			imageBytesArray[i] = imageBytes;
+		});
 
-				byte[] imageBytes = await _imageGenerationService.GenerateImageAsync(
-					fen,
-					previousLocation: previousLocation,
-					currentLocation: currentLocation,
-					imageConfig,
-					cancellationToken);
+		foreach (byte[] imageBytes in imageBytesArray)
+		{
+			using Image<Rgba32> image = Image.Load<Rgba32>(imageBytes);
+			var frame = image.Frames.CloneFrame(0);
 
-				using Image<Rgba32> image = Image.Load<Rgba32>(imageBytes);
-				var frame = image.Frames.CloneFrame(0);
+			// Set the delay until the next image is displayed.
+			metadata = image.Frames.RootFrame.Metadata.GetGifMetadata();
+			metadata.FrameDelay = frameDelayInCentiSeconds;
 
-				// Set the delay until the next image is displayed.
-				metadata = image.Frames.RootFrame.Metadata.GetGifMetadata();
-				metadata.FrameDelay = frameDelayInCentiSeconds;
-
-				gif.Frames.AddFrame(image.Frames.RootFrame);
-			});
+			gif.Frames.AddFrame(image.Frames.RootFrame);
+		}
 
 		return gif;
 	}

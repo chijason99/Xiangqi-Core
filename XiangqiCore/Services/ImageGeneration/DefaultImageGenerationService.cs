@@ -174,7 +174,7 @@ public class DefaultImageGenerationService : IImageGenerationService
 
 	public byte[] GenerateImage(Piece[,] position, Coordinate? previousLocation = null, Coordinate? currentLocation = null, ImageConfig? imageConfig = null)
 	{
-		using Image<Rgba32> image = GenerateBoardImageCore(position);
+		using Image<Rgba32> image = GenerateBoardImageCore(position, previousLocation, currentLocation, imageConfig);
 		using MemoryStream memoryStream = new();
 
 		image.Save(memoryStream, new PngEncoder());
@@ -184,7 +184,7 @@ public class DefaultImageGenerationService : IImageGenerationService
 
 	public async Task<byte[]> GenerateImageAsync(Piece[,] position, Coordinate? previousLocation = null, Coordinate? currentLocation = null, ImageConfig? imageConfig = null, CancellationToken cancellationToken = default)
 	{
-		using Image<Rgba32> image = GenerateBoardImageCore(position);
+		using Image<Rgba32> image = GenerateBoardImageCore(position, previousLocation, currentLocation, imageConfig);
 		using MemoryStream memoryStream = new();
 
 		await image.SaveAsync(memoryStream, new PngEncoder(), cancellationToken);
