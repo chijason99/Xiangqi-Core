@@ -4,6 +4,8 @@ using XiangqiCore.Extension;
 using XiangqiCore.Game;
 using XiangqiCore.Misc;
 using XiangqiCore.Move;
+using XiangqiCore.Services.MoveParsing;
+using XiangqiCore.Services.PgnGeneration;
 
 namespace xiangqi_core_test.XiangqiCore.XiangqiGameTest;
 public static class XiangqiGameTests
@@ -74,7 +76,9 @@ public static class XiangqiGameTests
 							.WithStartingFen(startingFen)
 							.Build();
 
-		List<string> moves = GameRecordParser.Parse(gameRecord);
+		DefaultMoveParsingService moveParsingService = new();
+
+		List<string> moves = moveParsingService.ParseGameRecord(gameRecord);
 
 		// Act
 		foreach (string move in moves)
@@ -100,7 +104,9 @@ public static class XiangqiGameTests
 							.WithStartingFen(startingFen)
 							.Build();
 
-		List<string> moves = GameRecordParser.Parse(gameRecord);
+		DefaultMoveParsingService moveParsingService = new();
+
+		List<string> moves = moveParsingService.ParseGameRecord(gameRecord);
 
 		foreach (string move in moves)
 		{
