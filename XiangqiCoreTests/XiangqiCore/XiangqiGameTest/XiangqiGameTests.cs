@@ -53,10 +53,10 @@ public static class XiangqiGameTests
 			yield return new object[] { new UndoMoveMethodTestData(
 				"rnbakabnr/9/1c5c1/p1p1p1p1p/9/9/P1P1P1P1P/1C5C1/9/RNBAKABNR w - - 0 0",
 				" 1. 相三進五  馬２進３    2. 兵七進一  卒７進１\r\n  3. 馬八進七  馬８進７    4. 車九進一  炮８平９\r\n  5. 馬二進三  車９平８    6. 車一平二  象３進５\r\n  7. 炮二進四  車１進１    8. 車九平四  車１平４\r\n  9. 車四進三  車４進３   10. 仕四進五  卒３進１\r\n 11. 炮二平九  車８進９   12. 馬三退二  馬７進６\r\n 13. 炮九平一  炮９平６   14. 車四平二  卒３進１\r\n 15. 車二平七  炮２退２   16. 炮八進四  炮２平３\r\n 17. 炮八平七  馬３退１   18. 炮七平九  車４進４\r\n 19. 相七進九  馬６進７   20. 馬七進六  車４退２\r\n 21. 相九退七  車４平５   22. 車七進二  馬１進３\r\n 23. 炮九平五  士４進５   24. 車七平六  車５退１\r\n 25. 炮一退一  炮６進３   26. 炮五平三  馬７進５\r\n 27. 相七進五  炮６平４   28. 馬二進四  炮４平２\r\n 29. 車六平八  馬３退１   30. 車八平七  車５進２\r\n 31. 炮一進三  車５退４   32. 車七退二  士５退４\r\n 33. 炮三進二  馬１進２   34. 車七退四  象５進３",
-				NumberOfMovesToUndo: 65,
-				ExpectedFen: "2cakab2/6C1C/9/1n2r4/2b3p2/1c7/P7P/9/4AN3/2RAK4 w - - 8 34",
-				ExpectedMoveHistoryCount: 68,
-				ExpectedRoundNumber: 8) };
+				NumberOfMovesToUndo: 68,
+				ExpectedFen: "rnbakabnr/9/1c5c1/p1p1p1p1p/9/9/P1P1P1P1P/1C5C1/9/RNBAKABNR w - - 0 0",
+				ExpectedMoveHistoryCount: 0,
+				ExpectedRoundNumber: 0) };
 		}
 	}
 
