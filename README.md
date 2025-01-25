@@ -1202,6 +1202,11 @@ string translatedMove = moveTranslationService.TranslateMove(game.MoveHistory[0]
 
 ## Release Notes
 
+Version 2.0.1
+
+Bug Fixes:
+- Fix the issue where the `DefaultImageGenerationService` does not make use of the `ImageConfig` from the user when generating the image
+
 Version 2.0.0
 
 Features:
