@@ -7,10 +7,15 @@ Xiangqi-Core is a comprehensive library designed to facilitate the development o
 
 - **Fluent API**: Provides a fluent API for easy configuration and initialization of game instances.
 - **Game State Management**: Easily manage game states, including piece positions, turn tracking, and game outcome detection.
-- **Parsing of Move Notations**: Supports parsing of move notations in UCCI, Chinese, and English, allowing for versatile game command inputs.
+- **Parsing of Move Notations**: Supports parsing of move notations in UCCI, Simplified Chinese, Traditional Chinese, and English, allowing for versatile game command inputs.
 - **Move Validation**: Validate player moves, ensuring moves adhere to the rules of Xiangqi.
-- **Utility Functions**: A collection of utility functions for piece and board management, including piece movement simulation and position checking.
-
+- **Image Generation**: Generate customizable images of the game board for visual representation.
+- **GIF Generation**: Generate customizable GIFs of the game for visual representation.
+- **PGN Generation**: Generate PGN strings and files for game records.
+- **Dpxq Game Record Parsing**: Import a game from dpxq.com using the Dpxq game record format.
+- **Randomisation of Board Position**: Randomise the board position based on the current FEN or custom piece counts.
+- **Move Translations**: Translate moves between different move notations.
+- **Dependency Injection**: Utilize the library with dependency injection in your applications.
 
 ## Installation
 
@@ -462,6 +467,22 @@ XiangqiGame game =  builder.WithDefaultConfiguration().Build();
  game.MakeMove(new Coordinate(column: 5, row: 2), new Coordinate(column: 5, row: 3));
 ```
 
+##### `UndoMove(int numberOfMovesToUndo = 1)`
+Undoes the specified number of moves in the game. Returns a boolean representing if the moves are undone successfully or not.
+```c#
+
+using XiangqiCore.Game;
+
+XiangqiBuilder builder = new ();
+
+XiangqiGame game =  builder.WithDefaultConfiguration().Build();
+
+game.MakeMove("炮二平五", MoveNotationType.Chinese);
+game.MakeMove("馬8進7", MoveNotationType.Chinese);
+
+game.UndoMove();
+```
+
 ### `IPgnGenerationService`
 The `IPgnGenerationService` interface provides a set of APIs for exporting the game as a PGN string or file.
 
@@ -778,6 +799,94 @@ IGifSavingService gifService = new DefaultGifSavingService();
 await gifService.SaveAsync("USERS/DOWNLOAD/test.gif", game, cancellationToken: default);
 ```
 
+### `IPgnGenerationService`
+The `IPgnGenerationService` interface provides a set of APIs for exporting the game as a PGN string or file.
+
+#### `public byte[] GeneratePgn(XiangqiGame game, MoveNotationType moveNotationType = MoveNotationType.TraditionalChinese)`
+
+#### `public string GeneratePgnString(XiangqiGame game, MoveNotationType moveNotationType = MoveNotationType.TraditionalChinese)`
+
+#### `public string ExportMoveHistory(XiangqiGame game, MoveNotationType targetNotationType = MoveNotationType.TraditionalChinese)`
+
+```c#
+using XiangqiCore.Game;
+
+XiangqiBuilder builder = new ();
+
+XiangqiGame game =  builder.WithDefaultConfiguration().Build();
+
+game.MakeMove("炮二平五", MoveNotationType.Chinese);
+
+IPgnGenerationService pgnService = new DefaultPgnGenerationService();
+
+string moveHistory = pgnService.ExportMoveHistory(game);
+```
+
+
+### `IPgnSavingService`
+The `IPgnSavingService` interface provides a set of APIs for exporting the game as a PGN file. You can save the game as a PGN file to the specified file path, with the notation type of your own choice.
+
+#### `public void Save(string filePath, XiangqiGame game, MoveNotationType moveNotationType = MoveNotationType.TraditionalChinese)`
+
+#### `public Task SaveAsync(string filePath, XiangqiGame game, MoveNotationType moveNotationType = MoveNotationType.TraditionalChinese, CancellationToken cancellationToken = default)`
+
+```c#
+using XiangqiCore.Game;
+
+XiangqiBuilder builder = new ();
+
+XiangqiGame game =  builder.WithDefaultConfiguration().Build();
+
+game.MakeMove("炮二平五", MoveNotationType.Chinese);
+
+IPgnSavingService pgnService = new DefaultPgnSavingService();
+
+await pgnService.SaveAsync("USERS/DOWNLOAD/test.pgn", game, cancellationToken: default);
+```
+
+### `IMoveParsingService`
+The `IMoveParsingService` interface provides a set of APIs for parsing move notations.
+
+#### `public ParsedMoveObject ParseMove(string move, MoveNotationType notationType)`
+
+Parses the move notation and returns a `ParsedMoveObject` containing the starting and destination coordinates of the move.
+```c#
+using XiangqiCore.Game;
+
+XiangqiBuilder builder = new ();
+
+XiangqiGame game =  builder.WithDefaultConfiguration().Build();
+
+IMoveParsingService moveParsingService = new DefaultMoveParsingService();
+
+ParsedMoveObject move = moveParsingService.ParseMove("炮二平五", MoveNotationType.Chinese);
+```
+
+#### `public List<string> ParseGameRecord(string gameRecord)`
+Parses the game record and returns a list of move notations. This is useful when you have a game record in a string format and you want to extract the move notations.
+
+### `IMoveTranslationService`
+
+The `IMoveTranslationService` interface provides a set of APIs for translating move notations between different languages.
+
+#### `public string TranslateMove(MoveHistoryObject move, MoveNotationType notationType)`
+
+Translates the move notation to the specified notation type.
+
+```c#
+using XiangqiCore.Game;
+
+XiangqiBuilder builder = new ();
+
+XiangqiGame game =  builder.WithDefaultConfiguration().Build();
+
+game.MakeMove("炮二平五", MoveNotationType.Chinese);
+
+IMoveTranslationService moveTranslationService = new DefaultMoveTranslationService();
+
+string translatedMove = moveTranslationService.TranslateMove(game.MoveHistory[0], MoveNotationType.English);
+```
+
 ### Public Properties
 
 #### `CurrentFen`
@@ -1049,7 +1158,25 @@ The maximum column and row are 9 and 10, respectively.
 
 ## Release Notes
 
+Version 2.0.0
+
+Features:
+- Upgraded to .NET 9.0
+- Dependency Injection support for the services by adding the `AddXiangqiCore` extension method
+- Separated the external logics, like the Image Generation and PGN generation, from the `XiangqiGame` class.
+	- Added the `IImageGenerationService` interface to generate images of the game, with the `DefaultImageGenerationService` implementation
+	- Added the `IImageSavingService` interface to export the game as an image file, with the `DefaultImageSavingService` implementation
+	- Added the `IGifGenerationService` interface to generate GIFs of the game, with the `DefaultGifGenerationService` implementation
+	- Added the `IGifSavingService` interface to export the game as a GIF file, with the `DefaultGifSavingService` implementation
+	- Added the `IPgnGenerationService` interface to export the game as a PGN string, with the `DefaultPgnGenerationService` implementation
+	- Added the `IPgnSavingService` interface to export the game as a PGN file, with the `DefaultPgnSavingService` implementation
+	- Added the `IMoveParsingService` interface to parse the move from the move notation string, and game record string, with the `DefaultMoveParsingService` implementation
+	- Added the `IMoveTranslationService` interface to translate the move notation between different languages, with the `DefaultMoveTranslationService` implementation
+	- Added the `IMoveCommand` interface to execute/undo the move in the game
+- Add the UndoMove method to undo moves in the game
+
 Version 1.6.0
+
 Features:
 - Separate the MoveNotationType from Chinese to SimplifiedChinese and TradtionalChinese
 - Now the MoveHistoryObject supports the translation into UCCI, English, Simplified Chinese and Traditional Chinese notations
@@ -1060,6 +1187,7 @@ Bug Fixes:
 
 
 Version 1.5.0
+
 Features:
 - Add the ImageConfig class to set different options for the image/GIF generation
 - Add Western pieces (black and white + coloured), Chinese pieces (coloured), and board (coloured) for the image generation
@@ -1070,6 +1198,7 @@ Bug Fixes:
 
 
 Version 1.4.1
+
 Features:
 - Rename the ``ExportGameAsPgnFile`` to ``GeneratePgnFile`` to follow naming convention
 - Add ``GenerateImageAsync``, ``GenerateGifAsync``, and ``GeneratePgnFileAsync`` for asynchronous generation of image, GIF, and PGN file
@@ -1079,6 +1208,7 @@ Bug Fixes:
 
 
 Version 1.4.0
+
 Features:
 - Functionality to randomise the board position using the `RandomisePiecePosition` method in the `XiangqiBuilder` class.
 - Add the overriding behaviour of the `WithBoardConfig` method in the `XiangqiBuilder` class. Now it will overwrite the existing FEN/Board Config if it is called multiple times.
