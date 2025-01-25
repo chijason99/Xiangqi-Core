@@ -1,8 +1,13 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
+using XiangqiCore.Move.Commands;
+using XiangqiCore.Services.GifGeneration;
+using XiangqiCore.Services.GifSaving;
 using XiangqiCore.Services.ImageGeneration;
+using XiangqiCore.Services.ImageSaving;
 using XiangqiCore.Services.MoveParsing;
 using XiangqiCore.Services.MoveTransalation;
 using XiangqiCore.Services.PgnGeneration;
+using XiangqiCore.Services.PgnSaving;
 
 namespace XiangqiCore.Extension;
 
@@ -14,28 +19,14 @@ public static class DependencyInjection
 		services.AddScoped<IPgnGenerationService, DefaultPgnGenerationService>();
 		services.AddScoped<IMoveParsingService, DefaultMoveParsingService>();
 		services.AddScoped<IMoveTranslationService, DefaultMoveTranslationService>();
+		services.AddScoped<IImageSavingService, DefaultImageSavingService>();
+		services.AddScoped<IGifSavingService, DefaultGifSavingService>();
+		services.AddScoped<IGifGenerationService, DefaultGifGenerationService>();
+		services.AddScoped<IPgnSavingService, DefaultPgnSavingService>();
+
+		services.AddScoped<IMoveCommand, NotationMoveCommand>();
+		services.AddScoped<IMoveCommand, CoordinateMoveCommand>();
 
 		return services;
 	}
-
-	public static IServiceCollection AddXiangqiServices(this IServiceCollection services, Action<XiangqiServiceOptions> configureOptions)
-	{
-		var options = new XiangqiServiceOptions();
-		configureOptions(options);
-
-		services.AddScoped<IMoveTranslationService>(provider => options.MoveTranslationService ?? new DefaultMoveTranslationService());
-		services.AddScoped<IPgnGenerationService>(provider => options.PgnGenerationService ?? new DefaultPgnGenerationService());
-		services.AddScoped<IImageGenerationService>(provider => options.ImageGenerationService ?? new DefaultImageGenerationService());
-		services.AddScoped<IMoveParsingService>(provider => options.MoveParsingService ?? new DefaultMoveParsingService());
-
-		return services;
-	}
-}
-
-public class XiangqiServiceOptions
-{
-	public IMoveTranslationService? MoveTranslationService { get; set; }
-	public IPgnGenerationService? PgnGenerationService { get; set; }
-	public IImageGenerationService? ImageGenerationService { get; set; }
-	public IMoveParsingService? MoveParsingService { get; set; }
 }

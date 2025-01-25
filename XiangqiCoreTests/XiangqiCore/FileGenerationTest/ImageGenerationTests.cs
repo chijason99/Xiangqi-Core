@@ -110,10 +110,13 @@ public class ImageGenerationTests
 				};
 
 				imageGenerationService.Save(filePath, game.CurrentFen, imageConfig: config);
-
-				// Assert
-				Assert.True(File.Exists(filePath), "Image file was not created.");
 			});
+
+			for (int i = 1; i < 21; i++)
+			{
+				string filePath = Path.Combine(tempDirectory, $"三兵巧勝炮雙士_{i}.jpg");
+				Assert.True(File.Exists(filePath), "Image file was not created.");
+			}
 		}
 		catch (Exception ex)
 		{

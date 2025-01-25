@@ -67,9 +67,11 @@ public class NotationMoveCommand : IMoveCommand
 		return moveHistoryObject;
 	}
 
-	public void Undo()
+	public MoveHistoryObject Undo()
 	{
-		throw new NotImplementedException();
+		_board.UndoMove(MoveHistoryObject);
+
+		return MoveHistoryObject;
 	}
 
 	private Coordinate FindStartingPosition(ParsedMoveObject moveObject, Side sideToMove)
@@ -155,6 +157,9 @@ public class NotationMoveCommand : IMoveCommand
 				catch (ArgumentOutOfRangeException)
 				{
 					Console.WriteLine("Trying to find out the correct piece to move due to an ambiguous move notation");
+
+					movedPiece = piecesToMove.Last();
+					moveObject.PieceOrder = PieceOrder.Last;
 				}
 			}
 		}

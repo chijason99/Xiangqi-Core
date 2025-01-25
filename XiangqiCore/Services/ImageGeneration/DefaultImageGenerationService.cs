@@ -53,7 +53,7 @@ public class DefaultImageGenerationService : IImageGenerationService
 
 		if (imageConfig.UseMoveIndicator)
 		{
-			if (previousPosition is not null)
+			if (previousPosition is not null && !previousPosition.Value.Equals(Coordinate.Empty))
 			{
 				using Image<Rgba32> moveIndicatorImage = _imageCache.GetImage(_imageResourcePathManager.GetMoveIndicatorResourcePath());
 
@@ -63,7 +63,7 @@ public class DefaultImageGenerationService : IImageGenerationService
 					new Point(xCoordinate * ImageConfig.DefaultSquareSize, yCoordinate * ImageConfig.DefaultSquareSize), 1f));
 			}
 
-			if (currentPosition is not null)
+			if (currentPosition is not null && !currentPosition.Value.Equals(Coordinate.Empty))
 			{
 				using Image<Rgba32> moveIndicatorImage = _imageCache.GetImage(_imageResourcePathManager.GetMoveIndicatorResourcePath());
 
@@ -174,7 +174,7 @@ public class DefaultImageGenerationService : IImageGenerationService
 
 	public byte[] GenerateImage(Piece[,] position, Coordinate? previousLocation = null, Coordinate? currentLocation = null, ImageConfig? imageConfig = null)
 	{
-		using Image<Rgba32> image = GenerateBoardImageCore(position);
+		using Image<Rgba32> image = GenerateBoardImageCore(position, previousLocation, currentLocation, imageConfig);
 		using MemoryStream memoryStream = new();
 
 		image.Save(memoryStream, new PngEncoder());
@@ -184,7 +184,7 @@ public class DefaultImageGenerationService : IImageGenerationService
 
 	public async Task<byte[]> GenerateImageAsync(Piece[,] position, Coordinate? previousLocation = null, Coordinate? currentLocation = null, ImageConfig? imageConfig = null, CancellationToken cancellationToken = default)
 	{
-		using Image<Rgba32> image = GenerateBoardImageCore(position);
+		using Image<Rgba32> image = GenerateBoardImageCore(position, previousLocation, currentLocation, imageConfig);
 		using MemoryStream memoryStream = new();
 
 		await image.SaveAsync(memoryStream, new PngEncoder(), cancellationToken);
