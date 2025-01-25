@@ -4,6 +4,8 @@ using XiangqiCore.Extension;
 using XiangqiCore.Game;
 using XiangqiCore.Misc;
 using XiangqiCore.Move;
+using XiangqiCore.Services.MoveParsing;
+using XiangqiCore.Services.PgnGeneration;
 
 namespace xiangqi_core_test.XiangqiCore.XiangqiGameTest;
 public static class XiangqiGameTests
@@ -28,6 +30,35 @@ public static class XiangqiGameTests
         }
     }
 
+	public static IEnumerable<object []> UndoMoveMethodTestData
+	{
+		get
+		{
+			yield return new object [] { new UndoMoveMethodTestData(
+				"r3kabr1/4a4/4bc2n/p1p1C1p1p/2c6/6P2/P1P1P3P/C1N5B/9/1RBAKA2R w - - 0 0",
+				"\r\n  1. 車一進一  炮３進３    2. 車一平八  車１平４\r\n  3. 炮九進四  車８進６    4. 炮九進三  車４進２\r\n  5. 車八進八  車４退２    6. 炮九平六  車８平５\r\n  7. 仕四進五  車５退３    8. 炮六平四  士５退４\r\n  9. 炮四平六  炮６退１   10. 車八進八",
+				NumberOfMovesToUndo: 3,
+				ExpectedFen: "1R1akCb2/9/4bc2n/2p1r1p1p/9/6P2/P1P5P/2c5B/4A4/1RBAK4 w - - 1 8",
+				ExpectedMoveHistoryCount: 16,
+				ExpectedRoundNumber: 8) };
+
+			yield return new object[] { new UndoMoveMethodTestData(
+				"rnbakabnr/9/1c5c1/p1p1p1p1p/9/9/P1P1P1P1P/1C5C1/9/RNBAKABNR w - - 0 0",
+				"1. 炮二平五  馬８進７    2. 馬二進三  卒７進１\r\n  3. 車一平二  車９平８    4. 車二進六  馬２進３\r\n  5. 兵七進一  炮８平９    6. 車二平三  炮９退１\r\n  7. 馬八進九  車１進１    8. 炮八平七  車１平６\r\n  9. 車三退一  炮９平７   10. 車三平八  車８進８\r\n 11. 炮五平六  炮２平１   12. 相七進五  馬７進６\r\n 13. 仕六進五  炮１進４   14. 馬九進七  炮１平５\r\n 15. 炮七退一  車８進１   16. 馬三進五  馬６進５\r\n 17. 兵七進一  車８平７   18. 兵七進一  馬３退１\r\n 19. 馬七進五  車７平８   20. 車九進六  炮７平９\r\n 21. 馬五進六  炮９進５   22. 馬六進七  車６平４\r\n 23. 車九進二  炮９進３   24. 車八退二  車８退１\r\n 25. 相五退三  車８進１   26. 相三進五  車８退１\r\n 27. 相五退三  車８進１   28. 相三進五  車８退５\r\n 29. 相五退三  車８進５   30. 相三進五  車８退３\r\n 31. 相五退三  車８平７   32. 仕五進四  車７進３\r\n 33. 帥五進一  馬５退７   34. 車八平六  車４平３\r\n 35. 車九平七  象３進１   36. 炮七平八  士６進５\r\n 37. 炮六平五  象７進５   38. 炮五進五  將５平６\r\n 39. 車六平四  士５進６   40. 車四進四  將６平５\r\n 41. 車四進一",
+				NumberOfMovesToUndo: 13,
+				ExpectedFen: "2bakab2/R1r6/9/2P1p3p/9/6n2/3R5/3C1A3/2C1K4/5Ar1c w - - 0 34",
+				ExpectedMoveHistoryCount: 68,
+				ExpectedRoundNumber: 8) };
+
+			yield return new object[] { new UndoMoveMethodTestData(
+				"rnbakabnr/9/1c5c1/p1p1p1p1p/9/9/P1P1P1P1P/1C5C1/9/RNBAKABNR w - - 0 0",
+				" 1. 相三進五  馬２進３    2. 兵七進一  卒７進１\r\n  3. 馬八進七  馬８進７    4. 車九進一  炮８平９\r\n  5. 馬二進三  車９平８    6. 車一平二  象３進５\r\n  7. 炮二進四  車１進１    8. 車九平四  車１平４\r\n  9. 車四進三  車４進３   10. 仕四進五  卒３進１\r\n 11. 炮二平九  車８進９   12. 馬三退二  馬７進６\r\n 13. 炮九平一  炮９平６   14. 車四平二  卒３進１\r\n 15. 車二平七  炮２退２   16. 炮八進四  炮２平３\r\n 17. 炮八平七  馬３退１   18. 炮七平九  車４進４\r\n 19. 相七進九  馬６進７   20. 馬七進六  車４退２\r\n 21. 相九退七  車４平５   22. 車七進二  馬１進３\r\n 23. 炮九平五  士４進５   24. 車七平六  車５退１\r\n 25. 炮一退一  炮６進３   26. 炮五平三  馬７進５\r\n 27. 相七進五  炮６平４   28. 馬二進四  炮４平２\r\n 29. 車六平八  馬３退１   30. 車八平七  車５進２\r\n 31. 炮一進三  車５退４   32. 車七退二  士５退４\r\n 33. 炮三進二  馬１進２   34. 車七退四  象５進３",
+				NumberOfMovesToUndo: 68,
+				ExpectedFen: "rnbakabnr/9/1c5c1/p1p1p1p1p/9/9/P1P1P1P1P/1C5C1/9/RNBAKABNR w - - 0 0",
+				ExpectedMoveHistoryCount: 0,
+				ExpectedRoundNumber: 0) };
+		}
+	}
 
 	[Theory]
 	[MemberData(nameof(MoveMethodWithCoordinatesTestData))]
@@ -62,7 +93,9 @@ public static class XiangqiGameTests
 							.WithStartingFen(startingFen)
 							.Build();
 
-		List<string> moves = GameRecordParser.Parse(gameRecord);
+		DefaultMoveParsingService moveParsingService = new();
+
+		List<string> moves = moveParsingService.ParseGameRecord(gameRecord);
 
 		// Act
 		foreach (string move in moves)
@@ -88,7 +121,9 @@ public static class XiangqiGameTests
 							.WithStartingFen(startingFen)
 							.Build();
 
-		List<string> moves = GameRecordParser.Parse(gameRecord);
+		DefaultMoveParsingService moveParsingService = new();
+
+		List<string> moves = moveParsingService.ParseGameRecord(gameRecord);
 
 		foreach (string move in moves)
 		{
@@ -97,9 +132,10 @@ public static class XiangqiGameTests
 		}
 
 		int startingRoundNumberCounter = initialMoveRoundNumber;
+		IPgnGenerationService pgnGenerationService = new DefaultPgnGenerationService();
 
 		// Act
-		string pgnGameRecord = game.ExportMoveHistory();
+		string pgnGameRecord = pgnGenerationService.ExportMoveHistory(game);
 
 		// Assert
 		foreach (string move in moves)
@@ -125,29 +161,31 @@ public static class XiangqiGameTests
 		DateTime competitionDate = new(year, month, day);
 
 		XiangqiGame game = builder
-							.WithStartingFen(startingFen)
-							.WithRedPlayer(player =>
-							{
-								player.Name = redPlayer;
-								player.Team = redTeam;
-							})
-							.WithBlackPlayer(player =>
-							{
-								player.Name = blackPlayer;
-								player.Team = blackTeam;
-							})
-							.WithCompetition(option =>
-							{
-								option
-									.WithGameDate(competitionDate)
-									.WithLocation(venue)
-									.WithName(comp);
-							})
-							.WithGameResult(result)
-							.Build();
+			.WithStartingFen(startingFen)
+			.WithRedPlayer(player =>
+			{
+				player.Name = redPlayer;
+				player.Team = redTeam;
+			})
+			.WithBlackPlayer(player =>
+			{
+				player.Name = blackPlayer;
+				player.Team = blackTeam;
+			})
+			.WithCompetition(option =>
+			{
+				option
+					.WithGameDate(competitionDate)
+					.WithLocation(venue)
+					.WithName(comp);
+			})
+			.WithGameResult(result)
+			.Build();
+
+		IPgnGenerationService pgnGenerationService = new DefaultPgnGenerationService();
 
 		// Act
-		string pgnString = game.ExportGameAsPgnString();
+		string pgnString = pgnGenerationService.GeneratePgnString(game);
 
 		// Assert
 		pgnString.Should().Contain("[Game \"Chinese Chess\"]");
@@ -161,6 +199,34 @@ public static class XiangqiGameTests
 		pgnString.Should().Contain($"[Site \"{venue}\"]");
 		pgnString.Should().Contain($"[Result \"{EnumHelper<GameResult>.GetDisplayName(result)}\"]");
 	}
+
+	[Theory]
+	[MemberData(nameof(UndoMoveMethodTestData))]
+	public static void GameStateShouldBeModifiedCorrectly_WhenCallingUndoMoveMethod(UndoMoveMethodTestData data)
+	{
+		// Arrange
+		XiangqiBuilder builder = new();
+
+		XiangqiGame game = builder
+							.WithStartingFen(data.StartingFen)
+							.WithMoveRecord(data.MoveRecord)
+							.Build();
+
+		// Act
+		game.UndoMove(numberOfMovesToUndo: data.NumberOfMovesToUndo);
+
+		// Assert
+		game.CurrentFen.Should().Be(data.ExpectedFen);
+		game.MoveHistory.Count.Should().Be(data.ExpectedMoveHistoryCount);
+	}
 }
 
 public record MoveMethodTestData(string StartingFen, Coordinate StartingPosition, Coordinate Destination, bool ExpectedResult);
+
+public record UndoMoveMethodTestData(
+	string StartingFen, 
+	string MoveRecord, 
+	int NumberOfMovesToUndo, 
+	string ExpectedFen, 
+	int ExpectedMoveHistoryCount,
+	int ExpectedRoundNumber);

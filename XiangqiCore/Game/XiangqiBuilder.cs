@@ -3,6 +3,7 @@ using XiangqiCore.Attributes;
 using XiangqiCore.Boards;
 using XiangqiCore.Misc;
 using XiangqiCore.Move;
+using XiangqiCore.Services.MoveParsing;
 
 namespace XiangqiCore.Game;
 
@@ -28,6 +29,8 @@ public class XiangqiBuilder : IXiangqiBuilder
 
 	private string _moveRecord { get; set; } = "";
 	private MoveNotationType _moveNotationType { get; set; } = MoveNotationType.TraditionalChinese;
+
+	private IMoveParsingService _moveParsingService { get; set; } = new DefaultMoveParsingService();
 
 	private string _gameName { get; set; } = "";
 
@@ -83,21 +86,35 @@ public class XiangqiBuilder : IXiangqiBuilder
 	}
 
 	/// <summary>
+	/// Sets the move parsing service for the Xiangqi game.
+	/// </summary>
+	/// <param name="moveParsingService"></param>
+	/// <returns></returns>
+	public XiangqiBuilder WithMoveParsingService(IMoveParsingService moveParsingService)
+	{
+		_moveParsingService = moveParsingService;
+		return this;
+	}
+
+	/// <summary>
 	/// Builds an instance of the Xiangqi game asynchronously.
 	/// </summary>
 	/// <returns>An instance of the <see cref="XiangqiGame"/> class.</returns>
 	public XiangqiGame Build()
-		=> XiangqiGame.Create(
+	{
+		return XiangqiGame.Create(
 			_initialFen,
 			_redPlayer,
 			_blackPlayer,
 			_competition,
+			_moveParsingService,
 			_useBoardConfig,
 			_boardConfig,
 			_gameResult,
 			_moveRecord,
 			_gameName,
 			_moveNotationType);
+	}
 
 	/// <summary>
 	/// Sets the configuration for the red player.

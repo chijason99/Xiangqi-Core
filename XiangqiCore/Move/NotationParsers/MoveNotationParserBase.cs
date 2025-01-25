@@ -1,10 +1,9 @@
 ﻿using XiangqiCore.Extension;
 using XiangqiCore.Misc;
 using XiangqiCore.Move.MoveObject;
-using XiangqiCore.Move.NotationParsers;
 using XiangqiCore.Pieces.PieceTypes;
 
-namespace XiangqiCore.Move;
+namespace XiangqiCore.Move.NotationParsers;
 
 public abstract class MoveNotationParserBase : INotationParser
 {
@@ -138,6 +137,6 @@ public abstract class MoveNotationParserBase : INotationParser
 
 public readonly struct PieceTypeSideKey(PieceType pieceType, Side side)
 {
-    public readonly PieceType PieceType { get; } = pieceType;
-    public readonly Side Side { get; } = side;
+	public readonly PieceType PieceType { get; } = pieceType;
+	public readonly Side Side { get; } = side;
 }

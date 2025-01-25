@@ -7,10 +7,15 @@ Xiangqi-Core is a comprehensive library designed to facilitate the development o
 
 - **Fluent API**: Provides a fluent API for easy configuration and initialization of game instances.
 - **Game State Management**: Easily manage game states, including piece positions, turn tracking, and game outcome detection.
-- **Parsing of Move Notations**: Supports parsing of move notations in UCCI, Chinese, and English, allowing for versatile game command inputs.
+- **Parsing of Move Notations**: Supports parsing of move notations in UCCI, Simplified Chinese, Traditional Chinese, and English, allowing for versatile game command inputs.
 - **Move Validation**: Validate player moves, ensuring moves adhere to the rules of Xiangqi.
-- **Utility Functions**: A collection of utility functions for piece and board management, including piece movement simulation and position checking.
-
+- **Image Generation**: Generate customizable images of the game board for visual representation.
+- **GIF Generation**: Generate customizable GIFs of the game for visual representation.
+- **PGN Generation**: Generate PGN strings and files for game records.
+- **Dpxq Game Record Parsing**: Import a game from dpxq.com using the Dpxq game record format.
+- **Randomisation of Board Position**: Randomise the board position based on the current FEN or custom piece counts.
+- **Move Translations**: Translate moves between different move notations.
+- **Dependency Injection**: Utilize the library with dependency injection in your applications.
 
 ## Installation
 
@@ -462,8 +467,11 @@ XiangqiGame game =  builder.WithDefaultConfiguration().Build();
  game.MakeMove(new Coordinate(column: 5, row: 2), new Coordinate(column: 5, row: 3));
 ```
 
-#### `ExportMoveHistory()`
-Exports the move history of the game as a string.
+##### `MakeMove(IMoveCommand moveCommand)`
+Makes a move in the game based on your customized implemenation of the IMoveCommand interface.
+By default, the library provides two MoveCommand class that implements the IMoveCommand interface, namely `NotationMoveCommand` and `CoordinateMoveCommand`.
+When calling the `MakeMove(Coodrinate startingPosition, Coordinate destination)` or `MakeMove(string move, MoveNotationType notationType)` method, 
+they are converted to the `CoordinateMoveCommand` and `NotationMoveCommand` respectively under the hood.
 
 ```c#
 using XiangqiCore.Game;
@@ -472,200 +480,30 @@ XiangqiBuilder builder = new ();
 
 XiangqiGame game =  builder.WithDefaultConfiguration().Build();
 
- game.MakeMove("炮二平五", MoveNotationType.Chinese);
- game.MakeMove("馬8進7", MoveNotationType.Chinese);
- game.MakeMove("馬二進三", MoveNotationType.Chinese);
- game.MakeMove("車9平8", MoveNotationType.Chinese);
+IMoveCommand moveCommand = new NotationMoveCommand(
+		moveParsingService: yourCustomImplementationOfMoveParsingService,
+		board: game.Board,
+		moveNotation: "E3+5",
+		sideToMove: Side.Red,
+		moveNotationType: MoveNotationType.English);
 
-string moveHistory = game.ExportMoveHistory();
-
-Console.WriteLine(moveHistory);
-
-// Output:
-// 1. 炮二平五 馬8進7 
-// 2. 馬二進三 車9平8
+game.MakeMove(moveCommand);
 ```
 
-#### `ExportGameAsPgnString()`
-Exports the game as a PGN string.
-
+##### `UndoMove(int numberOfMovesToUndo = 1)`
+Undoes the specified number of moves in the game. Returns a boolean representing if the moves are undone successfully or not.
 ```c#
+
 using XiangqiCore.Game;
 
 XiangqiBuilder builder = new ();
 
-XiangqiGame game =  builder
-	.WithRedPlayer(player => player.Name = "吕钦")
-	.WithBlackPlayer(player => player.Name = "王嘉良")
-	.WithCompetition(competition => {
-		competition.Event = "全国象棋个人锦标赛";
-		competition.Date = "1987-11-30";
-	})
-	.WithMoveRecord(@"
-	1. 炮二平五  馬８進７    2. 馬二進三  車９平８
-  3. 馬八進七  卒３進１    4. 炮八平九  馬２進３
-  5. 車九平八  車１平２    6. 車一進一  象７進５
-  7. 車一平四  炮２進４    8. 車八進一  士６進５
-  9. 車八平六  炮２進１   10. 車四進五  卒７進１
- 11. 車四平三  馬７退６   12. 車三平二  車８進１
- 13. 兵五進一  炮８平７   14. 車二平三  車８進４
- 15. 馬三進五  車８平６   16. 車六進五  炮２退１
- 17. 炮五平二  車６平８   18. 馬五退四  車２進５
- 19. 仕六進五  車２平５   20. 車六平八  車５平６
- 21. 車八退三  車６進３   22. 炮二平四  車６平７
- 23. 兵七進一  卒７進１   24. 兵七進一  車７退２
- 25. 馬七進六  車７平２   26. 馬六退八  卒５進１
- 27. 炮四進六  車８退４   28. 車三進一  車８平６
- 29. 車三退一  車６進４   30. 兵七進一  馬３退２
- 31. 馬八退六  卒５進１   32. 馬六進七  象５進３
- 33. 炮九進四  馬６進５   34. 車三平一  卒５平４
- 35. 馬七退八  車６進１   36. 馬八進九  車６平２
- 37. 相三進五  象３進１   38. 兵七平六  馬２進３
- 39. 炮九平八  車２退１   40. 車一進三  士５退６
- 41. 兵六進一")
-	.WithGameResult(GameResult.RedWin)
-	.Build();
-
-string pgnString = game.ExportGameAsPgnString();
-
-Console.WriteLine(pgnString);
-
-// Output:
-// [Game "Chinese Chess"]
-// [Event "全国象棋个人锦标赛"]
-// [Site "Unknown"]
-// [Date "1987.11.30"]
-// [Red "吕钦"]
-// [RedTeam "Unknown"]
-// [Black "王嘉良"]
-// [BlackTeam "Unknown"]
-// [Result "1-0"]
-// [FEN "rnbakabnr/9/1c5c1/p1p1p1p1p/9/9/P1P1P1P1P/1C5C1/9/RNBAKABNR w - - 0 1"]
-// 1. 炮二平五  馬８進７
-// 2. 馬二進三  車９平８
-// 3. 馬八進七  卒３進１
-// 4. 炮八平九  馬２進３
-// 5. 車九平八  車１平２
-// 6. 車一進一  象７進５
-// 7. 車一平四  炮２進４
-// 8. 車八進一  士６進５
-// 9. 車八平六  炮２進１
-// 10. 車四進五  卒７進１
-// 11. 車四平三  馬７退６
-// 12. 車三平二  車８進１
-// 13. 兵五進一  炮８平７
-// 14. 車二平三  車８進４
-// 15. 馬三進五  車８平６
-// 16. 車六進五  炮２退１
-// 17. 炮五平二  車６平８
-// 18. 馬五退四  車２進５
-// 19. 仕六進五  車２平５
-// 20. 車六平八  車５平６
-// 21. 車八退三  車６進３
-// 22. 炮二平四  車６平７
-// 23. 兵七進一  卒７進１
-// 24. 兵七進一  車７退２
-// 25. 馬七進六  車７平２
-// 26. 馬六退八  卒５進１
-// 27. 炮四進六  車８退４
-// 28. 車三進一  車８平６
-// 29. 車三退一  車６進４
-// 30. 兵七進一  馬３退２
-// 31. 馬八退六  卒５進１
-// 32. 馬六進七  象５進３
-// 33. 炮九進四  馬６進５
-// 34. 車三平一  卒５平４
-// 35. 馬七退八  車６進１
-// 36. 馬八進九  車６平２
-// 37. 相三進五  象３進１
-// 38. 兵七平六  馬２進３
-// 39. 炮九平八  車２退１
-// 40. 車一進三  士５退６
-// 41. 兵六進一
-```
-
-#### `GeneratePgnFile(string filePath)`
-#### `GeneratePgnFileAsync(string filePath, CancellationToken cancellationToken = default)`
-
-Exports the game as a PGN file to the specified filePath.
-If the file name is provided in the file path, please make sure you are using the PGN extension. If not provided, the PGN file would be default to use the GameName in the XiangqiGame class
-
-```c#
-using XiangqiCore.Game;
-
-XiangqiBuilder builder = new ();
-
-XiangqiGame game =  builder
-	.WithRedPlayer(player => player.Name = "吕钦")
-	.WithBlackPlayer(player => player.Name = "王嘉良")
-	.WithCompetition(competition => {
-		competition.Event = "全国象棋个人锦标赛";
-		competition.Date = "1987-11-30";
-	})
-	.Buil();
-
- game.MakeMove("炮二平五", MoveNotationType.Chinese);
- game.MakeMove("馬8進7", MoveNotationType.Chinese);
- game.MakeMove("馬二進三", MoveNotationType.Chinese);
- game.MakeMove("車9平8", MoveNotationType.Chinese);
-
- game.ExportGameAsPgnFile("game.pgn");
-```
-
-#### GenerateImage(string filePath, int moveCount = 0, ImageConfig? config = null,)
-#### GenerateImageAsync(string filePath, int moveCount = 0, ImageConfig? config = null, CancellationToken cancellationToken = default)
-Generates an image of the a board position for a specified move count and saves it to the specified file path.
-If the image name is provided in the file path, please make sure you are using the JPG extension. If not provided, the image would be default to use the GameName in the XiangqiGame class
-
-The `ImageConfig` class is used to set the configuration for the image generation. Below are the properties you can configure and they are all defualt to false:
-
-- FlipVertical : Flip the board vertically across the 5th column;
-- FlipHorizontal: Flip the board horizontally across the river;
-- UseBlackAndWhitePieces: Use black and white pieces instead of the coloured pieces;
-- UseMoveIndicator: Show the move indicator on the image to display where the piece moves from/to;
-- UseWesternPieces: Use pieces with a logo instead of traditonal pieces with a Chinese character;
-- UseBlackAndWhiteBoard: Use a black and white board instead of the coloured board;
-
-```c#
-using XiangqiCore.Game;
-
-XiangqiBuilder builder = new ();
-XiangqiGame game =  builder
-	.WithDefaultConfiguration()
-	.Build();
+XiangqiGame game =  builder.WithDefaultConfiguration().Build();
 
 game.MakeMove("炮二平五", MoveNotationType.Chinese);
 game.MakeMove("馬8進7", MoveNotationType.Chinese);
-game.MakeMove("馬二進三", MoveNotationType.Chinese);
 
-ImageConfig config = new()
-{
-	UseBlackAndWhitePieces = true,
-	UseMoveIndicator = true,
-	UseWesternPieces = true,
-};
-
-game.GenerateImage("C:\Users\User\Downloads", moveCount: 3);
-```
-
-####  `GenerateGif(string filePath, ImageConfig? config = null, decimal frameDelayInSecond = 1)`
-####  `GenerateGifAsync(string filePath, ImageConfig? config = null, decimal frameDelayInSecond = 1, CancellationToken cancellationToken = default)`
-Generates a GIF of the game and saves it to the specified file path.
-If the image name is provided in the file path, please make sure you are using the GIF extension. If not provided, the image would be default to use the GameName in the XiangqiGame class
-
-```c#
-using XiangqiCore.Game;
-
-XiangqiBuilder builder = new ();
-XiangqiGame game =  builder
-	.WithDefaultConfiguration()
-	.Build();
-
-game.MakeMove("炮二平五", MoveNotationType.Chinese);
-game.MakeMove("馬8進7", MoveNotationType.Chinese);
-game.MakeMove("馬二進三", MoveNotationType.Chinese);
-
-game.GenerateGif("C:\Users\User\Downloads", frameDelayInSecond: 2);
+game.UndoMove();
 ```
 
 ### Public Properties
@@ -716,6 +554,21 @@ Console.WriteLine(boardPosition.GetPieceAtPosition(new Coordinate(column: 5, row
 
 #### `MoveHistory`
 Gets the move history of the game as a list of `MoveHistoryObject`.
+
+The `MoveHistoryObject` class has the following properties:
+
+- **FenAfterMove**
+- **FenBeforeMove**
+- **IsCapture**: Indicates if the move resulted in a capture.
+- **IsCheck**: Indicates if the move resulted in a check.
+- **IsCheckmate**: Indicates if the move resulted in a checkmate.
+- **HasMultiplePieceOfSameTypeOnSameColumn**: Indicates if there are multiple pieces of the same type on the same column.
+- **PieceMoved**: The piece type of the piece that was moved.
+- **PieceCaptured**: The piece type of the piece that was captured, if any.
+- **MovingSide**: The side (Red or Black) that made the move.
+- **StartingPosition**: The starting coordinate of the move.
+- **Destination**: The destination coordinate of the move.
+- **PieceOrder**: The order of the piece in the column, as there might be more than one pieces of the same type.
 
 ```c#
 using XiangqiCore.Game;
@@ -937,9 +790,437 @@ The maximum column and row are 9 and 10, respectively.
 	Red
 ```
 
+## Services
+
+The library provides a set of interfaces and default implementations for generating images, GIFs, and PGNs for the Xiangqi game, as well as translating moves between different move notations, and move parsing.
+The default implementations can be used out of the box, or you can create your own implementations by implementing the interfaces.
+They are designed to be used with dependency injection in your applications.
+
+### `IPgnGenerationService`
+The `IPgnGenerationService` interface provides a set of APIs for exporting the game as a PGN string or file.
+
+#### `ExportMoveHistory(XiangqiGame game, MoveNotationType moveNotationType = MoveNotationType.TraditionalChinese)`
+Returns the move history of the game as a string. The moveNotationType is used to specify the type of move notation you want in the result. The default value is TraditionalChinese.
+
+```c#
+using XiangqiCore.Game;
+
+XiangqiBuilder builder = new ();
+
+XiangqiGame game =  builder.WithDefaultConfiguration().Build();
+
+game.MakeMove("炮二平五", MoveNotationType.Chinese);
+game.MakeMove("馬8進7", MoveNotationType.Chinese);
+game.MakeMove("馬二進三", MoveNotationType.Chinese);
+game.MakeMove("車9平8", MoveNotationType.Chinese);
+
+IPgnGenerationService pgnService = new DefaultPgnGenerationService();
+string moveHistory = pgnService.ExportMoveHistory(game);
+
+Console.WriteLine(moveHistory);
+
+// Output:
+// 1. 炮二平五 馬8進7 
+// 2. 馬二進三 車9平8
+```
+
+#### `GeneratePgnString(XiangqiGame game, MoveNotationType moveNotationType = MoveNotationType.TraditionalChinese)`
+Returns a PGN string. The moveNotationType is used to specify the type of move notation you want in the result. The default value is TraditionalChinese.
+
+```c#
+using XiangqiCore.Game;
+
+XiangqiBuilder builder = new ();
+
+XiangqiGame game =  builder
+	.WithRedPlayer(player => player.Name = "吕钦")
+	.WithBlackPlayer(player => player.Name = "王嘉良")
+	.WithCompetition(competition => {
+		competition.Event = "全国象棋个人锦标赛";
+		competition.Date = "1987-11-30";
+	})
+	.WithMoveRecord(@"
+	1. 炮二平五  馬８進７    2. 馬二進三  車９平８
+  3. 馬八進七  卒３進１    4. 炮八平九  馬２進３
+  5. 車九平八  車１平２    6. 車一進一  象７進５
+  7. 車一平四  炮２進４    8. 車八進一  士６進５
+  9. 車八平六  炮２進１   10. 車四進五  卒７進１
+ 11. 車四平三  馬７退６   12. 車三平二  車８進１
+ 13. 兵五進一  炮８平７   14. 車二平三  車８進４
+ 15. 馬三進五  車８平６   16. 車六進五  炮２退１
+ 17. 炮五平二  車６平８   18. 馬五退四  車２進５
+ 19. 仕六進五  車２平５   20. 車六平八  車５平６
+ 21. 車八退三  車６進３   22. 炮二平四  車６平７
+ 23. 兵七進一  卒７進１   24. 兵七進一  車７退２
+ 25. 馬七進六  車７平２   26. 馬六退八  卒５進１
+ 27. 炮四進六  車８退４   28. 車三進一  車８平６
+ 29. 車三退一  車６進４   30. 兵七進一  馬３退２
+ 31. 馬八退六  卒５進１   32. 馬六進七  象５進３
+ 33. 炮九進四  馬６進５   34. 車三平一  卒５平４
+ 35. 馬七退八  車６進１   36. 馬八進九  車６平２
+ 37. 相三進五  象３進１   38. 兵七平六  馬２進３
+ 39. 炮九平八  車２退１   40. 車一進三  士５退６
+ 41. 兵六進一")
+	.WithGameResult(GameResult.RedWin)
+	.Build();
+
+IPgnGenerationService pgnService = new DefaultPgnGenerationService();
+
+string pgnString = pgnService.GeneratePgnString(game);
+
+Console.WriteLine(pgnString);
+
+// Output:
+// [Game "Chinese Chess"]
+// [Event "全国象棋个人锦标赛"]
+// [Site "Unknown"]
+// [Date "1987.11.30"]
+// [Red "吕钦"]
+// [RedTeam "Unknown"]
+// [Black "王嘉良"]
+// [BlackTeam "Unknown"]
+// [Result "1-0"]
+// [FEN "rnbakabnr/9/1c5c1/p1p1p1p1p/9/9/P1P1P1P1P/1C5C1/9/RNBAKABNR w - - 0 1"]
+// 1. 炮二平五  馬８進７
+// 2. 馬二進三  車９平８
+// 3. 馬八進七  卒３進１
+// 4. 炮八平九  馬２進３
+// 5. 車九平八  車１平２
+// 6. 車一進一  象７進５
+// 7. 車一平四  炮２進４
+// 8. 車八進一  士６進５
+// 9. 車八平六  炮２進１
+// 10. 車四進五  卒７進１
+// 11. 車四平三  馬７退６
+// 12. 車三平二  車８進１
+// 13. 兵五進一  炮８平７
+// 14. 車二平三  車８進４
+// 15. 馬三進五  車８平６
+// 16. 車六進五  炮２退１
+// 17. 炮五平二  車６平８
+// 18. 馬五退四  車２進５
+// 19. 仕六進五  車２平５
+// 20. 車六平八  車５平６
+// 21. 車八退三  車６進３
+// 22. 炮二平四  車６平７
+// 23. 兵七進一  卒７進１
+// 24. 兵七進一  車７退２
+// 25. 馬七進六  車７平２
+// 26. 馬六退八  卒５進１
+// 27. 炮四進六  車８退４
+// 28. 車三進一  車８平６
+// 29. 車三退一  車６進４
+// 30. 兵七進一  馬３退２
+// 31. 馬八退六  卒５進１
+// 32. 馬六進七  象５進３
+// 33. 炮九進四  馬６進５
+// 34. 車三平一  卒５平４
+// 35. 馬七退八  車６進１
+// 36. 馬八進九  車６平２
+// 37. 相三進五  象３進１
+// 38. 兵七平六  馬２進３
+// 39. 炮九平八  車２退１
+// 40. 車一進三  士５退６
+// 41. 兵六進一
+```
+
+#### `GeneratePgn(XiangqiGame game, MoveNotationType moveNotationType = MoveNotationType.TraditionalChinese)`
+Returns the PGN string as bytes array. The moveNotationType is used to specify the type of move notation you want in the result. The default value is TraditionalChinese.
+
+### IPgnSavingService
+The `IPgnSavingService` interface provides a set of APIs for exporting the game as a PGN file.
+
+#### `Save(string filePath, XiangqiGame game, MoveNotationType moveNotationType = MoveNotationType.TraditionalChinese)`
+#### `SaveAsync(string filePath, XiangqiGame game, MoveNotationType moveNotationType = MoveNotationType.TraditionalChinese, CancellationToken cancellationToken = default)`
+
+Exports the game as a PGN file to the specified filePath.
+If the file name is provided in the file path, please make sure you are using the PGN extension. If not provided, the PGN file would be default to use the GameName in the XiangqiGame class
+
+```c#
+using XiangqiCore.Game;
+
+XiangqiBuilder builder = new ();
+
+XiangqiGame game =  builder
+	.WithRedPlayer(player => player.Name = "吕钦")
+	.WithBlackPlayer(player => player.Name = "王嘉良")
+	.WithCompetition(competition => {
+		competition.Event = "全国象棋个人锦标赛";
+		competition.Date = "1987-11-30";
+	})
+	.Buil();
+
+ game.MakeMove("炮二平五", MoveNotationType.Chinese);
+ game.MakeMove("馬8進7", MoveNotationType.Chinese);
+ game.MakeMove("馬二進三", MoveNotationType.Chinese);
+ game.MakeMove("車9平8", MoveNotationType.Chinese);
+
+ IPgnSavingService pgnService = new DefaultPgnSavingService();
+
+ await pgnService.SaveAsync("USERS/DOWNLOAD/test.pgn", game, cancellationToken: default);
+```
+
+### IImageGenerationService
+The `IImageGenerationService` interface provides a set of APIs for generating images of the game.
+
+#### `public byte[] GenerateImage(string fen, Coordinate? previousLocation = null, Coordinate? currentLocation = null, ImageConfig? imageConfig = null)`
+
+#### `public Task<byte[]> GenerateImageAsync(string fen, Coordinate? previousLocation = null, Coordinate? currentLocation = null, ImageConfig? imageConfig = null, CancellationToken cancellationToken = default)`
+
+#### `public byte[] GenerateImage(MoveHistoryObject moveHistoryObject, ImageConfig? imageConfig = null)`
+
+#### `public Task<byte[]> GenerateImageAsync(MoveHistoryObject moveHistoryObject, ImageConfig? imageConfig = null, CancellationToken cancellationToken = default)`
+
+#### `public byte[] GenerateImage(Piece[,] position, Coordinate? previousLocation = null, Coordinate? currentLocation = null, ImageConfig? imageConfig = null)`
+
+#### `public Task<byte[]> GenerateImageAsync(Piece[,] position, Coordinate? previousLocation = null, Coordinate? currentLocation = null, ImageConfig? imageConfig = null, CancellationToken cancellationToken = default)`
+
+Generates an image of the a board position for a specified move count and saves it to the specified file path.
+If the image name is provided in the file path, please make sure you are using the JPG extension. If not provided, the image would be default to use the GameName in the XiangqiGame class
+
+The `ImageConfig` class is used to set the configuration for the image generation. Below are the properties you can configure and they are all defualt to false:
+
+- FlipVertical : Flip the board vertically across the 5th column;
+- FlipHorizontal: Flip the board horizontally across the river;
+- UseBlackAndWhitePieces: Use black and white pieces instead of the coloured pieces;
+- UseMoveIndicator: Show the move indicator on the image to display where the piece moves from/to;
+- UseWesternPieces: Use pieces with a logo instead of traditonal pieces with a Chinese character;
+- UseBlackAndWhiteBoard: Use a black and white board instead of the coloured board;
+
+```c#
+using XiangqiCore.Game;
+
+XiangqiBuilder builder = new ();
+XiangqiGame game =  builder
+	.WithDefaultConfiguration()
+	.Build();
+
+game.MakeMove("炮二平五", MoveNotationType.Chinese);
+game.MakeMove("馬8進7", MoveNotationType.Chinese);
+game.MakeMove("馬二進三", MoveNotationType.Chinese);
+
+ImageConfig config = new()
+{
+	UseBlackAndWhitePieces = true,
+	UseMoveIndicator = true,
+	UseWesternPieces = true,
+};
+
+IImageGenerationService imageService = new DefaultImageGenerationService();
+
+await imageService.GenerateImage(game.CurrentFen, cancellationToken: default);
+```
+
+### `IImageSavingService`
+The `IImageSavingService` interface provides a set of APIs for exporting the game as an image file.
+
+#### `public void Save(string filePath, string fen, Coordinate? previousLocation = null, Coordinate? currentLocation = null, ImageConfig? imageConfig = null)`
+
+#### `public Task SaveAsync(string filePath, string fen, Coordinate? previousLocation = null, Coordinate? currentLocation = null, ImageConfig? imageConfig = null, CancellationToken cancellationToken = default)`
+
+#### `public void Save(string filePath, MoveHistoryObject moveHistoryObject, ImageConfig? imageConfig = null)`
+
+#### `public Task SaveAsync(string filePath, MoveHistoryObject moveHistoryObject, ImageConfig? imageConfig = null, CancellationToken cancellationToken = default)`
+
+#### `public void Save(string filePath, Piece[,] position, Coordinate? previousLocation = null, Coordinate? currentLocation = null, ImageConfig? imageConfig = null)`
+
+#### `public Task SaveAsync(string filePath, Piece[,] position, Coordinate? previousLocation = null, Coordinate? currentLocation = null, ImageConfig? imageConfig = null, CancellationToken cancellationToken = default)`
+
+```c#
+using XiangqiCore.Game;
+
+XiangqiBuilder builder = new ();
+XiangqiGame game =  builder
+	.WithDefaultConfiguration()
+	.Build();
+
+game.MakeMove("炮二平五", MoveNotationType.Chinese);
+game.MakeMove("馬8進7", MoveNotationType.Chinese);
+game.MakeMove("馬二進三", MoveNotationType.Chinese);
+
+IImageSavingService imageService = new DefaultImageSavingService();
+
+await imageService.SaveAsync("USERS/DOWNLOAD/test.jpg", game.CurrentFen, cancellationToken: default);
+```
+
+
+### `IGifGenerationService`
+The `IGifGenerationService` interface provides a set of APIs for generating GIFs of the game.
+
+#### `public byte[] GenerateGif(IEnumerable<string> fens, ImageConfig? imageConfig = null)`
+
+#### `public Task<byte[]> GenerateGifAsync(IEnumerable<string> fens, ImageConfig? imageConfig = null, CancellationToken cancellationToken = default)`
+
+#### `public byte[] GenerateGif(List<MoveHistoryObject> moveHistory, ImageConfig? imageConfig = null)`
+
+#### `public Task<byte[]> GenerateGifAsync(List<MoveHistoryObject> moveHistory, ImageConfig? imageConfig = null, CancellationToken cancellationToken = default)`
+
+#### `public byte[] GenerateGif(XiangqiGame game, ImageConfig? imageConfig = null)`
+
+#### `public Task<byte[]> GenerateGifAsync(XiangqiGame game, ImageConfig? imageConfig = null, CancellationToken cancellationToken = default)`
+Generates a GIF of the game and saves it to the specified file path.
+If the image name is provided in the file path, please make sure you are using the GIF extension. If not provided, the image would be default to use the GameName in the XiangqiGame class
+
+```c#
+using XiangqiCore.Game;
+
+XiangqiBuilder builder = new ();
+XiangqiGame game =  builder
+	.WithDefaultConfiguration()
+	.Build();
+
+game.MakeMove("炮二平五", MoveNotationType.Chinese);
+game.MakeMove("馬8進7", MoveNotationType.Chinese);
+game.MakeMove("馬二進三", MoveNotationType.Chinese);
+
+IGifGenerationService gifService = new DefaultGifGenerationService();
+
+await gifService.GenerateGifAsync(game, cancellationToken: default);
+```
+
+### `IGifSavingService`
+The `IGifSavingService` interface provides a set of APIs for exporting the game as a GIF file.
+
+#### `public void Save(string filePath, IEnumerable<string> fens, ImageConfig? imageConfig = null)`
+
+#### `public Task SaveAsync(string filePath, IEnumerable<string> fens, ImageConfig? imageConfig = null, CancellationToken cancellationToken = defaul`
+
+#### `public void Save(string filePath, List<MoveHistoryObject> moveHistory, ImageConfig? imageConfig = null)`
+
+#### `public Task SaveAsync(string filePath, List<MoveHistoryObject> moveHistory, ImageConfig? imageConfig = null, CancellationToken cancellationToken = defaul`
+
+#### `public void Save(string filePath, XiangqiGame game, ImageConfig? imageConfig = null)`
+
+#### `public Task SaveAsync(string filePath, XiangqiGame game, ImageConfig? imageConfig = null, CancellationToken cancellationToken = default)`
+
+```c#
+
+using XiangqiCore.Game;
+
+XiangqiBuilder builder = new ();
+
+XiangqiGame game =  builder
+	.WithDefaultConfiguration()
+	.Build();
+
+game.MakeMove("炮二平五", MoveNotationType.Chinese);
+game.MakeMove("馬8進7", MoveNotationType.Chinese);
+game.MakeMove("馬二進三", MoveNotationType.Chinese);
+
+IGifSavingService gifService = new DefaultGifSavingService();
+
+await gifService.SaveAsync("USERS/DOWNLOAD/test.gif", game, cancellationToken: default);
+```
+
+### `IPgnGenerationService`
+The `IPgnGenerationService` interface provides a set of APIs for exporting the game as a PGN string or file.
+
+#### `public byte[] GeneratePgn(XiangqiGame game, MoveNotationType moveNotationType = MoveNotationType.TraditionalChinese)`
+
+#### `public string GeneratePgnString(XiangqiGame game, MoveNotationType moveNotationType = MoveNotationType.TraditionalChinese)`
+
+#### `public string ExportMoveHistory(XiangqiGame game, MoveNotationType targetNotationType = MoveNotationType.TraditionalChinese)`
+
+```c#
+using XiangqiCore.Game;
+
+XiangqiBuilder builder = new ();
+
+XiangqiGame game =  builder.WithDefaultConfiguration().Build();
+
+game.MakeMove("炮二平五", MoveNotationType.Chinese);
+
+IPgnGenerationService pgnService = new DefaultPgnGenerationService();
+
+string moveHistory = pgnService.ExportMoveHistory(game);
+```
+
+
+### `IPgnSavingService`
+The `IPgnSavingService` interface provides a set of APIs for exporting the game as a PGN file. You can save the game as a PGN file to the specified file path, with the notation type of your own choice.
+
+#### `public void Save(string filePath, XiangqiGame game, MoveNotationType moveNotationType = MoveNotationType.TraditionalChinese)`
+
+#### `public Task SaveAsync(string filePath, XiangqiGame game, MoveNotationType moveNotationType = MoveNotationType.TraditionalChinese, CancellationToken cancellationToken = default)`
+
+```c#
+using XiangqiCore.Game;
+
+XiangqiBuilder builder = new ();
+
+XiangqiGame game =  builder.WithDefaultConfiguration().Build();
+
+game.MakeMove("炮二平五", MoveNotationType.Chinese);
+
+IPgnSavingService pgnService = new DefaultPgnSavingService();
+
+await pgnService.SaveAsync("USERS/DOWNLOAD/test.pgn", game, cancellationToken: default);
+```
+
+### `IMoveParsingService`
+The `IMoveParsingService` interface provides a set of APIs for parsing move notations.
+
+#### `public ParsedMoveObject ParseMove(string move, MoveNotationType notationType)`
+
+Parses the move notation and returns a `ParsedMoveObject` containing the starting and destination coordinates of the move.
+```c#
+using XiangqiCore.Game;
+
+XiangqiBuilder builder = new ();
+
+XiangqiGame game =  builder.WithDefaultConfiguration().Build();
+
+IMoveParsingService moveParsingService = new DefaultMoveParsingService();
+
+ParsedMoveObject move = moveParsingService.ParseMove("炮二平五", MoveNotationType.Chinese);
+```
+
+#### `public List<string> ParseGameRecord(string gameRecord)`
+Parses the game record and returns a list of move notations. This is useful when you have a game record in a string format and you want to extract the move notations.
+
+### `IMoveTranslationService`
+
+The `IMoveTranslationService` interface provides a set of APIs for translating move notations between different languages.
+
+#### `public string TranslateMove(MoveHistoryObject move, MoveNotationType notationType)`
+
+Translates the move notation to the specified notation type.
+
+```c#
+using XiangqiCore.Game;
+
+XiangqiBuilder builder = new ();
+
+XiangqiGame game =  builder.WithDefaultConfiguration().Build();
+
+game.MakeMove("炮二平五", MoveNotationType.Chinese);
+
+IMoveTranslationService moveTranslationService = new DefaultMoveTranslationService();
+
+string translatedMove = moveTranslationService.TranslateMove(game.MoveHistory[0], MoveNotationType.English);
+```
+
 ## Release Notes
 
+Version 2.0.0
+
+Features:
+- Upgraded to .NET 9.0
+- Dependency Injection support for the services by adding the `AddXiangqiCore` extension method
+- Separated the external logics, like the Image Generation and PGN generation, from the `XiangqiGame` class.
+	- Added the `IImageGenerationService` interface to generate images of the game, with the `DefaultImageGenerationService` implementation
+	- Added the `IImageSavingService` interface to export the game as an image file, with the `DefaultImageSavingService` implementation
+	- Added the `IGifGenerationService` interface to generate GIFs of the game, with the `DefaultGifGenerationService` implementation
+	- Added the `IGifSavingService` interface to export the game as a GIF file, with the `DefaultGifSavingService` implementation
+	- Added the `IPgnGenerationService` interface to export the game as a PGN string, with the `DefaultPgnGenerationService` implementation
+	- Added the `IPgnSavingService` interface to export the game as a PGN file, with the `DefaultPgnSavingService` implementation
+	- Added the `IMoveParsingService` interface to parse the move from the move notation string, and game record string, with the `DefaultMoveParsingService` implementation
+	- Added the `IMoveTranslationService` interface to translate the move notation between different languages, with the `DefaultMoveTranslationService` implementation
+	- Added the `IMoveCommand` interface to execute/undo the move in the game
+- Add the UndoMove method to undo moves in the game
+
 Version 1.6.0
+
 Features:
 - Separate the MoveNotationType from Chinese to SimplifiedChinese and TradtionalChinese
 - Now the MoveHistoryObject supports the translation into UCCI, English, Simplified Chinese and Traditional Chinese notations
@@ -950,6 +1231,7 @@ Bug Fixes:
 
 
 Version 1.5.0
+
 Features:
 - Add the ImageConfig class to set different options for the image/GIF generation
 - Add Western pieces (black and white + coloured), Chinese pieces (coloured), and board (coloured) for the image generation
@@ -960,6 +1242,7 @@ Bug Fixes:
 
 
 Version 1.4.1
+
 Features:
 - Rename the ``ExportGameAsPgnFile`` to ``GeneratePgnFile`` to follow naming convention
 - Add ``GenerateImageAsync``, ``GenerateGifAsync``, and ``GeneratePgnFileAsync`` for asynchronous generation of image, GIF, and PGN file
@@ -969,6 +1252,7 @@ Bug Fixes:
 
 
 Version 1.4.0
+
 Features:
 - Functionality to randomise the board position using the `RandomisePiecePosition` method in the `XiangqiBuilder` class.
 - Add the overriding behaviour of the `WithBoardConfig` method in the `XiangqiBuilder` class. Now it will overwrite the existing FEN/Board Config if it is called multiple times.

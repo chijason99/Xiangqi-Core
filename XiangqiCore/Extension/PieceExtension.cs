@@ -344,58 +344,6 @@ public static class PieceExtension
         return deepClonedPosition;
 	}
 
-    public static byte[] GenerateBoardImage(
-        this Piece[,] position, 
-        ImageConfig? config = null,
-        Coordinate? previousPosition = null,
-        Coordinate? currentPosition = null)
-	{
-        config ??= new ImageConfig();
-
-        config.PreloadImages();
-
-		using Image<Rgba32> boardImage = config.GetBoardImage();
-        boardImage.Mutate(x => x.Resize(ImageConfig.DefaultBoardWidth, ImageConfig.DefaultBoardHeight));
-
-        foreach (Piece piece in position.Cast<Piece>().Where(p => p is not EmptyPiece))
-        {
-			using Image<Rgba32> pieceImage = config.GetPieceImage(piece.PieceType, piece.Side);
-
-            (int xCoordinate, int yCoordinate) = config.GetCoordinatesAfterRotation(piece.Coordinate);
-
-			boardImage.Mutate(ctx => ctx.DrawImage(pieceImage, 
-                new Point(xCoordinate * ImageConfig.DefaultSquareSize, yCoordinate * ImageConfig.DefaultSquareSize), 1f));
-		}
-
-        if (config.UseMoveIndicator)
-        {
-            if (previousPosition is not null)
-            {
-                using Image<Rgba32> moveIndicatorImage = config.GetMoveIndicatorImage();
-
-				(int xCoordinate, int yCoordinate) = config.GetCoordinatesAfterRotation(previousPosition.Value);
-
-				boardImage.Mutate(ctx => ctx.DrawImage(moveIndicatorImage,
-                    new Point(xCoordinate * ImageConfig.DefaultSquareSize, yCoordinate * ImageConfig.DefaultSquareSize), 1f));
-            }
-
-            if (currentPosition is not null)
-            {
-                using Image<Rgba32> moveIndicatorImage = config.GetMoveIndicatorImage();
-
-				(int xCoordinate, int yCoordinate) = config.GetCoordinatesAfterRotation(currentPosition.Value);
-
-				boardImage.Mutate(ctx => ctx.DrawImage(moveIndicatorImage,
-                    new Point(xCoordinate * ImageConfig.DefaultSquareSize, yCoordinate * ImageConfig.DefaultSquareSize), 1f));
-            }
-        }
-
-		using MemoryStream memoryStream = new();
-		boardImage.Save(memoryStream, new PngEncoder());
-
-		return memoryStream.ToArray();
-	}
-
 	/// <summary>
 	/// Checks if there are multiple pieces of the same type on the same column.
 	/// This method is used for the move notation generation, so advisor and bishop are excluded from the check.
