@@ -36,14 +36,14 @@ public class DefaultImageGenerationService : IImageGenerationService
 
 		imageConfig ??= new();
 
-		Image<Rgba32> boardImage = _imageCache.GetImage(_imageResourcePathManager.GetBoardResourcePath());
+		Image<Rgba32> boardImage = _imageCache.GetImage(_imageResourcePathManager.GetBoardResourcePath(imageConfig));
 
 		boardImage.Mutate(x => x.Resize(ImageConfig.DefaultBoardWidth, ImageConfig.DefaultBoardHeight));
 
 		foreach (Piece piece in position.Cast<Piece>().Where(p => p is not EmptyPiece))
 		{
 			using Image<Rgba32> pieceImage = _imageCache.GetImage(
-				_imageResourcePathManager.GetPieceResourcePath(piece.PieceType, piece.Side));
+				_imageResourcePathManager.GetPieceResourcePath(piece.PieceType, piece.Side, imageConfig));
 
 			(int xCoordinate, int yCoordinate) = GetCoordinatesAfterRotation(piece.Coordinate);
 
@@ -55,7 +55,7 @@ public class DefaultImageGenerationService : IImageGenerationService
 		{
 			if (previousPosition is not null && !previousPosition.Value.Equals(Coordinate.Empty))
 			{
-				using Image<Rgba32> moveIndicatorImage = _imageCache.GetImage(_imageResourcePathManager.GetMoveIndicatorResourcePath());
+				using Image<Rgba32> moveIndicatorImage = _imageCache.GetImage(_imageResourcePathManager.GetMoveIndicatorResourcePath(imageConfig));
 
 				(int xCoordinate, int yCoordinate) = GetCoordinatesAfterRotation(previousPosition.Value);
 
@@ -65,7 +65,7 @@ public class DefaultImageGenerationService : IImageGenerationService
 
 			if (currentPosition is not null && !currentPosition.Value.Equals(Coordinate.Empty))
 			{
-				using Image<Rgba32> moveIndicatorImage = _imageCache.GetImage(_imageResourcePathManager.GetMoveIndicatorResourcePath());
+				using Image<Rgba32> moveIndicatorImage = _imageCache.GetImage(_imageResourcePathManager.GetMoveIndicatorResourcePath(imageConfig));
 
 				(int xCoordinate, int yCoordinate) = GetCoordinatesAfterRotation(currentPosition.Value);
 
