@@ -154,12 +154,18 @@ public static class PieceExtension
 
         Piece pieceToMove = boardPosition.GetPieceAtPosition(startingPosition);
         Side targetKingSide = pieceToMove.Side;
-        Piece[,] positionAfterSimulation = boardPosition.SimulateMove(startingPosition, destination);
-        King targetKing = positionAfterSimulation.GetPiecesOfType<King>(targetKingSide).Single();
 
-        return positionAfterSimulation.IsKingInCheck(targetKingSide) ||
-               positionAfterSimulation.IsKingExposedDirectlyToEnemyKing(targetKing.Coordinate);
-    }
+        SimpleMoveObject simpleMoveObject = boardPosition.MakeMoveInPlace(startingPosition, destination);
+
+		King targetKing = boardPosition.GetPiecesOfType<King>(targetKingSide).Single();
+
+        bool willExposeKingToDanger = boardPosition.IsKingInCheck(targetKingSide) ||
+			   boardPosition.IsKingExposedDirectlyToEnemyKing(targetKing.Coordinate);
+
+		boardPosition.UndoMoveInPlace(simpleMoveObject);
+		
+        return willExposeKingToDanger;
+	}
 
     /// <summary>
     /// Gets the pieces of the specified type on the board for the specified side.
