@@ -13,31 +13,29 @@ public class Board
 
 	internal Board()
 	{
-		_position = FenHelper.CreatePositionFromFen(_emptyBoardFen);
+		Position = FenHelper.CreatePositionFromFen(_emptyBoardFen);
 	}
 
 	internal Board(string fenString)
 	{
-		_position = FenHelper.CreatePositionFromFen(fenString);
+		Position = FenHelper.CreatePositionFromFen(fenString);
 	}
 
 	internal Board(BoardConfig config)
 	{
-		_position = FenHelper.CreatePositionFromFen(_emptyBoardFen);
+		Position = FenHelper.CreatePositionFromFen(_emptyBoardFen);
 
 		foreach (var keyValuePair in config.PiecesToAdd)
 			SetPieceAtPosition(keyValuePair.Key, keyValuePair.Value);
 	}
 
-	private Piece[,] _position { get; set; }
+	public Piece[,] Position { get; private set; }
 
-	public Piece[,] Position => _position.DeepClone();
+	private void SetPieceAtPosition(Coordinate targetCoordinates, Piece targetPiece) => Position.SetPieceAtPosition(targetCoordinates, targetPiece);
 
-	private void SetPieceAtPosition(Coordinate targetCoordinates, Piece targetPiece) => _position.SetPieceAtPosition(targetCoordinates, targetPiece);
+	public Piece GetPieceAtPosition(Coordinate targetCoordinates) => Position.GetPieceAtPosition(targetCoordinates);
 
-	public Piece GetPieceAtPosition(Coordinate targetCoordinates) => _position.GetPieceAtPosition(targetCoordinates);
-
-	public string GetFenFromPosition => FenHelper.GetFenFromPosition(_position);
+	public string GetFenFromPosition => FenHelper.GetFenFromPosition(Position);
 
 	public static int[] GetAllRows() => [1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
 
@@ -50,7 +48,7 @@ public class Board
 
 	internal MoveHistoryObject MakeMove(Coordinate startingPosition, Coordinate destination, Side sideToMove, PieceOrder pieceOrder = PieceOrder.Unknown)
 	{
-		if (!_position.HasPieceAtPosition(startingPosition))
+		if (!Position.HasPieceAtPosition(startingPosition))
 			throw new InvalidOperationException($"There must be a piece on the starting position {startingPosition}");
 
 		Piece pieceToMove = GetPieceAtPosition(startingPosition);
@@ -58,21 +56,22 @@ public class Board
 		if (pieceToMove.Side != sideToMove)
 			throw new InvalidOperationException($"The side to move now should be {EnumHelper<Side>.GetDisplayName(sideToMove)}");
 
-		if (!pieceToMove.ValidateMove(_position, startingPosition, destination))
+		if (!pieceToMove.ValidateMove(Position, startingPosition, destination))
 			throw new InvalidOperationException($"The proposed move from {startingPosition} to {destination} violates the game logic"); ;
 
 		MoveHistoryObject moveHistory = CreateMoveHistory(sideToMove, startingPosition, destination, pieceOrder);
-		_position.MakeMove(startingPosition, destination);
-
+		
 		return moveHistory;
 	}
 
 	internal void UndoMove(MoveHistoryObject moveHistory)
 	{
-		Piece pieceMoved = PieceFactory.Create(moveHistory.PieceMoved, moveHistory.MovingSide, moveHistory.StartingPosition);
+		Piece pieceMoved = Position.GetPieceAtPosition(moveHistory.Destination);
+		pieceMoved.MoveTo(moveHistory.StartingPosition);
+
 		SetPieceAtPosition(moveHistory.StartingPosition, pieceMoved);
 
-		Piece pieceCaptured = new EmptyPiece();
+		Piece pieceCaptured = PieceFactory.CreateEmptyPiece();
 
 		if (moveHistory.IsCapture)
 			pieceCaptured = PieceFactory.Create(moveHistory.PieceCaptured, moveHistory.MovingSide.GetOppositeSide(), moveHistory.Destination);
@@ -82,15 +81,17 @@ public class Board
 
 	private MoveHistoryObject CreateMoveHistory(Side sideToMove, Coordinate startingPosition, Coordinate destination, PieceOrder pieceOrder)
 	{
-		Piece pieceCaptured = GetPieceAtPosition(destination);
-		Piece[,] positionAfterTheProposedMove = _position.SimulateMove(startingPosition, destination);
-		bool isCapture = _position.HasPieceAtPosition(destination);
-		bool isCheck = positionAfterTheProposedMove.IsKingInCheck(sideToMove.GetOppositeSide());
-		bool isCheckmate = positionAfterTheProposedMove.IsSideInCheckmate(sideToMove);
-		Piece pieceMoved = GetPieceAtPosition(startingPosition);
+		SimpleMoveObject simpleMoveObject = Position.MakeMoveInPlace(startingPosition, destination);
+		
+		bool isCapture = simpleMoveObject.PieceCaptured is not EmptyPiece;
+		bool isCheck = Position.IsKingInCheck(sideToMove.GetOppositeSide());
+		bool isCheckmate = Position.IsSideInCheckmate(sideToMove);
+
+		Piece pieceMoved = simpleMoveObject.PieceMoved;
+		Piece pieceCaptured = simpleMoveObject.PieceCaptured;
 
 		MoveHistoryObject moveHistory = new(
-			fenAfterMove: FenHelper.GetFenFromPosition(positionAfterTheProposedMove),
+			fenAfterMove: FenHelper.GetFenFromPosition(Position),
 			fenBeforeMove: GetFenFromPosition,
 			isCapture,
 			isCheck,
@@ -101,7 +102,7 @@ public class Board
 			startingPosition,
 			destination,
 			pieceOrder,
-			hasMultiplePieceOfSameTypeOnSameColumn: _position.HasMultiplePieceOfSameTypeOnSameColumn(
+			hasMultiplePieceOfSameTypeOnSameColumn: Position.HasMultiplePieceOfSameTypeOnSameColumn(
 				pieceMoved.PieceType, 
 				sideToMove, 
 				startingPosition.Column)
