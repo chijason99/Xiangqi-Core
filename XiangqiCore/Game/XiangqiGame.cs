@@ -203,6 +203,8 @@ public class XiangqiGame
 			RoundNumber = FenHelper.GetRoundNumber(initialFenString),
 			NumberOfMovesWithoutCapture = FenHelper.GetNumberOfMovesWithoutCapture(initialFenString),
 		};
+		
+		createdGameInstance.MoveCommandInvoker = new MoveCommandInvoker(createdGameInstance.Board);
 
 		if (useBoardConfig)
 			createdGameInstance.InitialFenString = FenHelper.GetFenFromPosition(createdGameInstance.Board.Position)
@@ -214,7 +216,6 @@ public class XiangqiGame
 		if (moveRecord is not null)
 			createdGameInstance.SaveMoveRecordToHistory(moveRecord, moveNotationType);
 
-		createdGameInstance.MoveCommandInvoker = new MoveCommandInvoker(createdGameInstance.Board);
 
 		return createdGameInstance;
 	}
