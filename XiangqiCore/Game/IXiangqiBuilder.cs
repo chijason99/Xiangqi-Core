@@ -1,4 +1,5 @@
 ﻿using XiangqiCore.Boards;
+using XiangqiCore.Move;
 
 namespace XiangqiCore.Game;
 
@@ -24,6 +25,12 @@ public interface IXiangqiBuilder
 
     XiangqiBuilder RandomisePosition(bool fromFen = true, bool allowCheck = true);
     XiangqiBuilder RandomisePosition(PieceCounts pieceCounts, bool allowCheck = true);
+
+    XiangqiBuilder WithMoveRecord(string moveRecord, MoveNotationType moveNotationType = MoveNotationType.TraditionalChinese);
+
+    XiangqiBuilder WithDpxqGameRecord(string dpxqGameRecord, MoveNotationType moveNotationType = MoveNotationType.SimplifiedChinese);
+
+
 
 	XiangqiGame Build();
 }
