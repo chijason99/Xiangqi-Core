@@ -72,4 +72,6 @@ public abstract class Piece(Coordinate coordinate, Side side)
 				yield return destination;
 		}
     }
+
+    public void MoveTo(Coordinate destination) => Coordinate = destination;
 }
