@@ -23,15 +23,20 @@ public class DefaultValidationStrategy : IValidationStrategy
         Side side = pieceToMove.Side;
         IValidationStrategy validationStrategy = pieceToMove.ValidationStrategy;
 
-        bool areCoordinatesValid = validationStrategy.AreCoordinatesValid(side, destination);
-        bool isDestinationContainingFriendlyPiece = boardPosition.IsDestinationContainingFriendlyPiece(startingPoint, destination);
-        bool isMoveLogicValid = validationStrategy.ValidateMoveLogicForPiece(boardPosition, startingPoint, destination);
-        bool willExposeKingToDanger = boardPosition.WillExposeKingToDanger(startingPoint, destination);
+        if (!validationStrategy.AreCoordinatesValid(side, destination))
+            return false;
 
-        return areCoordinatesValid &&
-               !isDestinationContainingFriendlyPiece &&
-               isMoveLogicValid &&
-               !willExposeKingToDanger;
+        if (boardPosition.IsDestinationContainingFriendlyPiece(startingPoint, destination))
+			return false;
+
+        if (!validationStrategy.ValidateMoveLogicForPiece(boardPosition, startingPoint, destination))
+            return false;
+
+        if (boardPosition.WillExposeKingToDanger(startingPoint, destination))
+			return false;
+
+        return true;
     }
+
     public virtual bool ValidateMoveLogicForPiece(Piece[,] boardPosition, Coordinate startingPoint, Coordinate destination) => true;
 }
