@@ -12,7 +12,6 @@ namespace XiangqiCore.Move.Commands;
 public class NotationMoveCommand : IMoveCommand
 {
 	private readonly IMoveParsingService _moveParsingService;
-	private readonly Board _board;
 	private readonly string _moveNotation;
 	private readonly Side _sideToMove;
 	private readonly MoveNotationType _moveNotationType;
@@ -20,27 +19,22 @@ public class NotationMoveCommand : IMoveCommand
 
 	public NotationMoveCommand(
 		IMoveParsingService moveParsingService,
-		Board board,
 		string moveNotation,
 		Side sideToMove,
 		MoveNotationType moveNotationType)
 	{
 		_moveParsingService = moveParsingService;
-		_board = board;
 		_moveNotation = moveNotation;
 		_sideToMove = sideToMove;
 		_moveNotationType = moveNotationType;
-		_position = _board.Position;
 	}
 
 	public NotationMoveCommand(
-		Board board,
 		string moveNotation,
 		Side sideToMove,
 		MoveNotationType moveNotationType) : 
 		this(
 			new DefaultMoveParsingService(), 
-			board, 
 			moveNotation, 
 			sideToMove, 
 			moveNotationType)
@@ -49,13 +43,13 @@ public class NotationMoveCommand : IMoveCommand
 
 	public MoveHistoryObject MoveHistoryObject { get; private set; }
 
-	public MoveHistoryObject Execute()
+	public MoveHistoryObject Execute(Board board)
 	{
 		ParsedMoveObject parsedMoveObject = _moveParsingService.ParseMove(_moveNotation, _moveNotationType);
 		Coordinate startingPosition = FindStartingPosition(parsedMoveObject, _sideToMove);
 		Coordinate destination = FindDestination(parsedMoveObject, startingPosition);
 
-		MoveHistoryObject moveHistoryObject = _board.MakeMove(
+		MoveHistoryObject moveHistoryObject = board.MakeMove(
 			startingPosition, 
 			destination, 
 			_sideToMove, 
@@ -67,9 +61,9 @@ public class NotationMoveCommand : IMoveCommand
 		return moveHistoryObject;
 	}
 
-	public MoveHistoryObject Undo()
+	public MoveHistoryObject Undo(Board board)
 	{
-		_board.UndoMove(MoveHistoryObject);
+		board.UndoMove(MoveHistoryObject);
 
 		return MoveHistoryObject;
 	}
