@@ -62,17 +62,18 @@ public class Board
 			throw new InvalidOperationException($"The proposed move from {startingPosition} to {destination} violates the game logic"); ;
 
 		MoveHistoryObject moveHistory = CreateMoveHistory(sideToMove, startingPosition, destination, pieceOrder);
-		_position.MakeMove(startingPosition, destination);
-
+		
 		return moveHistory;
 	}
 
 	internal void UndoMove(MoveHistoryObject moveHistory)
 	{
-		Piece pieceMoved = PieceFactory.Create(moveHistory.PieceMoved, moveHistory.MovingSide, moveHistory.StartingPosition);
+		Piece pieceMoved = _position.GetPieceAtPosition(moveHistory.Destination);
+		pieceMoved.MoveTo(moveHistory.StartingPosition);
+
 		SetPieceAtPosition(moveHistory.StartingPosition, pieceMoved);
 
-		Piece pieceCaptured = new EmptyPiece();
+		Piece pieceCaptured = PieceFactory.CreateEmptyPiece();
 
 		if (moveHistory.IsCapture)
 			pieceCaptured = PieceFactory.Create(moveHistory.PieceCaptured, moveHistory.MovingSide.GetOppositeSide(), moveHistory.Destination);
@@ -82,15 +83,17 @@ public class Board
 
 	private MoveHistoryObject CreateMoveHistory(Side sideToMove, Coordinate startingPosition, Coordinate destination, PieceOrder pieceOrder)
 	{
-		Piece pieceCaptured = GetPieceAtPosition(destination);
-		Piece[,] positionAfterTheProposedMove = _position.SimulateMove(startingPosition, destination);
-		bool isCapture = _position.HasPieceAtPosition(destination);
-		bool isCheck = positionAfterTheProposedMove.IsKingInCheck(sideToMove.GetOppositeSide());
-		bool isCheckmate = positionAfterTheProposedMove.IsSideInCheckmate(sideToMove);
-		Piece pieceMoved = GetPieceAtPosition(startingPosition);
+		SimpleMoveObject simpleMoveObject = _position.MakeMoveInPlace(startingPosition, destination);
+		
+		bool isCapture = simpleMoveObject.PieceCaptured is not EmptyPiece;
+		bool isCheck = _position.IsKingInCheck(sideToMove.GetOppositeSide());
+		bool isCheckmate = _position.IsSideInCheckmate(sideToMove);
+
+		Piece pieceMoved = simpleMoveObject.PieceMoved;
+		Piece pieceCaptured = simpleMoveObject.PieceCaptured;
 
 		MoveHistoryObject moveHistory = new(
-			fenAfterMove: FenHelper.GetFenFromPosition(positionAfterTheProposedMove),
+			fenAfterMove: FenHelper.GetFenFromPosition(_position),
 			fenBeforeMove: GetFenFromPosition,
 			isCapture,
 			isCheck,

@@ -15,7 +15,6 @@ public class NotationMoveCommand : IMoveCommand
 	private readonly string _moveNotation;
 	private readonly Side _sideToMove;
 	private readonly MoveNotationType _moveNotationType;
-	private readonly Piece[,] _position;
 
 	public NotationMoveCommand(
 		IMoveParsingService moveParsingService,
@@ -45,9 +44,11 @@ public class NotationMoveCommand : IMoveCommand
 
 	public MoveHistoryObject Execute(Board board)
 	{
+		Piece[,] position = board.Position;
+
 		ParsedMoveObject parsedMoveObject = _moveParsingService.ParseMove(_moveNotation, _moveNotationType);
-		Coordinate startingPosition = FindStartingPosition(parsedMoveObject, _sideToMove);
-		Coordinate destination = FindDestination(parsedMoveObject, startingPosition);
+		Coordinate startingPosition = FindStartingPosition(position, parsedMoveObject, _sideToMove);
+		Coordinate destination = FindDestination(position, parsedMoveObject, startingPosition);
 
 		MoveHistoryObject moveHistoryObject = board.MakeMove(
 			startingPosition, 
@@ -68,18 +69,18 @@ public class NotationMoveCommand : IMoveCommand
 		return MoveHistoryObject;
 	}
 
-	private Coordinate FindStartingPosition(ParsedMoveObject moveObject, Side sideToMove)
+	private Coordinate FindStartingPosition(Piece[,] position, ParsedMoveObject moveObject, Side sideToMove)
 	{
 		if (moveObject.IsFromUcciNotation)
 			return moveObject.StartingPosition!.Value;
 
-		Piece[] potentialPiecesToMove = GetPotentialPiecesToMove(moveObject.PieceType, sideToMove);
+		Piece[] potentialPiecesToMove = GetPotentialPiecesToMove(position, moveObject.PieceType, sideToMove);
 		Piece? movedPiece = null;
 
 		if (moveObject is MultiColumnPawnParsedMoveObject multiColumnPawnObject)
 			movedPiece = FindMovedPieceForMultiColumnPawn(multiColumnPawnObject, potentialPiecesToMove, sideToMove);
 		else
-			movedPiece = FindMovedPiece(potentialPiecesToMove, moveObject, sideToMove);
+			movedPiece = FindMovedPiece(position, potentialPiecesToMove, moveObject, sideToMove);
 
 		if (movedPiece is null)
 			throw new InvalidOperationException("No valid piece found to move.");
@@ -87,9 +88,9 @@ public class NotationMoveCommand : IMoveCommand
 		return movedPiece.Coordinate;
 	}
 
-	private Piece[] GetPotentialPiecesToMove(PieceType pieceType, Side sideToMove)
+	private Piece[] GetPotentialPiecesToMove(Piece[,] position, PieceType pieceType, Side sideToMove)
 	{
-		var allPiecesOfType = _position.GetPiecesOfType(pieceType, sideToMove);
+		var allPiecesOfType = position.GetPiecesOfType(pieceType, sideToMove);
 
 		if (!allPiecesOfType.Any()) throw new InvalidOperationException($"Cannot find any columns containing more than one {EnumHelper<Side>.GetDisplayName(sideToMove)} {EnumHelper<PieceType>.GetDisplayName(pieceType)}");
 
@@ -100,7 +101,7 @@ public class NotationMoveCommand : IMoveCommand
 		return potentialPiecesToMove;
 	}
 
-	private Piece FindMovedPiece(Piece[] piecesToMove, ParsedMoveObject moveObject, Side sideToMove)
+	private Piece FindMovedPiece(Piece[,] position, Piece[] piecesToMove, ParsedMoveObject moveObject, Side sideToMove)
 	{
 		// If the starting column is provided, then find the piece that has the same column as the starting column;
 		// Otherwise, i.e. there are more than one piece of the same type and side in the column, pick the one following the order
@@ -137,7 +138,7 @@ public class NotationMoveCommand : IMoveCommand
 				{
 					Coordinate guessedDestination = piece.GetDestinationCoordinateFromNotation(moveObject.MoveDirection, moveObject.FourthCharacter);
 
-					if (piece.ValidateMove(_position, piece.Coordinate, guessedDestination))
+					if (piece.ValidateMove(position, piece.Coordinate, guessedDestination))
 					{
 						movedPiece = piece;
 						moveObject.PieceOrder = PieceOrder.First;
@@ -191,12 +192,12 @@ public class NotationMoveCommand : IMoveCommand
 			return pawnsOnColumn[(int)moveObject.PieceOrder - 1];
 	}
 
-	private Coordinate FindDestination(ParsedMoveObject moveObject, Coordinate startingCoordinate)
+	private Coordinate FindDestination(Piece[,] position, ParsedMoveObject moveObject, Coordinate startingCoordinate)
 	{
 		if (moveObject.IsFromUcciNotation)
 			return moveObject.Destination.Value;
 
-		Piece pieceToMove = _position.GetPieceAtPosition(startingCoordinate);
+		Piece pieceToMove = position.GetPieceAtPosition(startingCoordinate);
 
 		MoveDirection moveDirection = moveObject.MoveDirection;
 
