@@ -30,7 +30,5 @@ public interface IXiangqiBuilder
 
     XiangqiBuilder WithDpxqGameRecord(string dpxqGameRecord, MoveNotationType moveNotationType = MoveNotationType.SimplifiedChinese);
 
-
-
 	XiangqiGame Build();
 }
