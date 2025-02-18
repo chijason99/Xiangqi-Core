@@ -25,9 +25,6 @@ public static class DependencyInjection
 		services.AddScoped<IGifGenerationService, DefaultGifGenerationService>();
 		services.AddScoped<IPgnSavingService, DefaultPgnSavingService>();
 
-		services.AddScoped<IMoveCommand, NotationMoveCommand>();
-		services.AddScoped<IMoveCommand, CoordinateMoveCommand>();
-
 		services.AddScoped<IXiangqiBuilder, XiangqiBuilder>();
 
 		return services;

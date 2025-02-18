@@ -42,6 +42,11 @@ public class XiangqiBuilder : IXiangqiBuilder
 	{
 	}
 
+	public XiangqiBuilder(IMoveParsingService moveParsingService)
+	{
+		_moveParsingService = moveParsingService;
+	}
+
 	/// <summary>
 	/// Sets the Xiangqi game configuration to the default starting position.
 	/// </summary>
