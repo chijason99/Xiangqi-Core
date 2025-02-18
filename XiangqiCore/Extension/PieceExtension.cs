@@ -8,6 +8,7 @@ using System.Net.Http.Headers;
 using XiangqiCore.Boards;
 using XiangqiCore.Misc;
 using XiangqiCore.Misc.Images;
+using XiangqiCore.Move.MoveObjects;
 using XiangqiCore.Pieces;
 using XiangqiCore.Pieces.PieceTypes;
 
@@ -107,8 +108,8 @@ public static class PieceExtension
 
         return startingPosition.Row < destination.Row ?
             piecesOnColumn.Count(piece => piece.Coordinate.Row > startingPosition.Row && piece.Coordinate.Row < destination.Row) :
-			piecesOnColumn.Count(piece => piece.Coordinate.Row < startingPosition.Row && piece.Coordinate.Row > destination.Row);
-	}
+            piecesOnColumn.Count(piece => piece.Coordinate.Row < startingPosition.Row && piece.Coordinate.Row > destination.Row);
+    }
 
     /// <summary>
     /// Checks if the destination position contains a friendly piece.
@@ -153,12 +154,18 @@ public static class PieceExtension
 
         Piece pieceToMove = boardPosition.GetPieceAtPosition(startingPosition);
         Side targetKingSide = pieceToMove.Side;
-        Piece[,] positionAfterSimulation = boardPosition.SimulateMove(startingPosition, destination);
-        King targetKing = positionAfterSimulation.GetPiecesOfType<King>(targetKingSide).Single();
 
-        return positionAfterSimulation.IsKingInCheck(targetKingSide) || 
-               positionAfterSimulation.IsKingExposedDirectlyToEnemyKing(targetKing.Coordinate);
-    }
+        SimpleMoveObject simpleMoveObject = boardPosition.MakeMoveInPlace(startingPosition, destination);
+
+		King targetKing = boardPosition.GetPiecesOfType<King>(targetKingSide).Single();
+
+        bool willExposeKingToDanger = boardPosition.IsKingInCheck(targetKingSide) ||
+			   boardPosition.IsKingExposedDirectlyToEnemyKing(targetKing.Coordinate);
+
+		boardPosition.UndoMoveInPlace(simpleMoveObject);
+		
+        return willExposeKingToDanger;
+	}
 
     /// <summary>
     /// Gets the pieces of the specified type on the board for the specified side.
@@ -173,27 +180,27 @@ public static class PieceExtension
             .Where(piece => piece.Side == side);
 
 
-	/// <summary>
-	/// Gets the pieces of the specified type on the board for the specified side.
-	/// </summary>
-	/// <param name="boardPosition">The board position array.</param>
-	/// <param name="pieceType">The type of the pieces to get.</param>
-	/// <param name="side">The side of the pieces. If null, pieces of the specified type from all sides are returned.</param>
-	/// <returns>The pieces of the specified type on the board for the specified side.</returns>
-	public static IEnumerable<Piece> GetPiecesOfType(this Piece[,] boardPosition, PieceType pieceType, Side? side = null)
-		=> boardPosition
-			.Cast<Piece>()
-			.Where(piece => piece.PieceType == pieceType)
-			.WhereIf(side is not null, p => p.Side == side.Value);
+    /// <summary>
+    /// Gets the pieces of the specified type on the board for the specified side.
+    /// </summary>
+    /// <param name="boardPosition">The board position array.</param>
+    /// <param name="pieceType">The type of the pieces to get.</param>
+    /// <param name="side">The side of the pieces. If null, pieces of the specified type from all sides are returned.</param>
+    /// <returns>The pieces of the specified type on the board for the specified side.</returns>
+    public static IEnumerable<Piece> GetPiecesOfType(this Piece[,] boardPosition, PieceType pieceType, Side? side = null)
+        => boardPosition
+            .Cast<Piece>()
+            .Where(piece => piece.PieceType == pieceType)
+            .WhereIf(side is not null, p => p.Side == side.Value);
 
-	/// <summary>
-	/// Checks if the king is attacked by a piece of the specified type.
-	/// </summary>
-	/// <typeparam name="TPieceType">The type of the attacking piece.</typeparam>
-	/// <param name="boardPosition">The board position array.</param>
-	/// <param name="kingCoordinate">The coordinate of the king.</param>
-	/// <returns>True if the king is attacked by a piece of the specified type, otherwise false.</returns>
-	public static bool IsKingAttackedBy<TPieceType>(this Piece[,] boardPosition, Coordinate kingCoordinate) where TPieceType : Piece
+    /// <summary>
+    /// Checks if the king is attacked by a piece of the specified type.
+    /// </summary>
+    /// <typeparam name="TPieceType">The type of the attacking piece.</typeparam>
+    /// <param name="boardPosition">The board position array.</param>
+    /// <param name="kingCoordinate">The coordinate of the king.</param>
+    /// <returns>True if the king is attacked by a piece of the specified type, otherwise false.</returns>
+    public static bool IsKingAttackedBy<TPieceType>(this Piece[,] boardPosition, Coordinate kingCoordinate) where TPieceType : Piece
     {
         King kingToCheck = (King)boardPosition.GetPieceAtPosition(kingCoordinate);
         Side enemySide = kingToCheck.Side.GetOppositeSide();
@@ -232,14 +239,14 @@ public static class PieceExtension
 
     public static bool IsKingExposedDirectlyToEnemyKing(this Piece[,] boardPosition)
     {
-		King redKing = (King)boardPosition.GetPiecesOfType(PieceType.King, Side.Red).Single();
-		King blackKing = (King)boardPosition.GetPiecesOfType(PieceType.King, Side.Black).Single();
+        King redKing = (King)boardPosition.GetPiecesOfType(PieceType.King, Side.Red).Single();
+        King blackKing = (King)boardPosition.GetPiecesOfType(PieceType.King, Side.Black).Single();
 
-		if (redKing.Coordinate.Column != blackKing.Coordinate.Column)
-			return false;
+        if (redKing.Coordinate.Column != blackKing.Coordinate.Column)
+            return false;
 
-		return boardPosition.CountPiecesBetweenOnColumn(redKing.Coordinate, blackKing.Coordinate) == 0;
-	}
+        return boardPosition.CountPiecesBetweenOnColumn(redKing.Coordinate, blackKing.Coordinate) == 0;
+    }
 
     /// <summary>
     /// Simulates a move on the board position array.
@@ -268,12 +275,11 @@ public static class PieceExtension
     /// <param name="destination">The destination position.</param>
     public static void MakeMove(this Piece[,] boardPosition, Coordinate startingPosition, Coordinate destination)
     {
-        Piece pieceAtStartingPosition = boardPosition.GetPieceAtPosition(startingPosition);
+        Piece movedPiece = boardPosition.GetPieceAtPosition(startingPosition);
 
-        Piece movedPiece = PieceFactory.Create(pieceAtStartingPosition.PieceType, pieceAtStartingPosition.Side, destination);
-        Piece emptyPiece = PieceFactory.CreateEmptyPiece();
+        movedPiece.MoveTo(destination);
 
-        boardPosition.SetPieceAtPosition(startingPosition, emptyPiece);
+        boardPosition.SetPieceAtPosition(startingPosition, PieceFactory.CreateEmptyPiece());
         boardPosition.SetPieceAtPosition(destination, movedPiece);
     }
 
@@ -296,18 +302,18 @@ public static class PieceExtension
                position.IsKingAttackedBy<Knight>(targetKing.Coordinate);
     }
 
-	public static bool IsSideInCheckmate(this Piece[,] position, Side sideToCheck)
-	{
-		foreach (Piece piece in GetPiecesToCheck(position, sideToCheck))
-		{
-			foreach (Coordinate potentatialCoordinate in piece.GeneratePotentialMoves(position))
-				return false;
-		}
+    public static bool IsSideInCheckmate(this Piece[,] position, Side sideToCheck)
+    {
+        foreach (Piece piece in GetPiecesToCheck(position, sideToCheck))
+        {
+            foreach (Coordinate potentatialCoordinate in piece.GeneratePotentialMoves(position))
+                return false;
+        }
 
-		return true;
-	}
+        return true;
+    }
 
-	private static IEnumerable<Piece> GetPiecesToCheck(Piece[,] position, Side sideToCheck)
+    private static IEnumerable<Piece> GetPiecesToCheck(Piece[,] position, Side sideToCheck)
     {
         var piecesToCheck = position
                             .Cast<Piece>()
@@ -315,52 +321,73 @@ public static class PieceExtension
 
         foreach (Piece pieceToCheck in piecesToCheck)
             yield return pieceToCheck;
-	}
+    }
 
     public static bool HasDuplicatePieceOnColumn(this Piece[,] position, int column, PieceType pieceType, Side side)
-		=> position.GetPiecesOnColumn(column).Count(x => x.PieceType == pieceType && x.Side == side) > 1;
+        => position.GetPiecesOnColumn(column).Count(x => x.PieceType == pieceType && x.Side == side) > 1;
 
     public static Piece[,] DeepClone(this Piece[,] position)
     {
         Piece[,] deepClonedPosition = new Piece[10, 9];
 
-		for (int row = 0; row < 10; row++)
-		{
-			for (int column = 0; column < 9; column++)
-			{
+        for (int row = 0; row < 10; row++)
+        {
+            for (int column = 0; column < 9; column++)
+            {
                 Piece originalPiece = position[row, column];
 
-                Piece clonedPiece = originalPiece.PieceType != PieceType.None ? 
+                Piece clonedPiece = originalPiece.PieceType != PieceType.None ?
                     PieceFactory.Create(
-                    originalPiece.PieceType, 
-                    originalPiece.Side, 
+                    originalPiece.PieceType,
+                    originalPiece.Side,
                     new Coordinate(column + 1, row + 1)) :
                 EmptyPiece.Instance;
 
-				deepClonedPosition[row, column] = clonedPiece;
-			}
-		}
+                deepClonedPosition[row, column] = clonedPiece;
+            }
+        }
 
         return deepClonedPosition;
-	}
+    }
 
-	/// <summary>
-	/// Checks if there are multiple pieces of the same type on the same column.
-	/// This method is used for the move notation generation, so advisor and bishop are excluded from the check.
-	/// </summary>
-	/// <param name="position"></param>
-	/// <param name="pieceType"></param>
-	/// <param name="side"></param>
-	/// <returns></returns>
-	public static bool HasMultiplePieceOfSameTypeOnSameColumn(
-        this Piece[,] position, 
-        PieceType pieceType, 
+    /// <summary>
+    /// Checks if there are multiple pieces of the same type on the same column.
+    /// This method is used for the move notation generation, so advisor and bishop are excluded from the check.
+    /// </summary>
+    /// <param name="position"></param>
+    /// <param name="pieceType"></param>
+    /// <param name="side"></param>
+    /// <returns></returns>
+    public static bool HasMultiplePieceOfSameTypeOnSameColumn(
+        this Piece[,] position,
+        PieceType pieceType,
         Side side,
         int column)
     {
         if (pieceType == PieceType.Advisor || pieceType == PieceType.Bishop)
             return false;
 
-		return position.GetPiecesOfType(pieceType, side).Count(p => p.Coordinate.Column == column) > 1;
-	}
+        return position.GetPiecesOfType(pieceType, side).Count(p => p.Coordinate.Column == column) > 1;
+    }
+
+    public static SimpleMoveObject MakeMoveInPlace(this Piece[,] position, Coordinate startingPosition, Coordinate destination)
+    {
+        Piece pieceToMove = position.GetPieceAtPosition(startingPosition);
+        Piece capturedPiece = position.GetPieceAtPosition(destination);
+
+        pieceToMove.MoveTo(destination);
+
+        position.SetPieceAtPosition(startingPosition, PieceFactory.CreateEmptyPiece());
+        position.SetPieceAtPosition(destination, pieceToMove);
+
+        return new SimpleMoveObject(startingPosition, destination, pieceToMove, capturedPiece);
+    }
+
+    public static void UndoMoveInPlace(this Piece[,] position, SimpleMoveObject moveObject)
+    {
+        moveObject.PieceMoved.MoveTo(moveObject.StartingPosition);
+
+		position.SetPieceAtPosition(moveObject.StartingPosition, moveObject.PieceMoved);
+        position.SetPieceAtPosition(moveObject.Destination, moveObject.PieceCaptured);
+    }
 }

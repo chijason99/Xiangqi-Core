@@ -1,9 +1,11 @@
-﻿using XiangqiCore.Move.MoveObjects;
+﻿using XiangqiCore.Boards;
+using XiangqiCore.Move.MoveObjects;
 
 namespace XiangqiCore.Move.Commands;
 
-public class MoveCommandInvoker
+public class MoveCommandInvoker(Board board)
 {
+	private readonly Board _board = board;
 	private readonly Stack<IMoveCommand> _moveCommands = [];
 	private readonly Stack<IMoveCommand> _undoCommands = [];
 
@@ -11,7 +13,7 @@ public class MoveCommandInvoker
 	{
 		_moveCommands.Push(moveCommand);
 		
-		MoveHistoryObject moveHistoryObject = moveCommand.Execute();
+		MoveHistoryObject moveHistoryObject = moveCommand.Execute(_board);
 
 		return moveHistoryObject;
 	}

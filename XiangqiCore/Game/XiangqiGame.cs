@@ -34,8 +34,7 @@ public class XiangqiGame
 		Player blackPlayer,
 		Competition competition,
 		GameResult result,
-		string gameName,
-		IMoveParsingService moveParsingService)
+		string gameName)
 	{
 		InitialFenString = initialFenString;
 		SideToMove = sideToMove;
@@ -43,7 +42,6 @@ public class XiangqiGame
 		BlackPlayer = blackPlayer;
 		Competition = competition;
 		GameResult = result;
-		_moveParsingService = moveParsingService;
 
 		if (string.IsNullOrWhiteSpace(gameName))
 		{
@@ -66,9 +64,7 @@ public class XiangqiGame
 	/// <summary>
 	/// The move command invoker responsible for executing/undoing move commands.
 	/// </summary>
-	private readonly MoveCommandInvoker _moveCommandInvoker = new();
-
-	private readonly IMoveParsingService _moveParsingService;
+	public MoveCommandInvoker MoveCommandInvoker { get; private set; }
 
 	/// <summary>
 	/// Gets the initial FEN string when the game is first created.
@@ -130,7 +126,7 @@ public class XiangqiGame
 	/// </summary>
 	public int RoundNumber { get; private set; } = 0;
 
-	private List<MoveHistoryObject> _moveHistory => _moveCommandInvoker.GetMoveHistories();
+	private List<MoveHistoryObject> _moveHistory => MoveCommandInvoker.GetMoveHistories();
 
 	/// <summary>
 	/// Gets the move history.
@@ -181,11 +177,10 @@ public class XiangqiGame
 		Player redPlayer,
 		Player blackPlayer,
 		Competition competition,
-		IMoveParsingService moveParsingService,
 		bool useBoardConfig = false,
 		BoardConfig? boardConfig = null,
 		GameResult gameResult = GameResult.Unknown,
-		string moveRecord = "",
+		List<string>? moveRecord = null,
 		string gameName = "",
 		MoveNotationType moveNotationType = MoveNotationType.TraditionalChinese)
 	{
@@ -202,13 +197,14 @@ public class XiangqiGame
 			blackPlayer,
 			competition,
 			gameResult,
-			gameName,
-			moveParsingService)
+			gameName)
 		{
 			Board = useBoardConfig ? new Board(boardConfig!) : new Board(initialFenString),
 			RoundNumber = FenHelper.GetRoundNumber(initialFenString),
 			NumberOfMovesWithoutCapture = FenHelper.GetNumberOfMovesWithoutCapture(initialFenString),
 		};
+		
+		createdGameInstance.MoveCommandInvoker = new MoveCommandInvoker(createdGameInstance.Board);
 
 		if (useBoardConfig)
 			createdGameInstance.InitialFenString = FenHelper.GetFenFromPosition(createdGameInstance.Board.Position)
@@ -217,8 +213,9 @@ public class XiangqiGame
 					createdGameInstance.RoundNumber, 
 					createdGameInstance.NumberOfMovesWithoutCapture);
 
-		if (!string.IsNullOrEmpty(moveRecord))
+		if (moveRecord is not null)
 			createdGameInstance.SaveMoveRecordToHistory(moveRecord, moveNotationType);
+
 
 		return createdGameInstance;
 	}
@@ -231,7 +228,7 @@ public class XiangqiGame
 	/// <returns><c>true</c> if the move is valid and successful; otherwise, <c>false</c>.</returns>
 	public bool MakeMove(Coordinate startingPosition, Coordinate destination)
 	{
-		CoordinateMoveCommand coordinateMoveCommand = new(Board, startingPosition, destination, SideToMove);
+		CoordinateMoveCommand coordinateMoveCommand = new(startingPosition, destination, SideToMove);
 
 		return MakeMove(coordinateMoveCommand);
 	}
@@ -246,8 +243,6 @@ public class XiangqiGame
 	public bool MakeMove(string moveNotation, MoveNotationType moveNotationType)
 	{
 		NotationMoveCommand notationMoveCommand = new (
-			_moveParsingService, 
-			Board, 
 			moveNotation,
 			SideToMove,
 			moveNotationType);
@@ -259,7 +254,7 @@ public class XiangqiGame
 	{
 		try
 		{
-			MoveHistoryObject latestMove = _moveCommandInvoker.ExecuteCommand(moveCommand);
+			MoveHistoryObject latestMove = MoveCommandInvoker.ExecuteCommand(moveCommand);
 
 			UpdateGameInfoAfterMove();
 
@@ -277,7 +272,7 @@ public class XiangqiGame
 	{
 		try
 		{
-			MoveHistoryObject moveHistory = _moveCommandInvoker.UndoCommand(numberOfMovesToUndo);
+			MoveHistoryObject moveHistory = MoveCommandInvoker.UndoCommand(numberOfMovesToUndo);
 
 			UpdateGameInfoAfterUndo();
 
@@ -335,10 +330,8 @@ public class XiangqiGame
 		GameResult = GameResult.Unknown;
 	}
 
-	private void SaveMoveRecordToHistory(string moveRecord, MoveNotationType moveNotationType)
+	private void SaveMoveRecordToHistory(List<string> moves, MoveNotationType moveNotationType)
 	{
-		List<string> moves = _moveParsingService.ParseGameRecord(moveRecord);
-
 		foreach (string move in moves)
 		{
 			bool isSuccessful = MakeMove(move, moveNotationType);

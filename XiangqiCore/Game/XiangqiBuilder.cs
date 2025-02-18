@@ -28,6 +28,7 @@ public class XiangqiBuilder : IXiangqiBuilder
 	private BoardConfig? _boardConfig { get; set; } = null;
 
 	private string _moveRecord { get; set; } = "";
+
 	private MoveNotationType _moveNotationType { get; set; } = MoveNotationType.TraditionalChinese;
 
 	private IMoveParsingService _moveParsingService { get; set; } = new DefaultMoveParsingService();
@@ -39,6 +40,11 @@ public class XiangqiBuilder : IXiangqiBuilder
 	/// </summary>
 	public XiangqiBuilder()
 	{
+	}
+
+	public XiangqiBuilder(IMoveParsingService moveParsingService)
+	{
+		_moveParsingService = moveParsingService;
 	}
 
 	/// <summary>
@@ -107,11 +113,10 @@ public class XiangqiBuilder : IXiangqiBuilder
 			_redPlayer,
 			_blackPlayer,
 			_competition,
-			_moveParsingService,
 			_useBoardConfig,
 			_boardConfig,
 			_gameResult,
-			_moveRecord,
+			!string.IsNullOrWhiteSpace(_moveRecord) ? _moveParsingService.ParseGameRecord(_moveRecord) : null,
 			_gameName,
 			_moveNotationType);
 	}

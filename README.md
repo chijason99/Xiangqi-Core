@@ -1202,6 +1202,10 @@ string translatedMove = moveTranslationService.TranslateMove(game.MoveHistory[0]
 
 ## Release Notes
 
+Version 2.1.0
+- Fix the issue where the `AddXiangqiCore` extension method throws an error
+- Improve the memory performance when validating the moves
+
 Version 2.0.1
 
 Bug Fixes:
