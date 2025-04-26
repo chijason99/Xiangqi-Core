@@ -1,8 +1,17 @@
 # Xiangqi-Core NuGet Package
 
-## Why Xiangqi-Core?
+## What is Xiangqi-Core?
 
 Xiangqi-Core is the ultimate library for building Xiangqi (Chinese Chess) applications in C#. Whether you're creating a learning tool, or a visualization platform, Xiangqi-Core provides everything you need to bring your ideas to life. Designed with performance, flexibility, and developer experience in mind, it’s the go-to solution for Xiangqi enthusiasts and professionals alike.
+
+---
+
+## Why Xiangqi-Core?
+
+- **Comprehensive**: Covers all aspects of Xiangqi, from move generation to game visualization.
+- **Customizable**: Tailor the library to your needs with flexible configurations and extensible APIs.
+- **Battle-Tested**: Built with .NET 9, ensuring top-notch performance and compatibility.
+- **Developer-Friendly**: Clear documentation, intuitive APIs, and support for dependency injection make development a breeze.
 
 ---
 
@@ -16,15 +25,6 @@ Xiangqi-Core is the ultimate library for building Xiangqi (Chinese Chess) applic
 - **Move Translation**: Seamlessly translate moves between different notations.
 - **Randomized Board Positions**: Generate random board setups for training or analysis.
 - **Dependency Injection Ready**: Integrate seamlessly into modern .NET applications.
-
----
-
-## Why Developers Love Xiangqi-Core
-
-- **Comprehensive**: Covers all aspects of Xiangqi, from move generation to game visualization.
-- **Customizable**: Tailor the library to your needs with flexible configurations and extensible APIs.
-- **Battle-Tested**: Built with .NET 9, ensuring top-notch performance and compatibility.
-- **Developer-Friendly**: Clear documentation, intuitive APIs, and support for dependency injection make development a breeze.
 
 ---
 
