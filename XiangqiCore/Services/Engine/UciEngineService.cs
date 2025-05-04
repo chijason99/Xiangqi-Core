@@ -16,20 +16,27 @@ public class UciEngineService : IXiangqiEngineService
 
 	public async Task<bool> IsReady()
 	{
-		await _processManager.SendCommandAsync("isready");
+		try
+		{
+			await _processManager.SendCommandAsync("isready");
 
-		// Read responses until "readyok" is found
-		await _processManager.ReadResponseAsync();
+			// Read responses until "readyok" is found
+			await _processManager.ReadResponseAsync("readyok");
 
-		return false;
+			return true;
+		}
+		catch (Exception ex) 
+		{
+			return false;
+		}
 	}
 
 	public async Task LoadEngineAsync(string enginePath)
 	{
 		await _processManager.StartAsync(enginePath);
 		await _processManager.SendCommandAsync("uci");
-
-		
+		// Read responses until "readyok" is found
+		await _processManager.ReadResponseAsync("uciok");
 	}
 
 	public Task<string> SendCustomCommand(string command)

@@ -12,39 +12,41 @@ public class DefaultProcessManager : IProcessManager
 
 	public event EventHandler<string> OnErrorReceived;
 
-	public async Task<string> ReadResponseAsync(string expectedResponse, TimeSpan timeout)
+	public async Task<string> ReadResponseAsync(Func<string, bool> stopCondition, TimeSpan? timeout = null)
 	{
 		if (!IsRunning || _standardOutput == null)
 			throw new InvalidOperationException("The process is not running");
 
-		CancellationTokenSource cancellationTokenSource = new(timeout);
+		CancellationTokenSource? cancellationTokenSource = null;
+
+		if (timeout.HasValue)
+			cancellationTokenSource = new(timeout.Value);
 
 		try
 		{
-			while (!cancellationTokenSource.Token.IsCancellationRequested)
+			while (cancellationTokenSource is null || !cancellationTokenSource.Token.IsCancellationRequested)
 			{
 				string response = await _standardOutput.ReadLineAsync();
 				Console.WriteLine($"Read response: {response}");
 
-				if (string.Equals(expectedResponse, response, StringComparison.OrdinalIgnoreCase))
-				{
-					return expectedResponse;
-				}
+				if (stopCondition(response))
+					return response;
 
 				if (string.IsNullOrEmpty(response))
-				{
 					// Break if no response is received (to avoid infinite loop)
 					break;
-				}
 			}
 		}
 		catch (OperationCanceledException)
 		{
-			Console.WriteLine($"Timeout while waiting for response: {expectedResponse}");
+			Console.WriteLine($"Timeout while waiting for response");
 		}
 
 		return string.Empty;
 	}
+
+	public async Task<string> ReadResponseAsync(string expectedResponse, TimeSpan? timeout = null)
+		=> await ReadResponseAsync(response => string.Equals(response, expectedResponse, StringComparison.OrdinalIgnoreCase), timeout);
 
 	public async Task SendCommandAsync(string command)
 	{
