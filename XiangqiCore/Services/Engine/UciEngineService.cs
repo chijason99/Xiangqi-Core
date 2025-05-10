@@ -1,4 +1,5 @@
 ﻿using System.Text;
+using System.Text.RegularExpressions;
 using XiangqiCore.Services.ProcessManager;
 
 namespace XiangqiCore.Services.Engine;
@@ -107,7 +108,13 @@ public class UciEngineService : IXiangqiEngineService
 			Console.WriteLine(response);
 
 			if (response.StartsWith("bestmove", StringComparison.OrdinalIgnoreCase))
-				return response;
+			{
+				Regex bestmoveRegex = new(@"^bestmove\s(?<bestMove>\w+)\sponder\s(?<ponder>\w+)");
+				Match match = bestmoveRegex.Match(response);
+
+				if (match.Success)
+					return match.Groups["bestMove"].Value;
+			}
 		}
 
 		throw new Exception();
