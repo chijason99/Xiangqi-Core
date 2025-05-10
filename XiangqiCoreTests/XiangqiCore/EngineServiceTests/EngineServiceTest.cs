@@ -203,6 +203,10 @@ public static class EngineServiceTest
 			.Setup(pm => pm.ReadResponsesAsync(It.IsAny<Func<string, bool>>(), It.IsAny<bool>(), It.IsAny<CancellationToken>()))
 			.Returns(MockAsyncEnumerable(responses));
 
+		mockMoveTranslationService
+			.Setup(s => s.TranslateMove(It.IsAny<MoveHistoryObject>(), It.IsAny<MoveNotationType>()))
+			.Returns("r9=8");
+
 		DefaultUciEngineService engineService = new(mockProcessManager.Object, mockMoveTranslationService.Object);
 
 		EngineAnalysisOptions options = new()
@@ -211,10 +215,13 @@ public static class EngineServiceTest
 		};
 
 		// Act
-		string bestMove = await engineService.SuggestMoveAsync("rnbakabCr/9/1c5c1/p1p1p1p1p/9/9/P1P1P1P1P/1C7/9/RNBAKABNR b - - 0 1", options);
+		string bestMove = await engineService.SuggestMoveAsync(
+			"rnbakabCr/9/1c5c1/p1p1p1p1p/9/9/P1P1P1P1P/1C7/9/RNBAKABNR b - - 0 1", 
+			options,
+			MoveNotationType.English);
 
 		// Assert
-		Assert.Equal("i10h10", bestMove);
+		Assert.Equal("r9=8", bestMove);
 
 		// Verify that the correct commands were sent
 		mockProcessManager.Verify(pm => pm.SendCommandAsync(It.Is<string>(cmd => cmd.StartsWith("position"))), Times.Once);

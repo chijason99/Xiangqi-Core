@@ -25,7 +25,7 @@ public class DefaultUciEngineService : IXiangqiEngineService
 		_moveTranslationService = moveTranslationService;
 	}
 
-	public async IAsyncEnumerable<AnalysisResult> AnalyzePositionAsync(string fen, MoveNotationType notationType = MoveNotationType.TraditionalChinese)
+	public async IAsyncEnumerable<AnalysisResult> AnalyzePositionAsync(string fen, MoveNotationType notationType = MoveNotationType.TraditionalChinese, CancellationToken cancellationToken = default)
 	{
 		Regex infoRegex = new(@"^info(?:\sdepth\s(?<depth>\d+))?(?:\sseldepth\s(?<seldepth>\d+))?(?:\smultipv\s(?<multipv>\d+))?(?:\sscore\scp\s(?<score>\d+))?(?:\snodes\s(?<nodes>\d+))?(?:\snps\s(?<nps>\d+))?(?:\stbhits\s(?<tbhits>\d+))?(?:\stime\s(?<time>\d+))?(?:\spv\s(?<pv>.+))?");
 
@@ -39,7 +39,7 @@ public class DefaultUciEngineService : IXiangqiEngineService
 		await _processManager.SendCommandAsync($"position fen {fen}");
 		await _processManager.SendCommandAsync("go infinite");
 
-		await foreach (string response in _processManager.ReadResponsesAsync(_ => false))
+		await foreach (string response in _processManager.ReadResponsesAsync(_ => false, cancellationToken: cancellationToken))
 		{
 			Console.WriteLine($"Response read: {response}");
 
@@ -78,6 +78,8 @@ public class DefaultUciEngineService : IXiangqiEngineService
 				else
 				{
 					Console.WriteLine("Stopping analysis...");
+					await StopAnalysisAsync();
+
 					yield break;
 				}
 			}
@@ -125,11 +127,18 @@ public class DefaultUciEngineService : IXiangqiEngineService
 	public void StopEngine()
 		=> _processManager.Stop();
 
-	public async Task<string> SuggestMoveAsync(string fen, EngineAnalysisOptions options)
+	public async Task<string> SuggestMoveAsync(
+		string fen, 
+		EngineAnalysisOptions options, 
+		MoveNotationType notationType = MoveNotationType.TraditionalChinese, 
+		CancellationToken cancellationToken = default)
 	{
 		// Default to start position
 		if (string.IsNullOrWhiteSpace(fen))
 			fen = "rnbakabnr/9/1c5c1/p1p1p1p1p/9/9/P1P1P1P1P/1C5C1/9/RNBAKABNR w - - 0 0";
+
+		XiangqiBuilder xiangqiBuilder = new();
+		XiangqiGame game = xiangqiBuilder.WithStartingFen(fen).Build();
 
 		StringBuilder builder = new();
 		builder.Append($"position fen {fen}");
@@ -160,8 +169,7 @@ public class DefaultUciEngineService : IXiangqiEngineService
 		string goCommand = builder.ToString();
 		await _processManager.SendCommandAsync(goCommand);
 
-		await foreach (string response in _processManager.ReadResponsesAsync(
-			response => response.StartsWith("bestmove", StringComparison.OrdinalIgnoreCase)))
+		await foreach (string response in _processManager.ReadResponsesAsync(_ => false, cancellationToken: cancellationToken))
 		{
 			Console.WriteLine(response);
 
@@ -175,7 +183,11 @@ public class DefaultUciEngineService : IXiangqiEngineService
 					// Stop the analysis on successful
 					await StopAnalysisAsync();
 
-					return match.Groups["bestMove"].Value;
+					game.MakeMove(match.Groups["bestMove"].Value, MoveNotationType.UCI);
+
+					string bestMove = _moveTranslationService.TranslateMove(game.MoveHistory.First(), notationType);
+
+					return bestMove;
 				}
 			}
 		}
