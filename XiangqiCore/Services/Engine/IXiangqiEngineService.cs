@@ -1,4 +1,6 @@
-﻿namespace XiangqiCore.Services.Engine;
+﻿using XiangqiCore.Move;
+
+namespace XiangqiCore.Services.Engine;
 
 public interface IXiangqiEngineService
 {
@@ -7,14 +9,31 @@ public interface IXiangqiEngineService
 	public void StopEngine();
 
 	// Engine analysis
-	public Task<AnalysisResult> AnalyzePositionAsync(string fen, EngineAnalysisOptions options);
+
+	/// <summary>
+	/// Equilvalent to calling "go infinite" in an UCI engine
+	/// </summary>
+	/// <param name="fen">The postiion you wish to analyse</param>
+	/// <param name="notationType">The move notation type you want to see in the response</param>
+	/// <returns>An enumerable of the AnalysisResult</returns>
+	public IAsyncEnumerable<AnalysisResult> AnalyzePositionAsync(string fen, MoveNotationType notationType = MoveNotationType.TraditionalChinese);
+
+	/// <summary>
+	/// Equilvalent to calling "go" in an UCI engine
+	/// </summary>
+	/// <param name="fen">The postiion you wish to analyse</param>
+	/// <param name="options"></param>
+	/// <returns>The best move returned by the engine</returns>
 	public Task<string> SuggestMoveAsync(string fen, EngineAnalysisOptions options);
+
+	/// <summary>
+	/// Stop the engine analysis. Equilvalent to calling "stop" in an UCI engine
+	/// </summary>
+	/// <returns></returns>
+	public Task StopAnalysisAsync();
 
 	// Engine Configuration
 	public Task SetEngineConfigAsync(string optionName, string value);
-
-	// Custom command execution
-	public Task<string> SendCustomCommandAsync(string command, Func<string, bool>? responseHandler = null, TimeSpan? timeout = null);
 
 	// Utility
 	public Task<bool> IsReady();

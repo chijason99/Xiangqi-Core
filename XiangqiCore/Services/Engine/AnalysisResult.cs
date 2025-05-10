@@ -2,19 +2,19 @@
 
 public class AnalysisResult
 {
-	public string BestMove { get; set; }
+	public string BestMove => PrincipalVariation.FirstOrDefault();
 
 	/// <summary>
 	/// Postiive for advantage to Red, Negative for advantage to Black
 	/// </summary>
-	public double Score { get; set; }
+	public int Score { get; set; }
 
 	/// <summary>
 	/// The sequence of moves that is proposed by the engine
 	/// </summary>
-	public string PrincipalVairation { get; set; }
+	public List<string> PrincipalVariation { get; set; }
 
 	public int Depth { get; set; }
 
-	public TimeSpan AnalysisTime { get; set; }
+	public decimal TimeSpent { get; set; }
 }
