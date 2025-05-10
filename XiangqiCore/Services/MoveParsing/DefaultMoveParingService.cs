@@ -11,6 +11,7 @@ public partial class DefaultMoveParsingService : IMoveParsingService
 	private readonly SimplifiedChineseNotationParser _simplifiedChineseNotationParser;
 	private readonly EnglishNotationParser _englishNotationParser;
 	private readonly UcciNotationParser _ucciNotationParser;
+	private readonly UciNotationParser _uciNotationParser;
 
 	public DefaultMoveParsingService()
 	{
@@ -18,6 +19,7 @@ public partial class DefaultMoveParsingService : IMoveParsingService
 		_simplifiedChineseNotationParser = new();
 		_englishNotationParser = new();
 		_ucciNotationParser = new();
+		_uciNotationParser = new();
 	}
 
 	public ParsedMoveObject ParseMove(string move, MoveNotationType moveNotationType)
@@ -27,6 +29,7 @@ public partial class DefaultMoveParsingService : IMoveParsingService
 			MoveNotationType.SimplifiedChinese => _simplifiedChineseNotationParser.Parse(move),
 			MoveNotationType.English => _englishNotationParser.Parse(move),
 			MoveNotationType.UCCI => _ucciNotationParser.Parse(move),
+			MoveNotationType.UCI => _uciNotationParser.Parse(move),
 			_ => throw new NotImplementedException()
 		};
 

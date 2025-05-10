@@ -11,6 +11,7 @@ public static class NotationParserFactory
 			MoveNotationType.SimplifiedChinese => MoveNotationParserBase.GetMoveNotationParserInstance<SimplifiedChineseNotationParser>(),
 			MoveNotationType.English => MoveNotationParserBase.GetMoveNotationParserInstance<EnglishNotationParser>(),
 			MoveNotationType.UCCI => MoveNotationParserBase.GetMoveNotationParserInstance<UcciNotationParser>(),
+			MoveNotationType.UCI => MoveNotationParserBase.GetMoveNotationParserInstance<UciNotationParser>(),
 			_ => throw new ArgumentException("Invalid Move Notation Type")
 		};
 }

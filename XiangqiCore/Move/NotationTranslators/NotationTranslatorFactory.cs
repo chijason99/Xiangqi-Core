@@ -20,6 +20,7 @@ public static class NotationTranslatorFactory
 				MoveNotationType.SimplifiedChinese => new SimplifiedChineseNotationTranslator(),
 				MoveNotationType.English => new EnglishNotationTranslator(),
 				MoveNotationType.UCCI => new UcciNotationTranslator(),
+				MoveNotationType.UCI => new UciNotationTranslator(),
 				_ => throw new NotSupportedException($"Notation type {targetNotationType} is not supported."),
 			};
 
