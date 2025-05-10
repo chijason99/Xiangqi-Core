@@ -10,6 +10,8 @@ public readonly struct Coordinate()
     private const int _uniCodeOfA = 65;
     private const int _uniCodeOfI = 73;
 
+	private const int _uniCodeOfa = 97;
+
 	public Coordinate(int column, int row) : this()
     {
         bool isEmptyCoordinate = column == _emptyCoordinateValue && row == _emptyCoordinateValue;
@@ -42,11 +44,28 @@ public readonly struct Coordinate()
 		return $"{column}{row}";
 	}
 
+	public static string TranslateToUciCoordinate(Coordinate coordinate)
+	{
+		if (coordinate.Equals(Empty))
+			return "00";
+
+		char column = TranslateToUciColumn(coordinate.Column);
+		int row = coordinate.Row;
+
+		return $"{column}{row}";
+	}
+
 	private static int TranslateToUcciRow(int row) => row - 1;
 
 	private static char TranslateToUcciColumn(int column)
 	{
 		int columnUnicode = column + _uniCodeOfA - 1 + 32; // Adding 32 to convert to lower case
+		return Convert.ToChar(columnUnicode);
+	}	
+	
+	private static char TranslateToUciColumn(int column)
+	{
+		int columnUnicode = column + _uniCodeOfa - 1;
 		return Convert.ToChar(columnUnicode);
 	}
 

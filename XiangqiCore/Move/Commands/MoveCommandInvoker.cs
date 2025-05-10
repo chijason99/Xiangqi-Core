@@ -18,16 +18,17 @@ public class MoveCommandInvoker(Board board)
 		return moveHistoryObject;
 	}
 
-	public MoveHistoryObject UndoCommand(int numberOfMovesToUndo = 1)
+	public MoveHistoryObject? UndoCommand(int numberOfMovesToUndo = 1)
 	{
 		for (int i = 0; i < numberOfMovesToUndo; i++)
 		{
 			IMoveCommand moveCommand = _moveCommands.Pop();
+			moveCommand.Undo(_board);
 
 			_undoCommands.Push(moveCommand);
 		}
 
-		return _moveCommands.Peek().MoveHistoryObject;
+		return _moveCommands.Any() ? _moveCommands.Peek().MoveHistoryObject : null;
 	}
 
 	public List<MoveHistoryObject> GetMoveHistories()

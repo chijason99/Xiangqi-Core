@@ -272,7 +272,7 @@ public class XiangqiGame
 	{
 		try
 		{
-			MoveHistoryObject moveHistory = MoveCommandInvoker.UndoCommand(numberOfMovesToUndo);
+			MoveCommandInvoker.UndoCommand(numberOfMovesToUndo);
 
 			UpdateGameInfoAfterUndo();
 

@@ -11,7 +11,7 @@ public record ParsedMoveObject
     public static int UnknownPieceOrderIndex => -1;
     public ParsedMoveObject() { }
 
-    // For UCCI notation
+    // For UCCI/UCI notation
     public ParsedMoveObject(Coordinate startingPoint, Coordinate destination)
     {
         StartingPosition = startingPoint;
