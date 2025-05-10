@@ -11,10 +11,10 @@ public interface IXiangqiEngineService
 	public Task<string> SuggestMoveAsync(string fen, EngineAnalysisOptions options);
 
 	// Engine Configuration
-	public Task SetEngineConfigAsync();
+	public Task SetEngineConfigAsync(string optionName, string value);
 
 	// Custom command execution
-	public Task<string> SendCustomCommand(string command);
+	public Task<string> SendCustomCommandAsync(string command, Func<string, bool>? responseHandler = null, TimeSpan? timeout = null);
 
 	// Utility
 	public Task<bool> IsReady();

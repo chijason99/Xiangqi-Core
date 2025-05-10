@@ -1,4 +1,5 @@
 ﻿using System.Diagnostics;
+using System.Runtime.CompilerServices;
 
 namespace XiangqiCore.Services.ProcessManager;
 
@@ -12,7 +13,32 @@ public class DefaultProcessManager : IProcessManager
 
 	public event EventHandler<string> OnErrorReceived;
 
-	public async Task<string> ReadResponseAsync(Func<string, bool> stopCondition, TimeSpan? timeout = null)
+	public async IAsyncEnumerable<string> ReadResponsesAsync(
+		Func<string, bool> stopCondition,  
+		bool stopOnEmtpyResponse = true,
+		[EnumeratorCancellation] CancellationToken cancellationToken = default)
+	{
+		if (!IsRunning || _standardOutput == null)
+			throw new InvalidOperationException("The process is not running");
+
+		while (true)
+		{
+			if (cancellationToken.IsCancellationRequested)
+				yield break;
+
+			string response = await _standardOutput.ReadLineAsync();
+
+			yield return response;
+
+			if (stopCondition(response) || (stopOnEmtpyResponse && string.IsNullOrWhiteSpace(response)))
+				yield break;
+		}
+	}
+
+	public async Task<string> ReadResponseAsync(
+		Func<string, bool> stopCondition, 
+		TimeSpan? timeout = null, 
+		bool stopOnEmtpyResponse = true)
 	{
 		if (!IsRunning || _standardOutput == null)
 			throw new InvalidOperationException("The process is not running");
@@ -24,20 +50,32 @@ public class DefaultProcessManager : IProcessManager
 
 		try
 		{
-			while (cancellationTokenSource is null || !cancellationTokenSource.Token.IsCancellationRequested)
+			while (true)
 			{
-				string response = await _standardOutput.ReadLineAsync();
-				Console.WriteLine($"Read response: {response}");
+				cancellationTokenSource?.Token.ThrowIfCancellationRequested();
 
-				if (stopCondition(response))
-					return response;
+				var readLineTask = _standardOutput.ReadLineAsync();
 
-				if (string.IsNullOrEmpty(response))
-					// Break if no response is received (to avoid infinite loop)
-					break;
+				var completedTask = await Task.WhenAny(
+					readLineTask,
+					Task.Delay((int?)timeout?.TotalMilliseconds ?? 1000)
+				);
+
+				if (completedTask == readLineTask && readLineTask.IsCompletedSuccessfully)
+				{
+					string response = await readLineTask;
+					Console.WriteLine($"Read response: {response}");
+
+					if (stopCondition(response) || (stopOnEmtpyResponse && string.IsNullOrWhiteSpace(response)))
+						return response;
+				}
+				else
+				{
+					return string.Empty;
+				}
 			}
 		}
-		catch (OperationCanceledException)
+		catch (Exception ex) when (ex is OperationCanceledException or IOException)
 		{
 			Console.WriteLine($"Timeout while waiting for response");
 		}
@@ -45,8 +83,8 @@ public class DefaultProcessManager : IProcessManager
 		return string.Empty;
 	}
 
-	public async Task<string> ReadResponseAsync(string expectedResponse, TimeSpan? timeout = null)
-		=> await ReadResponseAsync(response => string.Equals(response, expectedResponse, StringComparison.OrdinalIgnoreCase), timeout);
+	public async Task<string> ReadResponseAsync(string expectedResponse, TimeSpan? timeout = null, bool stopOnEmtpyResponse = true)
+		=> await ReadResponseAsync(response => string.Equals(response, expectedResponse, StringComparison.OrdinalIgnoreCase), timeout, stopOnEmtpyResponse);
 
 	public async Task SendCommandAsync(string command)
 	{
@@ -55,6 +93,8 @@ public class DefaultProcessManager : IProcessManager
 
 		await _standardInput.WriteLineAsync(command);
 		await _standardInput.FlushAsync();
+
+		Console.WriteLine($"Command sent: {command}");
 	}
 
 	public async Task StartAsync(string enginePath)

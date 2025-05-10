@@ -5,12 +5,12 @@ public class EngineAnalysisOptions
 	/// <summary>
 	/// Depth of analysis
 	/// </summary>
-	public int Depth { get; set; } = 10;
+	public int? Depth { get; set; }
 
 	/// <summary>
 	/// Move time for the engine in milliseconds
 	/// </summary>
-	public int MoveTime { get; set; } = 1000;
+	public int? MoveTime { get; set; }
 
 	/// <summary>
 	/// Indicates whether the engine should use pondering during analysis.
@@ -20,4 +20,6 @@ public class EngineAnalysisOptions
 	/// consume additional computational resources.
 	/// </summary>
 	public bool UsePonder { get; set; } = false;
+
+	public IEnumerable<string> Moves { get; set; } = [];
 }
