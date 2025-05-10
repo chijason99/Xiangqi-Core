@@ -4,5 +4,6 @@ public enum MoveNotationType
     English,
 	SimplifiedChinese,
 	TraditionalChinese,
-    UCCI
+    UCCI,
+	UCI
 }
