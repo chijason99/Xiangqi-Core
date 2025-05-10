@@ -16,7 +16,4 @@ public interface IProcessManager
 
 	// Process status
 	public bool IsRunning { get; }
-
-	// Error handling
-	public event EventHandler<string> OnErrorReceived;
 }

@@ -11,8 +11,6 @@ public class DefaultProcessManager : IProcessManager
 
 	public bool IsRunning => _process is not null && !_process.HasExited;
 
-	public event EventHandler<string> OnErrorReceived;
-
 	public async IAsyncEnumerable<string> ReadResponsesAsync(
 		Func<string, bool> stopCondition,  
 		bool stopOnEmtpyResponse = true,
@@ -117,14 +115,6 @@ public class DefaultProcessManager : IProcessManager
 				RedirectStandardError = true,
 				WorkingDirectory = Path.GetDirectoryName(enginePath)
 			},
-		};
-
-		_process.ErrorDataReceived += (sender, e) =>
-		{
-			if (!string.IsNullOrEmpty(e.Data))
-			{
-				OnErrorReceived?.Invoke(this, e.Data);
-			}
 		};
 
 		_process.Start();
