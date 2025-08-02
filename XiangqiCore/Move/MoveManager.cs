@@ -41,18 +41,27 @@ public class MoveManager
     ///  Retrieves the list of move histories in the game.
     ///  By default, it returns the main line (the first variation) if any variations exists.
     /// </summary>
-    public List<MoveHistoryObject> GetMoveHistory()
+    /// <param name="includeRootNode">
+    /// If true, the root move will be included in the results.
+    /// For example, when you want to show the initial position in the GIF of the game.
+    /// </param>
+    /// <param name="variationsPath">
+    /// <see cref="VariationPath"/>
+    /// </param>
+    /// <exception cref="ArgumentOutOfRangeException">Thrown if moveNumber or any variation path values are invalid.</exception>
+    /// <exception cref="InvalidOperationException">Thrown if the requested path does not exist.</exception>
+    public List<MoveHistoryObject> GetMoveHistory(
+        bool includeRootNode = false, 
+        VariationPath? variationsPath = null)
     {
-        List<MoveHistoryObject> results = [];
-        var currentNode = RootMove;
-        
-        while (currentNode is not null)
-        {
-            results.Add(currentNode.MoveHistoryObject);
-            currentNode = currentNode.Variations.FirstOrDefault();
-        }
+        var nodesOnPath = GetNodesOnPath(variationsPath);
 
-        return results;
+        if (!includeRootNode)
+            nodesOnPath = nodesOnPath.Skip(1); // Skip the root move if not included.
+        
+        return nodesOnPath
+            .Select(node => node.MoveHistoryObject)
+            .ToList();
     }
     
     /// <summary>
@@ -70,29 +79,10 @@ public class MoveManager
     }
     
     /// <summary>
-    /// Undo the current move in the game
-    /// NOTE: Any variations of the current move will be lost when undoing a move.
+    /// Remove all moves after the current move in the game
     /// </summary>
-    /// <exception cref="InvalidOperationException">Thrown when trying to undo the RootMove </exception>
-    public void UndoMove()
+    public void DeleteSubsequentMoves()
     {
-        _moveCommandInvoker.UndoCommand(CurrentMove.MoveCommand ?? 
-                                        throw new InvalidOperationException("Cannot undo a move without a command."));
-        
-        NavigateToMove(CurrentMove.Parent ?? 
-                       throw new InvalidOperationException("Cannot undo the root move."));
-        
-        CurrentMove.RemoveAllVariations();
-    }
-    
-    /// <summary>
-    /// A shortcut to undo all moves in the game, resetting the current move to the root move.
-    /// This effectively clears the move history and starts a new game.
-    /// Note that this will discard all variations and the current move.
-    /// </summary>
-    public void UndoAllMoves()
-    {
-        NavigateToMove(RootMove);
         CurrentMove.RemoveAllVariations();
     }
     
@@ -121,33 +111,52 @@ public class MoveManager
     /// </param>
     /// <exception cref="ArgumentOutOfRangeException">Thrown if moveNumber or any variation path values are invalid.</exception>
     /// <exception cref="InvalidOperationException">Thrown if the requested path does not exist.</exception>
-    public void NavigateToMove(int moveNumber, Dictionary<int, int>? variationsPath = null)
+    public void NavigateToMove(int moveNumber, VariationPath? variationsPath = null)
     {
         if (moveNumber < 0)
             throw new ArgumentOutOfRangeException(
                 nameof(moveNumber), 
                 "Move number must be non-negative.");
 		
+        var targetMove = GetNodesOnPath(variationsPath)
+            .FirstOrDefault(node => node.MoveNumber == moveNumber);
+        
+        NavigateToMove(targetMove);
+    }
+
+    /// <summary>
+    /// Get the last move in the game history.
+    /// </summary>
+    /// <param name="variationsPath">
+    /// <see cref="VariationPath"/>
+    /// </param>
+    /// <returns></returns>
+    /// <exception cref="InvalidOperationException">Throw when the last move is null which should never happen</exception>
+    public MoveNode GetLastMove(VariationPath? variationsPath = null)
+        => GetNodesOnPath(variationsPath).LastOrDefault() 
+               ?? throw new InvalidOperationException("No moves found in the history.");
+    
+    /// <summary>
+    /// Get an IEnumerable of MoveNodes on the path.
+    /// </summary>
+    private IEnumerable<MoveNode> GetNodesOnPath(VariationPath? variationsPath = null)
+    {
         if (variationsPath is not null && variationsPath.Any(kvp => kvp.Key < 0 || kvp.Value < 0))
             throw new ArgumentOutOfRangeException(
                 nameof(variationsPath), 
                 "Variation number must be non-negative.");
 
-        var targetMove = RootMove;
+        variationsPath ??= [];
+        var currentNode = RootMove;
 
-        while (targetMove.MoveNumber < moveNumber)
+        while (currentNode is not null)
         {
-            var variationNumber = 0;
+            yield return currentNode;
             
-            var _ = variationsPath is not null && 
-                    variationsPath.TryGetValue(targetMove.MoveNumber, out variationNumber);
+            // Get the variation number for the next move.
+            int variationNumber = variationsPath.GetValueOrDefault(currentNode.MoveNumber + 1, 0);
             
-            targetMove = targetMove.Variations
-                .ElementAtOrDefault(variationNumber) 
-                ?? throw new InvalidOperationException(
-                    $"No variation found for move number {targetMove.MoveNumber} with variation number {variationNumber}.");
+            currentNode = currentNode.Variations.ElementAtOrDefault(variationNumber);
         }
-        
-        NavigateToMove(targetMove);
     }
 }

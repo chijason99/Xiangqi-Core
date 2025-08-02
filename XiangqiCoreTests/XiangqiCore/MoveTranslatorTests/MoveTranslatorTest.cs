@@ -325,9 +325,9 @@ public static class MoveTranslatorTest
 		// Assert
 		Assert.Multiple(() =>
 		{
-			for (int i = 0; i < game.MoveHistory.Count; i++)
+			for (int i = 0; i < game.GetMoveHistory().Count; i++)
 			{
-				string ucciMove = game.MoveHistory[i].TranslateTo(testData.TargetNotationType);
+				string ucciMove = game.GetMoveHistory()[i].TranslateTo(testData.TargetNotationType);
 				Assert.Equal(expectedMoves[i], ucciMove);
 			}
 		});

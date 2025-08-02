@@ -56,7 +56,7 @@ public class DefaultPgnGenerationService : IPgnGenerationService
 	{
 		List<string> movesOfEachRound = [];
 
-		var groupedMoveHitories = game.MoveHistory
+		var groupedMoveHitories = game.GetMoveHistory()
 			.Select(moveHistoryItem =>
 				new
 				{

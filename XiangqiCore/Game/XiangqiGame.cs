@@ -128,13 +128,12 @@ public class XiangqiGame
 	/// </summary>
 	public int RoundNumber { get; private set; } = 0;
 
-	private List<MoveHistoryObject> _moveHistory => MoveManager.GetMoveHistory();
-
-	/// <summary>
-	/// Gets the move history.
-	/// </summary>
-	public IReadOnlyList<MoveHistoryObject> MoveHistory => _moveHistory.AsReadOnly();
-
+	/// <inheritdoc cref="MoveManager.GetMoveHistory(bool, VariationPath?)"/>
+	public IReadOnlyList<MoveHistoryObject> GetMoveHistory(
+		bool includeRootNode = false, 
+		VariationPath? variationsPath = null) 
+		=> MoveManager.GetMoveHistory(includeRootNode, variationsPath).AsReadOnly();
+	
 	/// <summary>
 	/// Gets the game result.
 	/// </summary>
@@ -257,7 +256,7 @@ public class XiangqiGame
 		{
 			MoveHistoryObject latestMove = MoveManager.AddMove(moveCommand);
 
-			UpdateGameInfoAfterMove();
+			UpdateGameInfoAfterMove(latestMove);
 
 			latestMove.UpdateFenWithGameInfo(RoundNumber, NumberOfMovesWithoutCapture);
 
@@ -269,13 +268,14 @@ public class XiangqiGame
 		}
 	}
 
-	public bool UndoMove()
+	/// <inheritdoc cref="MoveManager.DeleteSubsequentMoves"/>
+	public bool DeleteSubsequentMoves()
 	{
 		try
 		{
-			MoveManager.UndoMove();
+			MoveManager.DeleteSubsequentMoves();
 
-			UpdateGameInfo();
+			UpdateGameInfo(resetGameResult: true);
 
 			return true;
 		}
@@ -287,7 +287,7 @@ public class XiangqiGame
 
 	private void IncrementRoundNumberIfNeeded()
 	{
-		if (SideToMove == Side.Red && (MoveHistory.Count > 1 || RoundNumber != 1))
+		if (SideToMove == Side.Red && (GetMoveHistory().Count > 1 || RoundNumber != 1))
 			RoundNumber++;
 	}
 
@@ -302,10 +302,8 @@ public class XiangqiGame
 	/// <summary>
 	/// Updates the game information after a move is made.
 	/// </summary>
-	private void UpdateGameInfoAfterMove()
+	private void UpdateGameInfoAfterMove(MoveHistoryObject latestMove)
 	{
-		MoveHistoryObject latestMove = _moveHistory.Last();
-
 		if (latestMove.IsCapture)
 			ResetNumberOfMovesWithoutCapture();
 		else
@@ -322,13 +320,14 @@ public class XiangqiGame
 	/// <summary>
 	/// Updates the game information according to the CurrentMove.
 	/// </summary>
-	private void UpdateGameInfo()
+	private void UpdateGameInfo(bool resetGameResult = false)
 	{
 		RoundNumber = FenHelper.GetRoundNumber(CurrentFen);
 		NumberOfMovesWithoutCapture = FenHelper.GetNumberOfMovesWithoutCapture(CurrentFen);
 		SideToMove = FenHelper.GetSideToMoveFromFen(CurrentFen);
-
-		GameResult = GameResult.Unknown;
+		
+		if (resetGameResult)
+			UpdateGameResult(GameResult.Unknown);
 	}
 
 	private void SaveMoveRecordToHistory(List<string> moves, MoveNotationType moveNotationType)
@@ -361,14 +360,11 @@ public class XiangqiGame
 	/// </summary>
 	/// <param name="moveNumber">The move number to navigate to (For the starting move, this would be 0).</param>
 	/// <param name="variationsPath">
-	/// An optional dictionary to provide guidance on the variation path to the target move.
-	/// The key is the move number (e.g., 1 for the first move) at which a choice is made,
-	/// and the value is the variation index to follow.
-	/// If a move number is not in the dictionary, the main line (index 0) is used by default.
+	/// <see cref="VariationPath"/>
 	/// </param>
 	/// <exception cref="ArgumentOutOfRangeException">Thrown if moveNumber or any variation path values are invalid.</exception>
 	/// <exception cref="InvalidOperationException">Thrown if the requested path does not exist.</exception>
-	public void NavigateToMove(int moveNumber, Dictionary<int, int>? variationsPath = null)
+	public void NavigateToMove(int moveNumber, VariationPath? variationsPath = null)
 	{
 		if (moveNumber < 0)
 			throw new ArgumentOutOfRangeException(
@@ -423,30 +419,17 @@ public class XiangqiGame
 	/// A shortcut to navigate to the end of the game.
 	/// </summary>
 	/// <param name="variationsPath">
-	/// An optional dictionary to provide guidance on the variation path to the target move.
-	/// The key is the move number (e.g., 1 for the first move) at which a choice is made,
-	/// and the value is the variation index to follow.
-	/// If a move number is not in the dictionary, the main line (index 0) is used by default.
+	/// <see cref="VariationPath"/>
 	/// </param>
-	public void NavigateToEnd(Dictionary<int, int>? variationsPath = null)
+	public void NavigateToEnd(VariationPath? variationsPath = null)
 	{
 		if (variationsPath is not null && variationsPath.Any(kvp => kvp.Key < 0 || kvp.Value < 0))
 			throw new ArgumentOutOfRangeException(
 				nameof(variationsPath), 
 				"Variation number must be non-negative.");
-		
-		while (CurrentMove.Variations.Count > 0)
-		{
-			int variationNumber = 0;
-			
-			if (variationsPath is not null && 
-			    variationsPath.TryGetValue(CurrentMove.MoveNumber, out variationNumber))
-			{
-				if (variationNumber < 0 || variationNumber >= CurrentMove.Variations.Count)
-					throw new ArgumentOutOfRangeException(nameof(variationsPath), $"Invalid variation number {variationNumber} for move {CurrentMove.MoveNumber}.");
-			}
 
-			NavigateToNextMove(variationNumber);
-		}
+		var lastMove = MoveManager.GetLastMove(variationsPath);
+		
+		NavigateToMove(lastMove);
 	}
 }

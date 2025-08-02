@@ -615,8 +615,7 @@ public static class XiangqiBuilderTests
 									.Build();
 
 		// Assert
-		int expectedNumberOfRounds = xiangqiGame
-										.MoveHistory
+		int expectedNumberOfRounds = xiangqiGame.GetMoveHistory()
 										.GroupBy(x => x.RoundNumber)
 										.Select(x => x.Key)
 										.Count();
@@ -723,8 +722,8 @@ public static class XiangqiBuilderTests
 		xiangqiGame.BlackPlayer.Team.Should().Be("四川成都懿锦金弈队");
 
 		xiangqiGame.GameResult.Should().Be(GameResult.Draw);
-		xiangqiGame.MoveHistory.Should().HaveCount(41 * 2 + 1);
-		xiangqiGame.MoveHistory.Last().FenAfterMove.Should().Be("4kab2/4a4/4b4/7N1/4p3p/2P2n3/2c1P4/4BC3/4A4/2BAK4 b - - 3 42");
+		xiangqiGame.GetMoveHistory().Should().HaveCount(41 * 2 + 1);
+		xiangqiGame.GetMoveHistory().Last().FenAfterMove.Should().Be("4kab2/4a4/4b4/7N1/4p3p/2P2n3/2c1P4/4BC3/4A4/2BAK4 b - - 3 42");
 	}
 
 	[Fact]
@@ -908,7 +907,7 @@ public static class XiangqiBuilderTests
 		xiangqiGame.BlackPlayer.Team.Should().Be("北方");
 
 		xiangqiGame.GameResult.Should().Be(GameResult.RedWin);
-		xiangqiGame.MoveHistory.Should().HaveCount(40 * 2 + 1);
+		xiangqiGame.GetMoveHistory().Should().HaveCount(40 * 2 + 1);
 	}
 
 	[Theory]

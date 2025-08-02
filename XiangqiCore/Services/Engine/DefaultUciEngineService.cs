@@ -57,14 +57,14 @@ public class DefaultUciEngineService : IXiangqiEngineService
 					string[] moves = proposedMoves.Split(' ');
 					List<string> principleVariation = [];
 
-					if (game.MoveHistory.Count > 0)
+					if (game.GetMoveHistory().Count > 0)
 						// Undo all moves before doing new ones
-						game.UndoMove();
+						game.DeleteSubsequentMoves();
 
 					foreach (string move in moves)
 						game.MakeMove(move, MoveNotationType.UCI);
 
-					foreach (MoveHistoryObject moveHistory in game.MoveHistory)
+					foreach (MoveHistoryObject moveHistory in game.GetMoveHistory())
 						principleVariation.Add(_moveTranslationService.TranslateMove(moveHistory, notationType));
 
 					yield return new AnalysisResult()
@@ -185,7 +185,7 @@ public class DefaultUciEngineService : IXiangqiEngineService
 
 					game.MakeMove(match.Groups["bestMove"].Value, MoveNotationType.UCI);
 
-					string bestMove = _moveTranslationService.TranslateMove(game.MoveHistory.First(), notationType);
+					string bestMove = _moveTranslationService.TranslateMove(game.GetMoveHistory().First(), notationType);
 
 					return bestMove;
 				}

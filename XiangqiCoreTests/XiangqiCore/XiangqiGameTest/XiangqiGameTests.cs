@@ -206,18 +206,23 @@ public static class XiangqiGameTests
 	{
 		// Arrange
 		XiangqiBuilder builder = new();
-
+        
 		XiangqiGame game = builder
-							.WithStartingFen(data.StartingFen)
-							.WithMoveRecord(data.MoveRecord)
-							.Build();
+			.WithStartingFen(data.StartingFen)
+			.WithMoveRecord(data.MoveRecord)
+			.Build();
 
+		int totalMoves = game.GetMoveHistory().Count;
+		int moveNumberToNavigateTo = totalMoves - data.NumberOfMovesToUndo;
+		
+		game.NavigateToMove(moveNumberToNavigateTo);
+		
 		// Act
-		game.UndoMove();
+		game.DeleteSubsequentMoves();
 
 		// Assert
 		game.CurrentFen.Should().Be(data.ExpectedFen);
-		game.MoveHistory.Count.Should().Be(data.ExpectedMoveHistoryCount);
+		game.GetMoveHistory().Count.Should().Be(data.ExpectedMoveHistoryCount);
 	}
 }
 

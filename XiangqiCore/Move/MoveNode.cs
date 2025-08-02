@@ -87,7 +87,7 @@ public class MoveNode
     /// <exception cref="InvalidOperationException">Thrown when the variation to remove does not exist in this move node.</exception>
     public void RemoveVariation(MoveNode variation)
     {
-        if (!Variations.Contains(variation))
+        if (!_variations.Contains(variation))
             throw new InvalidOperationException("The variation to remove does not exist in this move node.");
         
         Queue<MoveNode> nodesToRemove = [];
@@ -100,6 +100,7 @@ public class MoveNode
             // Sever the parent-child relationship to avoid memory leaks
             // and unexpected behavior when another place is holding a reference to this node.
             node.Parent = null;
+            _variations.Remove(node);
 
             if (node._variations.Count == 0) 
                 continue;

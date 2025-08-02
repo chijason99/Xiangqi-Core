@@ -24,7 +24,7 @@ public static class MoveNavigationTest
         game.NavigateToMove(moveNumber: 1);
 
         // Assert
-        game.CurrentFen.Should().Be("rnbakabnr/9/1c5c1/p1p1p1p1p/9/9/P1P1P1P1P/1C2C4/9/RNBAKABNR b - - 1 2");
+        game.CurrentFen.Should().Be("rnbakabnr/9/1c5c1/p1p1p1p1p/9/9/P1P1P1P1P/1C2C4/9/RNBAKABNR b - - 1 1");
     }
     
     [Fact]
@@ -151,6 +151,6 @@ public static class MoveNavigationTest
 
         // Assert
         // Verify that the current move is the first move
-        game.CurrentFen.Should().Be("2R1kab2/9/2Na5/2p1r3p/5Pp2/2P6/9/4B4/4A4/2B1KA3 b - - 0 38");
+        game.CurrentFen.Should().Be("2R1kab2/9/2Na5/2p1r3p/5Pp2/2P6/9/4B4/4A4/2B1KA3 b - - 0 37");
     }
 }
