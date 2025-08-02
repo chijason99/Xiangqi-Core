@@ -213,7 +213,7 @@ public static class XiangqiGameTests
 							.Build();
 
 		// Act
-		game.UndoMove(numberOfMovesToUndo: data.NumberOfMovesToUndo);
+		game.UndoMove();
 
 		// Assert
 		game.CurrentFen.Should().Be(data.ExpectedFen);

@@ -59,7 +59,7 @@ public class DefaultUciEngineService : IXiangqiEngineService
 
 					if (game.MoveHistory.Count > 0)
 						// Undo all moves before doing new ones
-						game.UndoMove(game.MoveHistory.Count);
+						game.UndoMove();
 
 					foreach (string move in moves)
 						game.MakeMove(move, MoveNotationType.UCI);

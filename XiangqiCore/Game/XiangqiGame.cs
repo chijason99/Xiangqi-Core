@@ -60,11 +60,13 @@ public class XiangqiGame
 			GameName = gameName;
 		}
 	}
-
+	
+	public MoveNode CurrentMove => MoveManager.CurrentMove;
+	
 	/// <summary>
-	/// The move command invoker responsible for executing/undoing move commands.
+	/// The move manager that handles the moves in the game.
 	/// </summary>
-	public MoveCommandInvoker MoveCommandInvoker { get; private set; }
+	public MoveManager MoveManager { get; private set; }
 
 	/// <summary>
 	/// Gets the initial FEN string when the game is first created.
@@ -114,7 +116,7 @@ public class XiangqiGame
 	/// <summary>
 	/// Gets the current FEN string representing the board position.
 	/// </summary>
-	public string CurrentFen => _moveHistory.LastOrDefault()?.FenAfterMove ?? InitialFenString;
+	public string CurrentFen => CurrentMove.MoveHistoryObject.FenAfterMove;
 
 	/// <summary>
 	/// Gets the number of moves without capture.
@@ -126,29 +128,12 @@ public class XiangqiGame
 	/// </summary>
 	public int RoundNumber { get; private set; } = 0;
 
-	private List<MoveHistoryObject> _moveHistory => MoveCommandInvoker.GetMoveHistories();
+	private List<MoveHistoryObject> _moveHistory => MoveManager.GetMoveHistory();
 
 	/// <summary>
 	/// Gets the move history.
 	/// </summary>
 	public IReadOnlyList<MoveHistoryObject> MoveHistory => _moveHistory.AsReadOnly();
-
-	/// <summary>
-	/// Used for displaying the initial state of the game in the GIF.
-	/// </summary>
-	public MoveHistoryObject InitialState => new(
-		fenAfterMove: InitialFenString, 
-		fenBeforeMove: InitialFenString,
-		isCapture: false,
-		isCheck: false,
-		isCheckMate: GameResult != GameResult.Unknown && GameResult != GameResult.Draw,
-		pieceMoved: PieceType.None,
-		pieceCaptured: PieceType.None,
-		side: SideToMove,
-		startingPosition: Coordinate.Empty,
-		destination: Coordinate.Empty,
-		pieceOrder: PieceOrder.Unknown,
-		hasMultiplePieceOfSameTypeOnSameColumn: false);
 
 	/// <summary>
 	/// Gets the game result.
@@ -171,6 +156,8 @@ public class XiangqiGame
 	/// <param name="boardConfig">The custom board configuration.</param>
 	/// <param name="gameResult">The game result.</param>
 	/// <param name="moveRecord">The move record.</param>
+	/// <param name="gameName">The game name</param>
+	/// <param name="moveNotationType">The move notation type</param>
 	/// <returns>A new instance of the <see cref="XiangqiGame"/> class.</returns>
 	internal static XiangqiGame Create(
 		string initialFenString,
@@ -204,7 +191,23 @@ public class XiangqiGame
 			NumberOfMovesWithoutCapture = FenHelper.GetNumberOfMovesWithoutCapture(initialFenString),
 		};
 		
-		createdGameInstance.MoveCommandInvoker = new MoveCommandInvoker(createdGameInstance.Board);
+		// Set up the MoveHistoryObject for the root move
+		MoveHistoryObject rootMoveHistory = new(
+			fenAfterMove: initialFenString, 
+			fenBeforeMove: initialFenString,
+			isCapture: false,
+			isCheck: false,
+			isCheckMate: gameResult != GameResult.Unknown && gameResult != GameResult.Draw,
+			pieceMoved: PieceType.None,
+			pieceCaptured: PieceType.None,
+			side: sideToMoveFromFen,
+			startingPosition: Coordinate.Empty,
+			destination: Coordinate.Empty,
+			pieceOrder: PieceOrder.Unknown,
+			hasMultiplePieceOfSameTypeOnSameColumn: false);
+		
+		MoveCommandInvoker commandInvoker = new(createdGameInstance.Board);
+		createdGameInstance.MoveManager = new MoveManager(commandInvoker, rootMoveHistory, createdGameInstance.Board);
 
 		if (useBoardConfig)
 			createdGameInstance.InitialFenString = FenHelper.GetFenFromPosition(createdGameInstance.Board.Position)
@@ -215,7 +218,6 @@ public class XiangqiGame
 
 		if (moveRecord is not null)
 			createdGameInstance.SaveMoveRecordToHistory(moveRecord, moveNotationType);
-
 
 		return createdGameInstance;
 	}
@@ -238,7 +240,6 @@ public class XiangqiGame
 	/// </summary>
 	/// <param name="moveNotation">The move notation.</param>
 	/// <param name="moveNotationType">The type of move notation.</param>
-	/// <param name="moveParsingService">The move parsing service used to create the MoveCommand. By default it would be using the Xiangqi Core default implementation</param>
 	/// <returns><c>true</c> if the move is valid and successful; otherwise, <c>false</c>.</returns>
 	public bool MakeMove(string moveNotation, MoveNotationType moveNotationType)
 	{
@@ -254,7 +255,7 @@ public class XiangqiGame
 	{
 		try
 		{
-			MoveHistoryObject latestMove = MoveCommandInvoker.ExecuteCommand(moveCommand);
+			MoveHistoryObject latestMove = MoveManager.AddMove(moveCommand);
 
 			UpdateGameInfoAfterMove();
 
@@ -268,13 +269,13 @@ public class XiangqiGame
 		}
 	}
 
-	public bool UndoMove(int numberOfMovesToUndo = 1)
+	public bool UndoMove()
 	{
 		try
 		{
-			MoveCommandInvoker.UndoCommand(numberOfMovesToUndo);
+			MoveManager.UndoMove();
 
-			UpdateGameInfoAfterUndo();
+			UpdateGameInfo();
 
 			return true;
 		}
@@ -319,9 +320,9 @@ public class XiangqiGame
 	}
 
 	/// <summary>
-	/// Updates the game information according to the <see cref="MoveHistoryObject"/> after undoing a move.
+	/// Updates the game information according to the CurrentMove.
 	/// </summary>
-	private void UpdateGameInfoAfterUndo()
+	private void UpdateGameInfo()
 	{
 		RoundNumber = FenHelper.GetRoundNumber(CurrentFen);
 		NumberOfMovesWithoutCapture = FenHelper.GetNumberOfMovesWithoutCapture(CurrentFen);
@@ -338,6 +339,114 @@ public class XiangqiGame
 
 			if (!isSuccessful)
 				break;
+		}
+	}
+
+	/// <summary>
+	/// Navigate to a specific move in the game history.
+	/// </summary>
+	/// <param name="targetMoveNode">The move node to navigate to.</param>
+	public void NavigateToMove(MoveNode targetMoveNode)
+	{
+		if (targetMoveNode is null)
+			throw new ArgumentNullException(nameof(targetMoveNode), "Target move node cannot be null.");
+		
+		MoveManager.NavigateToMove(targetMoveNode);
+		
+		UpdateGameInfo();
+	}
+	
+	/// <summary>
+	/// Navigate to a specific move in the game history.
+	/// </summary>
+	/// <param name="moveNumber">The move number to navigate to (For the starting move, this would be 0).</param>
+	/// <param name="variationsPath">
+	/// An optional dictionary to provide guidance on the variation path to the target move.
+	/// The key is the move number (e.g., 1 for the first move) at which a choice is made,
+	/// and the value is the variation index to follow.
+	/// If a move number is not in the dictionary, the main line (index 0) is used by default.
+	/// </param>
+	/// <exception cref="ArgumentOutOfRangeException">Thrown if moveNumber or any variation path values are invalid.</exception>
+	/// <exception cref="InvalidOperationException">Thrown if the requested path does not exist.</exception>
+	public void NavigateToMove(int moveNumber, Dictionary<int, int>? variationsPath = null)
+	{
+		if (moveNumber < 0)
+			throw new ArgumentOutOfRangeException(
+				nameof(moveNumber), 
+				"Move number must be non-negative.");
+		
+		if (variationsPath is not null && variationsPath.Any(kvp => kvp.Key < 0 || kvp.Value < 0))
+			throw new ArgumentOutOfRangeException(
+				nameof(variationsPath), 
+				"Variation number must be non-negative.");
+		
+		MoveManager.NavigateToMove(moveNumber, variationsPath);
+		
+		UpdateGameInfo();
+	}
+
+	/// <summary>
+	/// A shortcut to navigate to the start of the game.
+	/// </summary>
+	public void NavigateToStart()
+	{
+		NavigateToMove(MoveManager.RootMove);
+	}
+	
+	/// <summary>
+	/// A shortcut to navigate to the previous move.
+	/// </summary>
+	public void NavigateToPreviousMove()
+	{
+		NavigateToMove(CurrentMove.Parent ?? throw new InvalidOperationException("No previous move available."));
+	}
+	
+	/// <summary>
+	/// A shortcut to navigate to the next move in the current variation.
+	/// </summary>
+	/// <param name="variationNumber">The variation number to navigate to (default is 0).</param>
+	/// <exception cref="InvalidOperationException"></exception>
+	/// <exception cref="ArgumentOutOfRangeException"></exception>
+	public void NavigateToNextMove(int variationNumber = 0)
+	{
+		if (variationNumber < 0)
+			throw new ArgumentOutOfRangeException(nameof(variationNumber), "Variation number must be non-negative.");
+		
+		if (CurrentMove.Variations.Count == 0 || variationNumber >= CurrentMove.Variations.Count)
+			throw new InvalidOperationException(
+				$"{nameof(variationNumber)} is invalid");
+		
+		NavigateToMove(CurrentMove.Variations.ElementAt(variationNumber));
+	}
+
+	/// <summary>
+	/// A shortcut to navigate to the end of the game.
+	/// </summary>
+	/// <param name="variationsPath">
+	/// An optional dictionary to provide guidance on the variation path to the target move.
+	/// The key is the move number (e.g., 1 for the first move) at which a choice is made,
+	/// and the value is the variation index to follow.
+	/// If a move number is not in the dictionary, the main line (index 0) is used by default.
+	/// </param>
+	public void NavigateToEnd(Dictionary<int, int>? variationsPath = null)
+	{
+		if (variationsPath is not null && variationsPath.Any(kvp => kvp.Key < 0 || kvp.Value < 0))
+			throw new ArgumentOutOfRangeException(
+				nameof(variationsPath), 
+				"Variation number must be non-negative.");
+		
+		while (CurrentMove.Variations.Count > 0)
+		{
+			int variationNumber = 0;
+			
+			if (variationsPath is not null && 
+			    variationsPath.TryGetValue(CurrentMove.MoveNumber, out variationNumber))
+			{
+				if (variationNumber < 0 || variationNumber >= CurrentMove.Variations.Count)
+					throw new ArgumentOutOfRangeException(nameof(variationsPath), $"Invalid variation number {variationNumber} for move {CurrentMove.MoveNumber}.");
+			}
+
+			NavigateToNextMove(variationNumber);
 		}
 	}
 }
