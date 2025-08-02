@@ -8,6 +8,14 @@ public class PawnValidationStrategy : DefaultValidationStrategy, IValidationStra
 {
     public static readonly int[] AvailableColumnsForPawnsNotYetCrossedTheRiver = [1, 3, 5, 7, 9];
 
+    public static int[] AvailableRowsForPawnsNotYetCrossedTheRiver(Side color)
+	    => color switch
+	    {
+		    Side.Red => [4, 5],
+		    Side.Black => [6, 7],
+		    _ => throw new InvalidSideException(color)
+	    };
+
     public override int[] GetPossibleRows(Side color)
     {
         int[] unavailableRowsForRedPawn = [1, 2, 3];
@@ -50,19 +58,29 @@ public class PawnValidationStrategy : DefaultValidationStrategy, IValidationStra
         return (isMovingForward && !(isMovingLeft || isMovingRight)) || (pawnHasCrossedTheRiver && ((isMovingLeft || isMovingRight) && !isMovingForward));
     }
 
-    Coordinate IValidationStrategy.GetRandomCoordinate(Random random, Side color)
+	public Coordinate[] GetValidCoordinates(Side side)
 	{
-        int randomRowIndex = random.Next(0, GetPossibleRows(color).Length);
-        int row = GetPossibleRows(color)[randomRowIndex];
+		if (side == Side.None)
+			throw new InvalidSideException(side);
 
-        bool hasCrossedTheRiver = color == Side.Red ? row >= 6 : row <= 5;
+		var rowsForPawnsNotYetCrossedTheRiver = AvailableRowsForPawnsNotYetCrossedTheRiver(side);
+		var availableColumnsForPawnsNotYetCrossedTheRiver = AvailableColumnsForPawnsNotYetCrossedTheRiver;
+		var rowsForPawnsCrossedTheRiver = GetPossibleRows(side).Except(rowsForPawnsNotYetCrossedTheRiver).ToArray();
+		
+		List<Coordinate> validCoordinates = [];
 
-		// Limit the choice of the columns if the pawn has not crossed the river
-        int[] availableColumns = hasCrossedTheRiver ? GetPossibleColumns() : AvailableColumnsForPawnsNotYetCrossedTheRiver;
-		int randomColumnIndex = random.Next(0, availableColumns.Length);
+		foreach (int row in rowsForPawnsNotYetCrossedTheRiver)
+		{
+			validCoordinates.AddRange(availableColumnsForPawnsNotYetCrossedTheRiver
+				.Select(column => new Coordinate(column, row)));
+		}
 
-		int column = availableColumns[randomColumnIndex];
-
-        return new Coordinate(column, row);
+		foreach (int row in rowsForPawnsCrossedTheRiver)
+		{
+			validCoordinates.AddRange(GetPossibleColumns()
+				.Select(column => new Coordinate(column, row)));
+		}
+		
+		return validCoordinates.ToArray();
 	}
 }

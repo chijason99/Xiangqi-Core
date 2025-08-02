@@ -1,5 +1,7 @@
 ﻿using XiangqiCore.Boards;
+using XiangqiCore.Misc;
 using XiangqiCore.Move;
+using XiangqiCore.Pieces.PieceTypes;
 
 namespace XiangqiCore.Game;
 
@@ -30,5 +32,7 @@ public interface IXiangqiBuilder
 
     XiangqiBuilder WithDpxqGameRecord(string dpxqGameRecord, MoveNotationType moveNotationType = MoveNotationType.SimplifiedChinese);
 
+    XiangqiBuilder WithPlacementConstraint(PieceType pieceType, Side side, Func<Coordinate, bool> constraint);
+    
 	XiangqiGame Build();
 }

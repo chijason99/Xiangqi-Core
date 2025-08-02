@@ -3,6 +3,7 @@ using XiangqiCore.Attributes;
 using XiangqiCore.Boards;
 using XiangqiCore.Misc;
 using XiangqiCore.Move;
+using XiangqiCore.Pieces.PieceTypes;
 using XiangqiCore.Services.MoveParsing;
 
 namespace XiangqiCore.Game;
@@ -99,6 +100,27 @@ public class XiangqiBuilder : IXiangqiBuilder
 	public XiangqiBuilder WithMoveParsingService(IMoveParsingService moveParsingService)
 	{
 		_moveParsingService = moveParsingService;
+		return this;
+	}
+
+	public XiangqiBuilder WithPlacementConstraint(
+		PieceType pieceType, 
+		Side side, 
+		Func<Coordinate, bool> constraint)
+	{
+		_boardConfig ??= new BoardConfig();
+		
+		var key = (pieceType, side);
+		
+		if (!_boardConfig.PiecePlacementConstraints.TryGetValue(
+			    key, out var constraints))
+		{
+			constraints = [];
+			_boardConfig.PiecePlacementConstraints[key] = constraints;
+		}
+		
+		constraints.Add(constraint);
+
 		return this;
 	}
 

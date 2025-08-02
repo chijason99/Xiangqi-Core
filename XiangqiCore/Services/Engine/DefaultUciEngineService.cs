@@ -46,7 +46,8 @@ public class DefaultUciEngineService : IXiangqiEngineService
 			if (response.StartsWith("info", StringComparison.OrdinalIgnoreCase))
 			{
 				Match match = infoRegex.Match(response);
-
+				
+				// TODO: Fix the error where the score is negative
 				if (match.Success)
 				{
 					int score = int.Parse(match.Groups["score"].Value);

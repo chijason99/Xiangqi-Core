@@ -1,5 +1,5 @@
 ﻿namespace XiangqiCore.Misc;
-public readonly struct Coordinate()
+public readonly record struct Coordinate()
 {
     private const int _minRow = 1;
     private const int _minColumn = 1;
