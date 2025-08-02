@@ -977,6 +977,7 @@ public static class XiangqiBuilderTests
 		Func<Coordinate, bool> blackBishopConstraintOne = c => c.Column == 5;
 		Func<Coordinate, bool> blackBishopConstraintTwo = c => c.Column is 1 or 7;
 		Func<Coordinate, bool> blackKnightPattern = c => c.Row <= 4;
+		Func<Coordinate, bool> blackKingPattern = c => c.Column == 5;
 
 		// Act
 		XiangqiGame xiangqiGame = builder
@@ -999,6 +1000,7 @@ public static class XiangqiBuilderTests
 			.WithPlacementConstraint(PieceType.Bishop, Side.Black, blackBishopConstraintOne)
 			.WithPlacementConstraint(PieceType.Bishop, Side.Black, blackBishopConstraintTwo)
 			.WithPlacementConstraint(PieceType.Knight, Side.Black, blackKnightPattern)
+			.WithPlacementConstraint(PieceType.King, Side.Black, blackKingPattern)
 			.RandomisePosition(allowCheck: false, fromFen: false)
 			.Build();
 

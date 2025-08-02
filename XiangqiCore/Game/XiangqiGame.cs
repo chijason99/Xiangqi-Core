@@ -189,11 +189,20 @@ public class XiangqiGame
 			RoundNumber = FenHelper.GetRoundNumber(initialFenString),
 			NumberOfMovesWithoutCapture = FenHelper.GetNumberOfMovesWithoutCapture(initialFenString),
 		};
-		
+
+		if (useBoardConfig)
+			createdGameInstance.InitialFenString = FenHelper.GetFenFromPosition(createdGameInstance.Board.Position)
+				.AppendGameInfoToFen(
+					createdGameInstance.SideToMove, 
+					createdGameInstance.RoundNumber, 
+					createdGameInstance.NumberOfMovesWithoutCapture);
+
 		// Set up the MoveHistoryObject for the root move
+		// NOTE: place this after the board is created, so that the initial fen string is correct if the user is 
+		// randomizing the board.
 		MoveHistoryObject rootMoveHistory = new(
-			fenAfterMove: initialFenString, 
-			fenBeforeMove: initialFenString,
+			fenAfterMove: createdGameInstance.InitialFenString, 
+			fenBeforeMove: createdGameInstance.InitialFenString,
 			isCapture: false,
 			isCheck: false,
 			isCheckMate: gameResult != GameResult.Unknown && gameResult != GameResult.Draw,
@@ -207,14 +216,7 @@ public class XiangqiGame
 		
 		MoveCommandInvoker commandInvoker = new(createdGameInstance.Board);
 		createdGameInstance.MoveManager = new MoveManager(commandInvoker, rootMoveHistory, createdGameInstance.Board);
-
-		if (useBoardConfig)
-			createdGameInstance.InitialFenString = FenHelper.GetFenFromPosition(createdGameInstance.Board.Position)
-				.AppendGameInfoToFen(
-					createdGameInstance.SideToMove, 
-					createdGameInstance.RoundNumber, 
-					createdGameInstance.NumberOfMovesWithoutCapture);
-
+		
 		if (moveRecord is not null)
 			createdGameInstance.SaveMoveRecordToHistory(moveRecord, moveNotationType);
 
