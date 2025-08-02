@@ -12,15 +12,14 @@ public class ImageCache
 
 	public Image<Rgba32> GetImage(string resourceName)
 	{
-		if (!_imageCache.TryGetValue(resourceName, out var image))
+		var cachedImage = _imageCache.GetOrAdd(resourceName, static key =>
 		{
-			using Stream stream = Assembly.GetAssembly(typeof(XiangqiBuilder))!.GetManifestResourceStream(resourceName)
-				?? throw new FileNotFoundException($"Resource '{resourceName}' not found.");
+			using Stream stream = Assembly.GetAssembly(typeof(XiangqiBuilder))!.GetManifestResourceStream(key)
+			                      ?? throw new FileNotFoundException($"Resource '{key}' not found.");
 
-			image = Image.Load<Rgba32>(stream);
-			_imageCache[resourceName] = image;
-		}
+			return Image.Load<Rgba32>(stream);
+		});
 
-		return image.Clone();
+		return cachedImage.Clone();
 	}
 }

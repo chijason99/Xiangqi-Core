@@ -1,31 +1,25 @@
-﻿using XiangqiCore.Move.NotationTranslators.Implementations;
+﻿using System.Collections.Concurrent;
+using XiangqiCore.Move.NotationTranslators.Implementations;
 
 namespace XiangqiCore.Move.NotationTranslators;
 
 public static class NotationTranslatorFactory
 {
-	private static readonly Dictionary<MoveNotationType, INotationTranslator> _translatorCache = [];
+	private static readonly ConcurrentDictionary<MoveNotationType, INotationTranslator> _translatorCache = [];
 
 	public static INotationTranslator GetTranslator(MoveNotationType targetNotationType)
 	{
-		if (_translatorCache.TryGetValue(targetNotationType, out INotationTranslator? translator))
+		return _translatorCache.GetOrAdd(targetNotationType, static type =>
 		{
-			return translator;
-		}
-		else
-		{
-			translator = targetNotationType switch
+			return type switch
 			{
 				MoveNotationType.TraditionalChinese => new TraditionalChineseNotationTranslator(),
 				MoveNotationType.SimplifiedChinese => new SimplifiedChineseNotationTranslator(),
 				MoveNotationType.English => new EnglishNotationTranslator(),
 				MoveNotationType.UCCI => new UcciNotationTranslator(),
 				MoveNotationType.UCI => new UciNotationTranslator(),
-				_ => throw new NotSupportedException($"Notation type {targetNotationType} is not supported."),
+				_ => throw new NotSupportedException($"Notation type {type} is not supported."),
 			};
-
-			_translatorCache[targetNotationType] = translator;
-			return translator;
-		}
+		});
 	}
 }
