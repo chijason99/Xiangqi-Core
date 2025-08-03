@@ -176,6 +176,10 @@ public class MoveManager
             
             // Get the variation number for the next move.
             int variationNumber = variationsPath.GetValueOrDefault(currentNode.MoveNumber + 1, 0);
+
+            if (variationNumber > currentNode.Variations.Count - 1)
+                // If the variation number is out of bounds, default to the first variation.
+                variationNumber = 0;
             
             currentNode = currentNode.Variations.ElementAtOrDefault(variationNumber);
         }

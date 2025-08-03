@@ -1,4 +1,6 @@
-﻿namespace XiangqiCore.Misc.Images;
+﻿using XiangqiCore.Move;
+
+namespace XiangqiCore.Misc.Images;
 
 public record ImageConfig
 {

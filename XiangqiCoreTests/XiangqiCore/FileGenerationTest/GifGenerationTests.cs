@@ -1,6 +1,8 @@
-﻿using XiangqiCore.Game;
+﻿using xiangqi_core_test.XiangqiCore.MoveRecordTreeTests;
+using XiangqiCore.Game;
 using XiangqiCore.Misc;
 using XiangqiCore.Misc.Images;
+using XiangqiCore.Move;
 using XiangqiCore.Services.GifSaving;
 
 namespace xiangqi_core_test.XiangqiCore.FileGenerationTest;
@@ -118,6 +120,47 @@ public static class GifGenerationTests
 			};
 
 			gifSavingService.Save(filePath, game, config);
+
+			// Assert
+			Assert.True(File.Exists(filePath), "GIF file was not created.");
+		}
+		catch (Exception ex)
+		{
+			Console.WriteLine(ex.Message);
+			throw;
+		}
+		finally
+		{
+			Directory.Delete(tempDirectory, true);
+		}
+	}
+	
+	[Fact]
+	public static void GenerateGif_ShouldCreateFilesCorrectly_WhenSupplyingVariations()
+	{
+		// Arrange
+		string tempDirectory = FileHelper.CreateTempDirectory("XiangqiGifCreationTests");
+		IGifSavingService gifSavingService = new DefaultGifSavingService();
+
+		try
+		{
+			// Act
+			var game = MoveNavigationTest.CreateGameInstanceWithVariations();
+
+			string filePath = Path.Combine(tempDirectory, $"{game.GameName}.gif");
+
+			ImageConfig config = new()
+			{
+				UseMoveIndicator = true,
+				FrameDelayInSecond = 1,
+				UseBlackAndWhitePieces = true
+			};
+
+			gifSavingService.Save(filePath, game.GetMoveHistory(includeRootNode: true, 
+				new VariationPath()
+			{
+				{ 12, 1 }
+			}).ToList(), config);
 
 			// Assert
 			Assert.True(File.Exists(filePath), "GIF file was not created.");

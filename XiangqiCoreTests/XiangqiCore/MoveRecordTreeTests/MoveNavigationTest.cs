@@ -227,7 +227,7 @@ public static class MoveNavigationTest
         game.CurrentFen.Should().Be("2bakab2/9/1cn1c1n2/p1p3p1p/4p4/1CP3P2/P2rPr2P/2N1BCN2/4A4/R3KABR1 w - - 20 10");
     }
 
-    private static XiangqiGame CreateGameInstanceWithVariations()
+    public static XiangqiGame CreateGameInstanceWithVariations()
     {
         XiangqiBuilder builder = new();
 

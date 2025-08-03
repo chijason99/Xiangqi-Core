@@ -24,7 +24,6 @@ public class DefaultGifGenerationService : IGifGenerationService
 		_imageGenerationService = new DefaultImageGenerationService();
 	}
 
-	// TODO: Make this GIF generation accept VariationPaths
 	private Image<Rgba32> GenerateGifCore(IEnumerable<string>? fens = null, List<MoveHistoryObject>? moveHistory = null, ImageConfig? imageConfig = null)
 	{
 		if (fens is null && moveHistory is null)
