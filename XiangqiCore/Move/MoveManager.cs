@@ -53,15 +53,26 @@ public class MoveManager
     public List<MoveHistoryObject> GetMoveHistory(
         bool includeRootNode = false, 
         VariationPath? variationsPath = null)
+        => GetMoveLine(includeRootNode, variationsPath)
+            .Select(node => node.MoveHistoryObject)
+            .ToList();
+
+    /// <summary>
+    ///  Retrieves the move line as an enumerable of MoveNode objects.
+    /// </summary>
+    /// <param name="includeRootNode"></param>
+    /// <param name="variationsPath"></param>
+    /// <returns></returns>
+    public IEnumerable<MoveNode> GetMoveLine(
+        bool includeRootNode = false,
+        VariationPath? variationsPath = null)
     {
         var nodesOnPath = GetNodesOnPath(variationsPath);
 
         if (!includeRootNode)
             nodesOnPath = nodesOnPath.Skip(1); // Skip the root move if not included.
         
-        return nodesOnPath
-            .Select(node => node.MoveHistoryObject)
-            .ToList();
+        return nodesOnPath;
     }
     
     /// <summary>

@@ -66,7 +66,7 @@ public class XiangqiGame
 	/// <summary>
 	/// The move manager that handles the moves in the game.
 	/// </summary>
-	public MoveManager MoveManager { get; private set; }
+	private MoveManager MoveManager { get; set; }
 
 	/// <summary>
 	/// Gets the initial FEN string when the game is first created.
@@ -133,6 +133,12 @@ public class XiangqiGame
 		bool includeRootNode = false, 
 		VariationPath? variationsPath = null) 
 		=> MoveManager.GetMoveHistory(includeRootNode, variationsPath).AsReadOnly();
+	
+	/// <inheritdoc cref="MoveManager.GetMoveLine(bool, VariationPath?)"/>
+	public IReadOnlyList<MoveNode> GetMoveLine(
+		bool includeRootNode = false, 
+		VariationPath? variationsPath = null) 
+		=> MoveManager.GetMoveLine(includeRootNode, variationsPath).ToArray();
 	
 	/// <summary>
 	/// Gets the game result.
