@@ -1,5 +1,17 @@
 ## Change Log
 
+### Version 3.0.0
+#### Bug Fixes
+- Fixed an issue where the `DefaultUciEngineService` did not correctly identify the score when it is negative.
+- Fixed an issue some classes that makes use of Cache/Singleton are not thread-safe, which could lead to unexpected behavior in multithreaded environments.
+
+#### Features
+- Xiangqi-Core now supports a tree-like structure for move history, allowing users to explore different branches of the game. This is particularly useful for analyzing alternative moves and strategies.
+- Introduced different APIs for move navigation in the `XiangqiGame` class, like NavigateToMove, NavigateToStart, NavigateToEnd, NavigateToNextMove, and NavigateToPreviousMove, which allow users to traverse the move history tree.
+- Optimized the `RandmoizePiecePosition` method for quicker performance
+- Added the `WithPiecePlacementConstraint` method to the `XiangqiBuilder` class, allowing users to specify constraints for piece placement when randomizing positions. This feature enables more controlled and strategic game setups.
+- Rename the `UndoMove` method to `DeleteSubsequentMoves` to better reflect its functionality, which now deletes all moves after the current move in the history tree.
+
 ### Version 2.2.0
 #### Bug Fixes
 - Fixed an issue where the `UndoMove` method failed to restore the board state to its previous position after a move was undone.
