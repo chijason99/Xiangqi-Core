@@ -1,4 +1,5 @@
-﻿using XiangqiCore.Extension;
+﻿using System.Collections.Concurrent;
+using XiangqiCore.Extension;
 using XiangqiCore.Misc;
 using XiangqiCore.Move.MoveObject;
 using XiangqiCore.Pieces.PieceTypes;
@@ -7,11 +8,11 @@ namespace XiangqiCore.Move.NotationParsers;
 
 public abstract class MoveNotationParserBase : INotationParser
 {
-	private static Dictionary<Type, MoveNotationParserBase> _instances = [];
+	private static ConcurrentDictionary<Type, MoveNotationParserBase> _instances = [];
 
-	protected virtual Dictionary<char, PieceType> SymbolToPieceTypeMap { get; set; } = [];
-	protected virtual Dictionary<char, MoveDirection> SymbolToMoveDirectionMap { get; set; } = [];
-	protected virtual Dictionary<char, PieceOrder> SymbolToPieceOrderMap { get; set; } = [];
+	protected virtual ConcurrentDictionary<char, PieceType> SymbolToPieceTypeMap { get; set; } = [];
+	protected virtual ConcurrentDictionary<char, MoveDirection> SymbolToMoveDirectionMap { get; set; } = [];
+	protected virtual ConcurrentDictionary<char, PieceOrder> SymbolToPieceOrderMap { get; set; } = [];
 
 
 	public Language Language { get; }
@@ -27,10 +28,7 @@ public abstract class MoveNotationParserBase : INotationParser
 
 	public static T GetMoveNotationParserInstance<T>() where T : MoveNotationParserBase, new()
 	{
-		if (!_instances.ContainsKey(typeof(T)))
-			_instances[typeof(T)] = new T();
-
-		return (T)_instances[typeof(T)];
+		return (T)_instances.GetOrAdd(typeof(T), _ => new T());
 	}
 
 	public abstract ParsedMoveObject Parse(string notation);
@@ -48,7 +46,7 @@ public abstract class MoveNotationParserBase : INotationParser
 			{
 				char symbolChar = symbol[0];
 
-				SymbolToMoveDirectionMap[symbolChar] = moveDirection;
+				SymbolToMoveDirectionMap.TryAdd(symbolChar, moveDirection);
 			}
 		}
 	}
@@ -66,7 +64,7 @@ public abstract class MoveNotationParserBase : INotationParser
 			{
 				char symbolChar = symbol[0];
 
-				SymbolToPieceOrderMap[symbolChar] = pieceOrder;
+				SymbolToPieceOrderMap.TryAdd(symbolChar, pieceOrder);
 			}
 		}
 	}
@@ -86,7 +84,7 @@ public abstract class MoveNotationParserBase : INotationParser
 				{
 					char symbolChar = symbol[0];
 
-					SymbolToPieceTypeMap[symbolChar] = pieceType;
+					SymbolToPieceTypeMap.TryAdd(symbolChar, pieceType);
 				}
 			}
 		}

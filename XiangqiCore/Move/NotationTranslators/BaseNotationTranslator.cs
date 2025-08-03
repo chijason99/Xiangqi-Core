@@ -1,4 +1,5 @@
-﻿using XiangqiCore.Extension;
+﻿using System.Collections.Concurrent;
+using XiangqiCore.Extension;
 using XiangqiCore.Misc;
 using XiangqiCore.Move.MoveObjects;
 using XiangqiCore.Move.NotationParsers;
@@ -8,9 +9,9 @@ namespace XiangqiCore.Move.NotationTranslators;
 
 public abstract class BaseNotationTranslator : INotationTranslator
 {
-	protected virtual Dictionary<PieceTypeSideKey, char> PieceTypeSymbolCache { get; set; } = [];
-	protected virtual Dictionary<MoveDirection, char> MoveDirectionSymbolCache { get; set; } = [];
-	protected virtual Dictionary<PieceOrder, char> PieceOrderSymbolCache { get; set; } = [];
+	protected virtual ConcurrentDictionary<PieceTypeSideKey, char> PieceTypeSymbolCache { get; set; } = [];
+	protected virtual ConcurrentDictionary<MoveDirection, char> MoveDirectionSymbolCache { get; set; } = [];
+	protected virtual ConcurrentDictionary<PieceOrder, char> PieceOrderSymbolCache { get; set; } = [];
 
 	public Language Language { get; init; }
 
@@ -42,7 +43,7 @@ public abstract class BaseNotationTranslator : INotationTranslator
 		{
 			string defaultSymbol = EnumHelper<MoveDirection>.GetDefaultSymbol(moveDirection, Language);
 
-			MoveDirectionSymbolCache[moveDirection] = defaultSymbol[0];
+			MoveDirectionSymbolCache.TryAdd(moveDirection, defaultSymbol[0]);
 		}
 	}
 
@@ -55,7 +56,7 @@ public abstract class BaseNotationTranslator : INotationTranslator
 		{
 			string defaultSymbol = EnumHelper<PieceOrder>.GetDefaultSymbol(pieceOrder, Language);
 
-			PieceOrderSymbolCache[pieceOrder] = defaultSymbol[0];
+			PieceOrderSymbolCache.TryAdd(pieceOrder, defaultSymbol[0]);
 		}
 	}
 
@@ -70,7 +71,7 @@ public abstract class BaseNotationTranslator : INotationTranslator
 			{
 				string defaultSymbol = EnumHelper<PieceType>.GetDefaultSymbol(pieceType, Language, side);
 
-				PieceTypeSymbolCache[new PieceTypeSideKey(pieceType, side)] = defaultSymbol[0];
+				PieceTypeSymbolCache.TryAdd(new PieceTypeSideKey(pieceType, side), defaultSymbol[0]);
 			}
 		}
 	}
