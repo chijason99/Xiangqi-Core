@@ -434,7 +434,7 @@ public class XiangqiGame
 		if (variationsPath is not null && variationsPath.Any(kvp => kvp.Key < 0 || kvp.Value < 0))
 			throw new ArgumentOutOfRangeException(
 				nameof(variationsPath), 
-				"Variation number must be non-negative.");
+				"All keys and values in variationsPath must be non-negative.");
 
 		var lastMove = MoveManager.GetLastMove(variationsPath);
 		
