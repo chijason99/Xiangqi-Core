@@ -119,7 +119,9 @@ public class MoveManager
                 "Move number must be non-negative.");
 		
         var targetMove = GetNodesOnPath(variationsPath)
-            .FirstOrDefault(node => node.MoveNumber == moveNumber);
+            .FirstOrDefault(node => node.MoveNumber == moveNumber)
+            ?? throw new InvalidOperationException(
+                $"No move found with the specified move number: {moveNumber} and variations path: {variationsPath}.");
         
         NavigateToMove(targetMove);
     }
@@ -135,6 +137,14 @@ public class MoveManager
     public MoveNode GetLastMove(VariationPath? variationsPath = null)
         => GetNodesOnPath(variationsPath).LastOrDefault() 
                ?? throw new InvalidOperationException("No moves found in the history.");
+    
+    /// <summary>
+    /// Get all variations of a specific move node.
+    /// </summary>
+    /// <param name="moveNodeToCheck"></param>
+    /// <returns></returns>
+    public IReadOnlyCollection<MoveNode> GetAllVariations(MoveNode moveNodeToCheck)
+        => moveNodeToCheck.Variations?.ToArray() ?? [];
     
     /// <summary>
     /// Get an IEnumerable of MoveNodes on the path.

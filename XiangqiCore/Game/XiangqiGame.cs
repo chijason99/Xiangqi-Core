@@ -434,4 +434,11 @@ public class XiangqiGame
 		
 		NavigateToMove(lastMove);
 	}
+
+	/// <summary>
+	///  Gets all variations for the current move.
+	/// </summary>
+	/// <returns></returns>
+	public IReadOnlyCollection<MoveNode> GetAllVariationsForCurrentMove()
+		=> MoveManager.GetAllVariations(CurrentMove);
 }

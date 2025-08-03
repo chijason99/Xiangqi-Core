@@ -153,4 +153,126 @@ public static class MoveNavigationTest
         // Verify that the current move is the first move
         game.CurrentFen.Should().Be("2R1kab2/9/2Na5/2p1r3p/5Pp2/2P6/9/4B4/4A4/2B1KA3 b - - 0 37");
     }
+
+    [Fact]
+    public static void NavigateToMoveWithVariationPath_ShouldSetBoardStateCorrectly()
+    {
+        // Arrange
+        XiangqiGame game = CreateGameInstanceWithVariations();
+
+        // Act
+        // Assert
+        // Navigate to the end of the first variation
+        Assert.Multiple(() =>
+        {
+            game.NavigateToEnd(new VariationPath()
+            {
+                {13, 0}
+            });
+
+            game.CurrentFen.Should().Be("2bakab2/2r6/1cn1c1n2/p1p1p1p1p/7R1/2P2NP2/P3P3P/1CN1C4/3r5/R1BAKAB2 w - - 16 8");
+
+            // Navigate to the end of the second variation
+            game.NavigateToEnd(new VariationPath()
+            {
+                {13, 1}
+            });
+
+            game.CurrentFen.Should().Be("2bakab2/r8/1cn1c1n2/p1p3p1p/4p4/2P3P2/P2rP3P/1CN2CN2/4A4/R1B1KABR1 w - - 16 8");
+
+            // Navigate to the end of the third variation
+            game.NavigateToEnd(new VariationPath()
+            {
+                {13, 2}
+            });
+
+            game.CurrentFen.Should().Be("2bakab2/3r5/1cn1c1n2/2p1p1p1p/7R1/r1P3P2/4P3P/BCN1C1N2/9/R2AKAB2 w - - 0 9");
+        });
+    }
+
+    [Fact]
+    public static void NavigateToMoveWithMultipleVariationPath_ShouldRenderBoardStateCorrectly()
+    {
+        // Arrange
+        var game = CreateGameInstanceWithVariations();
+
+        // Navigate to the second variation of move 13
+        game.NavigateToMove(15, new VariationPath()
+        {
+            { 13, 1 }
+        });
+        
+        game.MakeMove("r1=6", MoveNotationType.English);
+        game.MakeMove("B7+5", MoveNotationType.English);
+        game.MakeMove("p5+1", MoveNotationType.English);
+        game.MakeMove("C8+2", MoveNotationType.English);
+        game.MakeMove("r6+5", MoveNotationType.English);
+
+        game.NavigateToPreviousMove();
+        game.NavigateToPreviousMove();
+        
+        game.MakeMove("R9=6", MoveNotationType.English);
+        game.MakeMove("r4+3", MoveNotationType.English);
+        game.MakeMove("K5=6", MoveNotationType.English);
+
+        // Act
+        game.NavigateToEnd(new VariationPath()
+        {
+            { 13, 1 },
+            { 16, 1 },
+            { 19, 0 }
+        });
+
+        // Assert
+        game.CurrentFen.Should().Be("2bakab2/9/1cn1c1n2/p1p3p1p/4p4/1CP3P2/P2rPr2P/2N1BCN2/4A4/R3KABR1 w - - 20 10");
+    }
+
+    private static XiangqiGame CreateGameInstanceWithVariations()
+    {
+        XiangqiBuilder builder = new();
+
+        XiangqiGame game = builder
+            .WithDefaultConfiguration()
+            .Build();
+        
+        // 順炮直車對橫車
+        game.MakeMove("C2=5", MoveNotationType.English);
+        game.MakeMove("c8=5", MoveNotationType.English);
+        game.MakeMove("H2+3", MoveNotationType.English);
+        game.MakeMove("h8+7", MoveNotationType.English);
+        game.MakeMove("R1=2", MoveNotationType.English);
+        game.MakeMove("r9+1", MoveNotationType.English);
+        game.MakeMove("P3+1", MoveNotationType.English);
+        game.MakeMove("r9=4", MoveNotationType.English);
+        game.MakeMove("H8+7", MoveNotationType.English);
+        game.MakeMove("h2+3", MoveNotationType.English);
+        game.MakeMove("P7+1", MoveNotationType.English);
+        game.MakeMove("r1+1", MoveNotationType.English);
+        
+        // Add the first common variation
+        game.MakeMove("H3+4", MoveNotationType.English);
+        game.MakeMove("r1=3", MoveNotationType.English);
+        game.MakeMove("R2+5", MoveNotationType.English);
+        game.MakeMove("r4+7", MoveNotationType.English);
+
+        game.NavigateToMove(12);
+        
+        // Add the second variation
+        game.MakeMove("A6+5", MoveNotationType.English);
+        game.MakeMove("r4+5", MoveNotationType.English);
+        game.MakeMove("C5=4", MoveNotationType.English);
+        game.MakeMove("p5+1", MoveNotationType.English);
+        
+        game.NavigateToMove(12);
+        
+        // Add the third variation
+        game.MakeMove("E7+9", MoveNotationType.English);
+        game.MakeMove("p1+1", MoveNotationType.English);
+        game.MakeMove("R2+5", MoveNotationType.English);
+        game.MakeMove("p1+1", MoveNotationType.English);
+        game.MakeMove("P9+1", MoveNotationType.English);
+        game.MakeMove("r1+4", MoveNotationType.English);
+
+        return game;
+    }
 }
