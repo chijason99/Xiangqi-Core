@@ -38,8 +38,6 @@ public class BoardConfig
 		PieceCounts.IncrementPieceCount(targetPieceType, targetColor);
 	}
 
-	// TODO: make this public?
-	// TODO: Also might want a method to pass in Func for filtering constraint
 	/// <summary>
 	/// This method is used for RandomizePiecePositions, where we want to add a piece onto the board
 	/// without incrementing the piece count after clearing the board.

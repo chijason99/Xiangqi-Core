@@ -27,7 +27,7 @@ public class DefaultUciEngineService : IXiangqiEngineService
 
 	public async IAsyncEnumerable<AnalysisResult> AnalyzePositionAsync(string fen, MoveNotationType notationType = MoveNotationType.TraditionalChinese, CancellationToken cancellationToken = default)
 	{
-		Regex infoRegex = new(@"^info(?:\sdepth\s(?<depth>\d+))?(?:\sseldepth\s(?<seldepth>\d+))?(?:\smultipv\s(?<multipv>\d+))?(?:\sscore\scp\s(?<score>\d+))?(?:\snodes\s(?<nodes>\d+))?(?:\snps\s(?<nps>\d+))?(?:\stbhits\s(?<tbhits>\d+))?(?:\stime\s(?<time>\d+))?(?:\spv\s(?<pv>.+))?");
+		Regex infoRegex = new(@"^info(?:\sdepth\s(?<depth>\d+))?(?:\sseldepth\s(?<seldepth>\d+))?(?:\smultipv\s(?<multipv>\d+))?(?:\sscore\scp\s(?<score>-?\d+))?(?:\snodes\s(?<nodes>\d+))?(?:\snps\s(?<nps>\d+))?(?:\stbhits\s(?<tbhits>\d+))?(?:\stime\s(?<time>\d+))?(?:\spv\s(?<pv>.+))?");
 
 		// Default to start position
 		if (string.IsNullOrWhiteSpace(fen))
