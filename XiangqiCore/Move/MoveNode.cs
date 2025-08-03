@@ -39,7 +39,7 @@ public class MoveNode
         MoveHistoryObject = moveHistoryObject ?? 
                               throw new ArgumentNullException(nameof(moveHistoryObject), "Move history object cannot be null.");
 
-        MoveNumber = 0; // The root move node has a depth of 0.
+        MoveNumber = 0; // The root move node has a move number of 0.
     }
     
     public MoveHistoryObject MoveHistoryObject { get; private set; }
