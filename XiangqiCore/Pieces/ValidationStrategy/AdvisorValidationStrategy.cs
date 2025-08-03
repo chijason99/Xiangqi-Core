@@ -55,10 +55,6 @@ public class AdvisorValidationStrategy : DefaultValidationStrategy, IHasSpecific
 
 	public override bool AreCoordinatesValid(Side color, Coordinate destination) => GetSpecificPositions(color).Contains(destination);
 
-	Coordinate IValidationStrategy.GetRandomCoordinate(Random random, Side side)
-	{
-		int randomIndex = random.Next(0, GetSpecificPositions(side).Length);
-
-		return GetSpecificPositions(side)[randomIndex];
-	}
+	public Coordinate[] GetValidCoordinates(Side side) 
+		=> GetSpecificPositions(side);
 }

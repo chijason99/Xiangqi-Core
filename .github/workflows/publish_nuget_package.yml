@@ -2,8 +2,8 @@ name: Publish Nuget Package
 
 on:
   push:
-    branches:
-       - master
+    tags:
+       - 'v*'  # Trigger on version tags like v1.0.0
 
 jobs:
   publish:
@@ -24,7 +24,10 @@ jobs:
           run: dotnet build --configuration Release --no-restore
 
         - name: Pack the project
-          run: dotnet pack --configuration Release --no-build --output ./nupkg
+          run: |
+            # Strip the 'v' prefix from the tag to get the version number
+            VERSION=$(echo $GITHUB_REF_NAME | sed 's/^v//')
+            dotnet pack --configuration Release --no-build --output ./nupkg -p:PackageVersion=$VERSION
 
         - name: Publish to NuGet
           env:

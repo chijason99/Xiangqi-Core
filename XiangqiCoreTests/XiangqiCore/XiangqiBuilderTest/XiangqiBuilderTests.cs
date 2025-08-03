@@ -615,8 +615,7 @@ public static class XiangqiBuilderTests
 									.Build();
 
 		// Assert
-		int expectedNumberOfRounds = xiangqiGame
-										.MoveHistory
+		int expectedNumberOfRounds = xiangqiGame.GetMoveHistory()
 										.GroupBy(x => x.RoundNumber)
 										.Select(x => x.Key)
 										.Count();
@@ -723,8 +722,8 @@ public static class XiangqiBuilderTests
 		xiangqiGame.BlackPlayer.Team.Should().Be("四川成都懿锦金弈队");
 
 		xiangqiGame.GameResult.Should().Be(GameResult.Draw);
-		xiangqiGame.MoveHistory.Should().HaveCount(41 * 2 + 1);
-		xiangqiGame.MoveHistory.Last().FenAfterMove.Should().Be("4kab2/4a4/4b4/7N1/4p3p/2P2n3/2c1P4/4BC3/4A4/2BAK4 b - - 3 42");
+		xiangqiGame.GetMoveHistory().Should().HaveCount(41 * 2 + 1);
+		xiangqiGame.GetMoveHistory().Last().FenAfterMove.Should().Be("4kab2/4a4/4b4/7N1/4p3p/2P2n3/2c1P4/4BC3/4A4/2BAK4 b - - 3 42");
 	}
 
 	[Fact]
@@ -908,7 +907,7 @@ public static class XiangqiBuilderTests
 		xiangqiGame.BlackPlayer.Team.Should().Be("北方");
 
 		xiangqiGame.GameResult.Should().Be(GameResult.RedWin);
-		xiangqiGame.MoveHistory.Should().HaveCount(40 * 2 + 1);
+		xiangqiGame.GetMoveHistory().Should().HaveCount(40 * 2 + 1);
 	}
 
 	[Theory]
@@ -967,6 +966,75 @@ public static class XiangqiBuilderTests
 
 		ValidateRandomizedPosition(boardPosition, testData);
 	}
+	
+	[Fact]
+	public static void PositionShouldFollowCustomConstraints_WhenCallingRandomisePosition_WithCustomConstraints()
+	{
+		// Arrange
+		XiangqiBuilder builder = new();
+
+		Func<Coordinate, bool> redRookConstraint = c => c.Row >= 5;
+		Func<Coordinate, bool> blackBishopConstraintOne = c => c.Column == 5;
+		Func<Coordinate, bool> blackBishopConstraintTwo = c => c.Column is 1 or 7;
+		Func<Coordinate, bool> blackKnightPattern = c => c.Row <= 4;
+		Func<Coordinate, bool> blackKingPattern = c => c.Column == 5;
+
+		// Act
+		XiangqiGame xiangqiGame = builder
+			.WithBoardConfig(x =>
+			{
+				x.SetPieceCounts(new PieceCounts(
+					RedPieces: new Dictionary<PieceType, int>()
+					{
+						{ PieceType.King, 1},	
+						{ PieceType.Rook, 1},	
+					},
+					BlackPieces: new Dictionary<PieceType, int>()
+					{
+						{ PieceType.King, 1},	
+						{ PieceType.Knight, 1},
+						{ PieceType.Bishop, 2}
+					}));
+			})
+			.WithPlacementConstraint(PieceType.Rook, Side.Red, redRookConstraint)
+			.WithPlacementConstraint(PieceType.Bishop, Side.Black, blackBishopConstraintOne)
+			.WithPlacementConstraint(PieceType.Bishop, Side.Black, blackBishopConstraintTwo)
+			.WithPlacementConstraint(PieceType.Knight, Side.Black, blackKnightPattern)
+			.WithPlacementConstraint(PieceType.King, Side.Black, blackKingPattern)
+			.RandomisePosition(allowCheck: false, fromFen: false)
+			.Build();
+
+		// Assert
+		Piece[,] boardPosition = xiangqiGame.BoardPosition;
+
+		Assert.Multiple(() =>
+		{
+			var redRook = boardPosition
+				.GetPiecesOfType(PieceType.Rook, Side.Red)
+				.Single();
+			
+			redRookConstraint(redRook.Coordinate)
+				.Should()
+				.BeTrue("the red rook should be placed according to the custom constraint");
+			
+			var blackBishops = boardPosition
+				.GetPiecesOfType(PieceType.Bishop, Side.Black)
+				.ToList();
+			
+			blackBishops.Count.Should().Be(2, "there should be two black bishops");
+			
+			blackBishops.All(b => blackBishopConstraintOne(b.Coordinate) || 
+										blackBishopConstraintTwo(b.Coordinate))
+				.Should()
+				.BeTrue("both black bishops should be placed according to the custom constraints");
+			
+			var blackKnight = boardPosition.GetPiecesOfType(PieceType.Knight, Side.Black).Single();
+			
+			blackKnightPattern(blackKnight.Coordinate)
+				.Should()
+				.BeTrue("the black knight should be placed according to the custom constraint");
+		});
+	}
 
 	private static void ValidateRandomizedPosition(Piece[,] boardPosition, RandomisePositionTestData testData)
 	{
@@ -1000,7 +1068,10 @@ public static class XiangqiBuilderTests
 
 		foreach (Piece piece in boardPosition.Cast<Piece>().Where(x => x is not EmptyPiece))
 		{
-			piece.ValidationStrategy.AreCoordinatesValid(piece.Side, piece.Coordinate).Should().BeTrue();
+			piece.ValidationStrategy
+				.AreCoordinatesValid(piece.Side, piece.Coordinate)
+				.Should()
+				.BeTrue($"Found {piece.Side} piece {piece.PieceType} at {piece.Coordinate} which is not valid according to the rules.");
 		}
 	}
 }

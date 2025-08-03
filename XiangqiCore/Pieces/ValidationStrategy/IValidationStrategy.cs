@@ -9,6 +9,7 @@ public interface IValidationStrategy
     /// This method does not validate against capturing a same color piece,
     /// nor does it validate against pieces being in a invalid position(King getting out of the palace for example)
     /// These other conditions are validated through other methods
+    /// </summary>
     /// <param name="boardPosition"></param>
     /// <param name="startingPoint"></param>
     /// <param name="destination"></param>
@@ -29,11 +30,13 @@ public interface IValidationStrategy
 
     bool IsProposedMoveValid(Piece[,] boardPosition, Coordinate startingPoint, Coordinate destination);
 
-    Coordinate GetRandomCoordinate(Random random, Side side)
+    Coordinate[] GetValidCoordinates(Side side)
     {
-        int randomRowIndex = random.Next(0, GetPossibleRows(side).Length);
-        int randomColumnIndex = random.Next(0, GetPossibleColumns().Length);
-
-		return new Coordinate(GetPossibleColumns()[randomColumnIndex], GetPossibleRows(side)[randomRowIndex]);
-	}
+        var possibleRows = GetPossibleRows(side);
+        var possibleColumns = GetPossibleColumns();
+        
+        return possibleRows
+            .SelectMany(row => possibleColumns.Select(column => new Coordinate(column, row)))
+            .ToArray();
+    }
 }

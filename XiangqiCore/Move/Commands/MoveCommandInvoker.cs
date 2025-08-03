@@ -3,43 +3,35 @@ using XiangqiCore.Move.MoveObjects;
 
 namespace XiangqiCore.Move.Commands;
 
+/// <summary>
+/// A class responsible for invoking move commands in the game of Xiangqi (Chinese Chess).
+/// </summary>
+/// <param name="board"></param>
 public class MoveCommandInvoker(Board board)
 {
 	private readonly Board _board = board;
-	private readonly Stack<IMoveCommand> _moveCommands = [];
-	private readonly Stack<IMoveCommand> _undoCommands = [];
 
+	/// <summary>
+	/// It executes a move command on the board and returns a MoveHistoryObject that contains information about the move.
+	/// </summary>
+	/// <param name="moveCommand"></param>
+	/// <returns></returns>
 	public MoveHistoryObject ExecuteCommand(IMoveCommand moveCommand)
 	{
-		_moveCommands.Push(moveCommand);
-		
-		MoveHistoryObject moveHistoryObject = moveCommand.Execute(_board);
+		var moveHistoryObject = moveCommand.Execute(_board);
 
 		return moveHistoryObject;
 	}
-
-	public MoveHistoryObject? UndoCommand(int numberOfMovesToUndo = 1)
+	
+	/// <summary>
+	///  Undoes a move command on the board and returns a MoveHistoryObject that contains information about the move that was undone.
+	/// </summary>
+	/// <param name="moveCommand"></param>
+	/// <returns></returns>
+	public MoveHistoryObject UndoCommand(IMoveCommand moveCommand)
 	{
-		for (int i = 0; i < numberOfMovesToUndo; i++)
-		{
-			IMoveCommand moveCommand = _moveCommands.Pop();
-			moveCommand.Undo(_board);
+		var moveHistoryObject = moveCommand.Undo(_board);
 
-			_undoCommands.Push(moveCommand);
-		}
-
-		return _moveCommands.Any() ? _moveCommands.Peek().MoveHistoryObject : null;
-	}
-
-	public List<MoveHistoryObject> GetMoveHistories()
-	{
-		List<MoveHistoryObject> result = new(_moveCommands.Count);
-
-		foreach (IMoveCommand moveCommand in _moveCommands)
-			result.Add(moveCommand.MoveHistoryObject);
-
-		result.Reverse();
-
-		return result;
+		return moveHistoryObject;
 	}
 }

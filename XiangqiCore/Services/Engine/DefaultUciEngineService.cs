@@ -27,7 +27,7 @@ public class DefaultUciEngineService : IXiangqiEngineService
 
 	public async IAsyncEnumerable<AnalysisResult> AnalyzePositionAsync(string fen, MoveNotationType notationType = MoveNotationType.TraditionalChinese, CancellationToken cancellationToken = default)
 	{
-		Regex infoRegex = new(@"^info(?:\sdepth\s(?<depth>\d+))?(?:\sseldepth\s(?<seldepth>\d+))?(?:\smultipv\s(?<multipv>\d+))?(?:\sscore\scp\s(?<score>\d+))?(?:\snodes\s(?<nodes>\d+))?(?:\snps\s(?<nps>\d+))?(?:\stbhits\s(?<tbhits>\d+))?(?:\stime\s(?<time>\d+))?(?:\spv\s(?<pv>.+))?");
+		Regex infoRegex = new(@"^info(?:\sdepth\s(?<depth>\d+))?(?:\sseldepth\s(?<seldepth>\d+))?(?:\smultipv\s(?<multipv>\d+))?(?:\sscore\scp\s(?<score>-?\d+))?(?:\snodes\s(?<nodes>\d+))?(?:\snps\s(?<nps>\d+))?(?:\stbhits\s(?<tbhits>\d+))?(?:\stime\s(?<time>\d+))?(?:\spv\s(?<pv>.+))?");
 
 		// Default to start position
 		if (string.IsNullOrWhiteSpace(fen))
@@ -46,7 +46,7 @@ public class DefaultUciEngineService : IXiangqiEngineService
 			if (response.StartsWith("info", StringComparison.OrdinalIgnoreCase))
 			{
 				Match match = infoRegex.Match(response);
-
+				
 				if (match.Success)
 				{
 					int score = int.Parse(match.Groups["score"].Value);
@@ -57,14 +57,14 @@ public class DefaultUciEngineService : IXiangqiEngineService
 					string[] moves = proposedMoves.Split(' ');
 					List<string> principleVariation = [];
 
-					if (game.MoveHistory.Count > 0)
+					if (game.GetMoveHistory().Count > 0)
 						// Undo all moves before doing new ones
-						game.UndoMove(game.MoveHistory.Count);
+						game.DeleteSubsequentMoves();
 
 					foreach (string move in moves)
 						game.MakeMove(move, MoveNotationType.UCI);
 
-					foreach (MoveHistoryObject moveHistory in game.MoveHistory)
+					foreach (MoveHistoryObject moveHistory in game.GetMoveHistory())
 						principleVariation.Add(_moveTranslationService.TranslateMove(moveHistory, notationType));
 
 					yield return new AnalysisResult()
@@ -185,7 +185,7 @@ public class DefaultUciEngineService : IXiangqiEngineService
 
 					game.MakeMove(match.Groups["bestMove"].Value, MoveNotationType.UCI);
 
-					string bestMove = _moveTranslationService.TranslateMove(game.MoveHistory.First(), notationType);
+					string bestMove = _moveTranslationService.TranslateMove(game.GetMoveHistory().First(), notationType);
 
 					return bestMove;
 				}

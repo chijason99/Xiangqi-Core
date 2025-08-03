@@ -25,7 +25,7 @@ This class is the core of the library and is designed to handle all aspects of a
 - [Public Properties](#public-properties)
   - [CurrentFen](#currentfen)
   - [BoardPosition](#boardposition)
-  - [MoveHistory](#movehistory)
+  - [GetMoveHistory](#getmovehistorybool-includerootnode--false-variationpath-variationpath--null)
   - [GameName](#gamename)
   - [GameResult](#gameresult)
   - [Competition](#competition)
@@ -60,7 +60,7 @@ XiangqiBuilder builder = new ();
 
 XiangqiGame game =  builder.WithDefaultConfiguration().Build();
 
- game.MakeMove("ÅÚ¶þÆ½Îå", MoveNotationType.Chinese);
+ game.MakeMove("ï¿½Ú¶ï¿½Æ½ï¿½ï¿½", MoveNotationType.Chinese);
  game.MakeMove("h8+7", MoveNotationType.English);
 ```
 
@@ -147,8 +147,8 @@ XiangqiBuilder builder = new ();
 
 XiangqiGame game =  builder.WithDefaultConfiguration().Build();
 
-game.MakeMove("ÅÚ¶þÆ½Îå", MoveNotationType.Chinese);
-game.MakeMove("ñR8ßM7", MoveNotationType.Chinese);
+game.MakeMove("ï¿½Ú¶ï¿½Æ½ï¿½ï¿½", MoveNotationType.Chinese);
+game.MakeMove("ï¿½R8ï¿½M7", MoveNotationType.Chinese);
 
 game.UndoMove();
 ```
@@ -168,9 +168,9 @@ XiangqiBuilder builder = new ();
 
 XiangqiGame game =  builder.WithDefaultConfiguration().Build();
 
- game.MakeMove("ÅÚ¶þÆ½Îå", MoveNotationType.Chinese);
- game.MakeMove("ñR8ßM7", MoveNotationType.Chinese);
- game.MakeMove("ñR¶þßMÈý", MoveNotationType.Chinese);
+ game.MakeMove("ï¿½Ú¶ï¿½Æ½ï¿½ï¿½", MoveNotationType.Chinese);
+ game.MakeMove("ï¿½R8ï¿½M7", MoveNotationType.Chinese);
+ game.MakeMove("ï¿½Rï¿½ï¿½ï¿½Mï¿½ï¿½", MoveNotationType.Chinese);
  game.MakeMove("Ü‡9Æ½8", MoveNotationType.Chinese);
 
 string currentFen = game.CurrentFen;
@@ -195,7 +195,7 @@ XiangqiBuilder builder = new ();
 
 XiangqiGame game =  builder.WithDefaultConfiguration().Build();
 
- game.MakeMove("ÅÚ¶þÆ½Îå", MoveNotationType.Chinese);
+ game.MakeMove("ï¿½Ú¶ï¿½Æ½ï¿½ï¿½", MoveNotationType.Chinese);
 
 Piece[,] boardPosition = game.BoardPosition;
 
@@ -207,8 +207,13 @@ Console.WriteLine(boardPosition.GetPieceAtPosition(new Coordinate(column: 5, row
 
 ---
 
-### `MoveHistory`
+### `GetMoveHistory`(bool includeRootNode = false, VariationPath? variationPath = null)
 Gets the move history of the game as a list of `MoveHistoryObject`.
+
+**Parameters**:
+- `includeRootNode` (bool): If `true`, includes the root node in the move history, usually used when you need the starting position, for example, in the case of generating a GIF of the game. Defaults to `false`.
+- `variationPath` (VariationPath): An optional parameter to specify a variation path to retrieve the move history for that specific variation.
+
 
 The `MoveHistoryObject` class has the following properties:
 
@@ -234,11 +239,11 @@ XiangqiBuilder builder = new ();
 
 XiangqiGame game =  builder.WithDefaultConfiguration().Build();
 
- game.MakeMove("ÅÚ¶þÆ½Îå", MoveNotationType.Chinese);
+ game.MakeMove("ï¿½Ú¶ï¿½Æ½ï¿½ï¿½", MoveNotationType.Chinese);
 
- game.MakeMove("ÅÚ¶þÆ½Îå", MoveNotationType.Chinese);
- game.MakeMove("ñR8ßM7", MoveNotationType.Chinese);
- game.MakeMove("ñR¶þßMÈý", MoveNotationType.Chinese);
+ game.MakeMove("ï¿½Ú¶ï¿½Æ½ï¿½ï¿½", MoveNotationType.Chinese);
+ game.MakeMove("ï¿½R8ï¿½M7", MoveNotationType.Chinese);
+ game.MakeMove("ï¿½Rï¿½ï¿½ï¿½Mï¿½ï¿½", MoveNotationType.Chinese);
  game.MakeMove("Ü‡9Æ½8", MoveNotationType.Chinese);
 
 
@@ -248,12 +253,121 @@ foreach (MoveHistoryObject move in moveHistory)
 	Console.WriteLine(move.MoveNotation);
 
 // Output:
-// ÅÚ¶þÆ½Îå
-// ñR8ßM7
-// ñR¶þßMÈý
+// ï¿½Ú¶ï¿½Æ½ï¿½ï¿½
+// ï¿½R8ï¿½M7
+// ï¿½Rï¿½ï¿½ï¿½Mï¿½ï¿½
 // Ü‡9Æ½8
 
 ```
+
+---
+
+### `GetMoveLine(bool includeRootNode = false, VariationPath? variationsPath = null)`
+Gets the move line of the game as a list of `MoveHistoryObject` for the specified variation path.
+Returns a ReadOnlyCollection of `MoveNode` representing the move line.
+
+**Parameters**:
+- `includeRootNode` (bool): If `true`, includes the root node in the move line, usually used when you need the starting position.
+- `variationsPath` (VariationPath): An optional parameter to specify a variation path to retrieve the move line for that specific variation.
+
+The `MoveNode` class has the following properties:
+- **Parent**: The parent node of the current move node. The parent node is the move that was made before the current move. Note that the root node does not have a parent.
+- **Variations**: A list of variations for the current move node. Variations are alternative moves that can be made from the current position.
+- **MoveNumber**: The move number of the current move node. The move number is the number of moves made in the game so far.
+
+The `VariationPath` is just a wrapper of a Dictionary<int, int> where the key is the move number and the value is the index of the variation in the `Variations` list of the `MoveNode`. 
+This allows you to specify a path through the variations of the game.
+
+For example, consider the game below that starts at the default position:
+1. C2=5 c8=5
+2. H2+3 h8+7
+3. R1=2 r9+1
+
+```C#
+var builder = new XiangqiBuilder();
+var game = builder.WithDefaultConfiguration().Build();
+
+game.MakeMove("C2=5", MoveNotationType.English);
+game.MakeMove("c8=5", MoveNotationType.English);
+game.MakeMove("H2+3", MoveNotationType.English);
+game.MakeMove("h8+7", MoveNotationType.English);
+game.MakeMove("R1=2", MoveNotationType.English);
+game.MakeMove("r9+1", MoveNotationType.English);
+
+```
+
+The root node would be the default position which has the move number 0. The first MoveNode would be the move C2=5, with a move number of 1,
+and c8=5 would have a move number of 2, and so on.
+
+You recently learned that other than r9+1, another possible move for black on round 3 is p7+1, which is a variation of the move r9+1.
+
+To record this, you simply need to navigate to move number 5 (the point where the move R1=2 is made), and then make another move:
+
+```c#
+game.NavigateToMove(5);
+
+game.MakeMove("p7+1", MoveNotationType.English);
+```
+
+Now that you have added the variation, the move line would look like this (just a visual representation, not actual code):
+(using 6a and 6b because the variation is at move number 6.)
+1. C2=5 c8=5
+2. H2+3 h8+7
+3. R1=2 (6a) r9+1
+        (6b) p7+1
+
+Let's say now you want to get the move line/move history of the game for the variation 4a, which is r9+1.
+You would create a `VariationPath` with the following dictionary:
+```c#
+VariationPath variationPath = new VariationPath(new Dictionary<int, int> 
+{
+    // For move number 6, we want the first variation (starting the count from 0)
+    // the move r9+1 is the first variation in this case because it is recorded first
+    { 6, 0 }
+});
+```
+
+And then you would call the `GetMoveLine` method with this variation path:
+
+```c#
+var moveLine = game.GetMoveLine(variationPath: variationPath);
+```
+
+You should then see the move line for the variation (4a) r9+1, and the game history would go on from there.
+The same principles apply to any variation in the game, allowing you to navigate through the move history and variations easily.
+
+--- 
+
+### `NavigateToMove(int moveNumber, VariationPath? variationsPath = null)`
+Navigates to a specific move in the game based on the move number and optional variation path.
+
+**Parameters**:
+- `moveNumber` (int): The move number to navigate to.
+- `variationsPath` (VariationPath): An optional parameter to specify a variation path to navigate to that specific variation.
+
+**Behavior**:
+- Updates the current game state to reflect the position after the specified move.
+- It would by default start from the root node. If the `variationsPath` is provided, it will navigate to the specified variation. Else it will always pick the first variation (main line) if there are any on the road to the target move number.
+
+---
+
+### `NavigateToStart()`
+Navigates to the starting position of the game.
+
+---
+
+### `NavigateToEnd(VariationPath? variationsPath = null)`
+Navigates to the end of the game, which is the last move made. If a variation path is provided, it will navigate to the end of those specific variations. Else it will always pick the first variation (main line) if there are any on the road to the end of the game.
+
+--- 
+
+### `NavigateToNextMove(int variationNumber = 0)`
+Navigates to the next move in the game. If there are multiple variations, you can specify which variation to navigate to. By default, it picks the first variation (main line).
+
+---
+
+### `NavigateToPreviousMove()`
+Navigates to the previous move in the game.
 
 ---
 
@@ -267,28 +381,28 @@ using XiangqiCore.Game;
 XiangqiBuilder builder = new ();
 
 XiangqiGame game1 =  builder
-	.WithRedPlayer(player => player.Name = "ÂÀÇÕ")
-	.WithBlackPlayer(player => player.Name = "Íõ¼ÎÁ¼")
+	.WithRedPlayer(player => player.Name = "ï¿½ï¿½ï¿½ï¿½")
+	.WithBlackPlayer(player => player.Name = "ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½")
 	.WithGameResult(GameResult.RedWin)
 	.Build();
 
 XiangqiGame game2 =  builder
-	.WithRedPlayer(player => player.Name = "ÍõÌìÒ»")
-	.WithBlackPlayer(player => player.Name = "àÎ©¶²")
+	.WithRedPlayer(player => player.Name = "ï¿½ï¿½ï¿½ï¿½Ò»")
+	.WithBlackPlayer(player => player.Name = "ï¿½ï¿½Î©ï¿½ï¿½")
 	.WithGameResult(GameResult.Draw)
 	.Build();
 
 XiangqiGame game3 =  builder
-	.WithRedPlayer(player => player.Name = "ºú˜sÈA")
-	.WithBlackPlayer(player => player.Name = "—î¹Ù­U")
+	.WithRedPlayer(player => player.Name = "ï¿½ï¿½ï¿½sï¿½A")
+	.WithBlackPlayer(player => player.Name = "ï¿½ï¿½Ù­U")
 	.WithGameResult(GameResult.BlackWin)
 	.Build();
 
 XiangqiGame game4 =  builder
-	.WithRedPlayer(player => player.Name = "ºú˜sÈA")
-	.WithBlackPlayer(player => player.Name = "—î¹Ù­U")
+	.WithRedPlayer(player => player.Name = "ï¿½ï¿½ï¿½sï¿½A")
+	.WithBlackPlayer(player => player.Name = "ï¿½ï¿½Ù­U")
 	.WithGameResult(GameResult.BlackWin)
-	.WithGameName("1980È«‡ø‚€ÈËÙ ºú˜sÈAÏÈ¸º—î¹Ù­U")
+	.WithGameName("1980È«ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ù ï¿½ï¿½ï¿½sï¿½Aï¿½È¸ï¿½ï¿½ï¿½Ù­U")
 	.Build();
 
 string gameName1 = game1.GameName;
@@ -302,10 +416,10 @@ Console.WriteLine(gameName3);
 Console.WriteLine(gameName4);
 
 // Output: 
-// ÂÀÇÕÏÈ„ÙÍõ¼ÎÁ¼
-// ÍõÌìÒ»ÏÈºÍàÎ©¶²
-// ºú˜sÈAÏÈØ“—î¹Ù­U
-// 1980È«‡ø‚€ÈËÙ ºú˜sÈAÏÈ¸º—î¹Ù­U
+// ï¿½ï¿½ï¿½ï¿½ï¿½È„ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+// ï¿½ï¿½ï¿½ï¿½Ò»ï¿½Èºï¿½ï¿½ï¿½Î©ï¿½ï¿½
+// ï¿½ï¿½ï¿½sï¿½Aï¿½ï¿½Ø“ï¿½ï¿½Ù­U
+// 1980È«ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ù ï¿½ï¿½ï¿½sï¿½Aï¿½È¸ï¿½ï¿½ï¿½Ù­U
 ```
 
 ---
@@ -346,7 +460,7 @@ XiangqiBuilder builder = new ();
 XiangqiGame game =  builder
 	.WithDefaultConfiguration()
 	.WithCompetition(competition => {
-		competition.WithName("È«¹úÏóÆå¸öÈË½õ±êÈü");
+		competition.WithName("È«ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ë½ï¿½ï¿½ï¿½ï¿½ï¿½");
 		competition.WithGameDate(DateTime.Parse"1987-11-30");
 	})
 	.Build();
@@ -357,7 +471,7 @@ Console.WriteLine(competition.Name);
 Console.WriteLine(competition.GameDate);
 
 // Output:
-// È«¹úÏóÆå¸öÈË½õ±êÈü
+// È«ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ë½ï¿½ï¿½ï¿½ï¿½ï¿½
 // 30/11/1987 00:00:00
 ```
 
@@ -373,8 +487,8 @@ XiangqiBuilder builder = new ();
 XiangqiGame game =  builder
 	.WithDefaultConfiguration()
 	.WithRedPlayer(player => {
-		player.Name = "ÂÀÇÕ";
-		player.Team = "¹ã¶«";
+		player.Name = "ï¿½ï¿½ï¿½ï¿½";
+		player.Team = "ï¿½ã¶«";
 	})
 	.Build();
 
@@ -384,8 +498,8 @@ Console.WriteLine(redPlayer.Name);
 Console.WriteLine(redPlayer.Team);
 
 // Output:
-// ÂÀÇÕ
-// ¹ã¶«
+// ï¿½ï¿½ï¿½ï¿½
+// ï¿½ã¶«
 ```
 
 ### `BlackPlayer`
@@ -400,8 +514,8 @@ XiangqiBuilder builder = new ();
 XiangqiGame game =  builder
 	.WithDefaultConfiguration()
 	.WithBlackPlayer(player => {
-		player.Name = "Íõ¼ÎÁ¼";
-		player.Team = "ºÚýˆ½­";
+		player.Name = "ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½";
+		player.Team = "ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½";
 	})
 	.Build();
 
@@ -411,8 +525,8 @@ Console.WriteLine(blackPlayer.Name);
 Console.WriteLine(blackPlayer.Team);
 
 // Output:
-// Íõ¼ÎÁ¼
-// ºÚýˆ½­
+// ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+// ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 ```
 
 ### `SideToMove`
@@ -434,21 +548,22 @@ Console.WriteLine(sideToMove);
 ```
 
 ### `Coordinate`
-A struct representing a coordinate on the Xiangqi board. It has two properties, `Column` and `Row`, representing the column and row of the coordinate.
+A record struct representing a coordinate on the Xiangqi board. It has two properties, `Column` and `Row`, representing the column and row of the coordinate.
 
 ``` Bash
 	Black
    1 2 3 4 5 6 7 8 9
-10 ©°©¤©Ð©¤©Ð©¤©Ð©¤©Ð©¤©Ð©¤©Ð©¤©Ð©¤©´
-9  ©¦ ©¦ ©¦ ©¦ ©¦ ©¦ ©¦ ©¦©¤©È
-8  ©À©¤©à©¤©à©¤©à©¤©à©¤©à©¤©à©¤©à©¤©È
-7  ©¦ ©¦ ©¦ ©¦ ©¦ ©¦ ©¦ ©¦©¤©È
-6  ©À©¤©à©¤©à©¤©à©¤©à©¤©à©¤©à©¤©à©¤©È
-5  ©¦ ©¦ ©¦ ©¦ ©¦ ©¦ ©¦ ©¦©¤©È
-4  ©À©¤©à©¤©à©¤©à©¤©à©¤©à©¤©à©¤©à©¤©È
-3  ©¦ ©¦ ©¦ ©¦ ©¦ ©¦ ©¦ ©¦©¤©È
-2  ©À©¤©à©¤©à©¤©à©¤©à©¤©à©¤©à©¤©à©¤©È
-1  ©¦ ©¦ ©¦ ©¦ ©¦ ©¦ ©¦ ©¦©¤©È
+10 ï¿½ï¿½ï¿½ï¿½ï¿½Ð©ï¿½ï¿½Ð©ï¿½ï¿½Ð©ï¿½ï¿½Ð©ï¿½ï¿½Ð©ï¿½ï¿½Ð©ï¿½ï¿½Ð©ï¿½ï¿½ï¿½
+9  ï¿½ï¿½ ï¿½ï¿½ ï¿½ï¿½ ï¿½ï¿½ ï¿½ï¿½ ï¿½ï¿½ ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+8  ï¿½ï¿½ï¿½ï¿½ï¿½à©¤ï¿½à©¤ï¿½à©¤ï¿½à©¤ï¿½à©¤ï¿½à©¤ï¿½à©¤ï¿½ï¿½
+7  ï¿½ï¿½ ï¿½ï¿½ ï¿½ï¿½ ï¿½ï¿½ ï¿½ï¿½ ï¿½ï¿½ ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+6  ï¿½ï¿½ï¿½ï¿½ï¿½à©¤ï¿½à©¤ï¿½à©¤ï¿½à©¤ï¿½à©¤ï¿½à©¤ï¿½à©¤ï¿½ï¿½
+5  ï¿½ï¿½ ï¿½ï¿½ ï¿½ï¿½ ï¿½ï¿½ ï¿½ï¿½ ï¿½ï¿½ ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+4  ï¿½ï¿½ï¿½ï¿½ï¿½à©¤ï¿½à©¤ï¿½à©¤ï¿½à©¤ï¿½à©¤ï¿½à©¤ï¿½à©¤ï¿½ï¿½
+3  ï¿½ï¿½ ï¿½ï¿½ ï¿½ï¿½ ï¿½ï¿½ ï¿½ï¿½ ï¿½ï¿½ ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+2  ï¿½ï¿½ï¿½ï¿½ï¿½à©¤ï¿½à©¤ï¿½à©¤ï¿½à©¤ï¿½à©¤ï¿½à©¤ï¿½à©¤ï¿½ï¿½
+1  ï¿½ï¿½ ï¿½ï¿½ ï¿½ï¿½ ï¿½ï¿½ ï¿½ï¿½ ï¿½ï¿½ ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
    1 2 3 4 5 6 7 8 9
 	Red
 ```
+

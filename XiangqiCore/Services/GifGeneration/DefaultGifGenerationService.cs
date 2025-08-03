@@ -202,14 +202,14 @@ public class DefaultGifGenerationService : IGifGenerationService
 
 	public byte[] GenerateGif(XiangqiGame game, ImageConfig? imageConfig = null)
 	{
-		List<MoveHistoryObject> moveHistory = [game.InitialState, ..game.MoveHistory];
+		List<MoveHistoryObject> moveHistory = [ ..game.GetMoveHistory(includeRootNode: true) ];
 
 		return GenerateGif(moveHistory, imageConfig);
 	}
 
 	public async Task<byte[]> GenerateGifAsync(XiangqiGame game, ImageConfig? imageConfig = null, CancellationToken cancellationToken = default)
 	{
-		List<MoveHistoryObject> moveHistory = [game.InitialState, .. game.MoveHistory];
+		List<MoveHistoryObject> moveHistory = [ ..game.GetMoveHistory() ];
 
 		return await GenerateGifAsync(moveHistory, imageConfig, cancellationToken);
 	}

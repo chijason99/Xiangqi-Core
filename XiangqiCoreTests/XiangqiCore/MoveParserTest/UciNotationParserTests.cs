@@ -51,9 +51,9 @@ public static class UciNotationParserTests
 		bool moveResult = game.MakeMove(moveNotation, MoveNotationType.TraditionalChinese);
 
 		moveResult.Should().BeTrue();
-		game.MoveHistory.Count.Should().Be(1);
+		game.GetMoveHistory().Count.Should().Be(1);
 
-		MoveHistoryObject latestMoveHistoryObject = game.MoveHistory.Last();
+		MoveHistoryObject latestMoveHistoryObject = game.GetMoveHistory().Last();
 
 		// Act
 		string result = latestMoveHistoryObject.TranslateTo(MoveNotationType.UCI);

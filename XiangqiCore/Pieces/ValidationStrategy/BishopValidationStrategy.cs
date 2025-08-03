@@ -28,9 +28,8 @@ public class BishopValidationStrategy : DefaultValidationStrategy, IHasSpecificP
                 new Coordinate(9, 3)
             ];
         }
-        else
-        {
-            return
+        
+        return
             [
                 new Coordinate(1, 8),
                 new Coordinate(3, 10),
@@ -40,7 +39,6 @@ public class BishopValidationStrategy : DefaultValidationStrategy, IHasSpecificP
                 new Coordinate(7, 6),
                 new Coordinate(9, 8)
             ];
-        }
     }
 
 	public override bool AreCoordinatesValid(Side color, Coordinate destination) => GetSpecificPositions(color).Contains(destination);
@@ -100,10 +98,6 @@ public class BishopValidationStrategy : DefaultValidationStrategy, IHasSpecificP
         BottomRight
     }
 
-    Coordinate IValidationStrategy.GetRandomCoordinate(Random random, Side side)
-    {
-        int randomIndex = random.Next(0, GetSpecificPositions(side).Length);
-
-		return GetSpecificPositions(side)[randomIndex];
-	}
+    public Coordinate[] GetValidCoordinates(Side side) 
+        => GetSpecificPositions(side);
 }

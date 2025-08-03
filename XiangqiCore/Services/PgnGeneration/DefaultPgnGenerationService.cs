@@ -52,11 +52,13 @@ public class DefaultPgnGenerationService : IPgnGenerationService
 		return pgnStringBuilder.ToString();
 	}
 
+	// TODO: options to export with all variations?
+	// TODO: a new service to export as JSON or XML?
 	public string ExportMoveHistory(XiangqiGame game, MoveNotationType targetNotationType = MoveNotationType.TraditionalChinese)
 	{
 		List<string> movesOfEachRound = [];
 
-		var groupedMoveHitories = game.MoveHistory
+		var groupedMoveHitories = game.GetMoveHistory()
 			.Select(moveHistoryItem =>
 				new
 				{
