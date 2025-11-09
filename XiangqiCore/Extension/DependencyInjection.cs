@@ -5,6 +5,7 @@ using XiangqiCore.Services.GifGeneration;
 using XiangqiCore.Services.GifSaving;
 using XiangqiCore.Services.ImageGeneration;
 using XiangqiCore.Services.ImageSaving;
+using XiangqiCore.Services.JsonGeneration;
 using XiangqiCore.Services.MoveParsing;
 using XiangqiCore.Services.MoveTransalation;
 using XiangqiCore.Services.PgnGeneration;
@@ -18,6 +19,7 @@ public static class DependencyInjection
 	{
 		services.AddScoped<IImageGenerationService, DefaultImageGenerationService>();
 		services.AddScoped<IPgnGenerationService, DefaultPgnGenerationService>();
+		services.AddScoped<IJsonGenerationService, DefaultJsonGenerationService>();
 		services.AddScoped<IMoveParsingService, DefaultMoveParsingService>();
 		services.AddScoped<IMoveTranslationService, DefaultMoveTranslationService>();
 		services.AddScoped<IImageSavingService, DefaultImageSavingService>();
