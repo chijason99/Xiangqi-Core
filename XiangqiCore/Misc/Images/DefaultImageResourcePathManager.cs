@@ -20,6 +20,14 @@ public class DefaultImageResourcePathManager : IImageResourcePathManager
 		if (side == Side.None)
 			throw new ArgumentException("Cannot get resource path for Side.None");
 
+		string customPieceKey = $"{side}_{pieceType}".ToLowerInvariant();
+		if (imageConfig.CustomPieceImagePaths is not null &&
+			imageConfig.CustomPieceImagePaths.TryGetValue(customPieceKey, out string? customPiecePath) &&
+			!string.IsNullOrWhiteSpace(customPiecePath))
+		{
+			return customPiecePath;
+		}
+
 		string path = "XiangqiCore.Assets.Pieces";
 
 		string stylePath = CHINESE_PATH;
@@ -48,6 +56,9 @@ public class DefaultImageResourcePathManager : IImageResourcePathManager
 	{
 		ArgumentNullException.ThrowIfNull(imageConfig, nameof(imageConfig));
 
+		if (!string.IsNullOrWhiteSpace(imageConfig.CustomBoardImagePath))
+			return imageConfig.CustomBoardImagePath;
+
 		string path = "XiangqiCore.Assets.Boards";
 
 		string colouorPath = COLOURED_PATH;
@@ -65,6 +76,9 @@ public class DefaultImageResourcePathManager : IImageResourcePathManager
 	public string GetMoveIndicatorResourcePath(ImageConfig imageConfig)
 	{
 		ArgumentNullException.ThrowIfNull(imageConfig, nameof(imageConfig));
+
+		if (!string.IsNullOrWhiteSpace(imageConfig.CustomMoveIndicatorImagePath))
+			return imageConfig.CustomMoveIndicatorImagePath;
 
 		string path = "XiangqiCore.Assets.MoveIndicators";
 

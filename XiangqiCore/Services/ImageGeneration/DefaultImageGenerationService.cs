@@ -32,23 +32,27 @@ public class DefaultImageGenerationService : IImageGenerationService
 
 	private Image<Rgba32> GenerateBoardImageCore(Piece[,] position, Coordinate? previousPosition = null, Coordinate? currentPosition = null, ImageConfig? imageConfig = null)
 	{
-		PreloadImages();
-
 		imageConfig ??= new();
+		PreloadImages(imageConfig);
 
 		Image<Rgba32> boardImage = _imageCache.GetImage(_imageResourcePathManager.GetBoardResourcePath(imageConfig));
-
-		boardImage.Mutate(x => x.Resize(ImageConfig.DefaultBoardWidth, ImageConfig.DefaultBoardHeight));
+		(int boardWidth, int boardHeight) = GetBoardDimensions(boardImage, imageConfig);
+		if (boardImage.Width != boardWidth || boardImage.Height != boardHeight)
+			boardImage.Mutate(x => x.Resize(boardWidth, boardHeight));
 
 		foreach (Piece piece in position.Cast<Piece>().Where(p => p is not EmptyPiece))
 		{
 			using Image<Rgba32> pieceImage = _imageCache.GetImage(
 				_imageResourcePathManager.GetPieceResourcePath(piece.PieceType, piece.Side, imageConfig));
+			ResizePieceImageIfNeeded(pieceImage, imageConfig);
 
-			(int xCoordinate, int yCoordinate) = GetCoordinatesAfterRotation(piece.Coordinate);
+			(int xCoordinate, int yCoordinate) = GetCoordinatesAfterRotation(piece.Coordinate, imageConfig);
 
 			boardImage.Mutate(ctx => ctx.DrawImage(pieceImage,
-				new Point(xCoordinate * ImageConfig.DefaultSquareSize, yCoordinate * ImageConfig.DefaultSquareSize), 1f));
+				new Point(
+					(int)Math.Round(imageConfig.SquareOriginX + (xCoordinate * imageConfig.SquareStepX)),
+					(int)Math.Round(imageConfig.SquareOriginY + (yCoordinate * imageConfig.SquareStepY))),
+				1f));
 		}
 
 		if (imageConfig.UseMoveIndicator)
@@ -56,28 +60,36 @@ public class DefaultImageGenerationService : IImageGenerationService
 			if (previousPosition is not null && !previousPosition.Value.Equals(Coordinate.Empty))
 			{
 				using Image<Rgba32> moveIndicatorImage = _imageCache.GetImage(_imageResourcePathManager.GetMoveIndicatorResourcePath(imageConfig));
+				ResizeMoveIndicatorIfNeeded(moveIndicatorImage, imageConfig);
 
-				(int xCoordinate, int yCoordinate) = GetCoordinatesAfterRotation(previousPosition.Value);
+				(int xCoordinate, int yCoordinate) = GetCoordinatesAfterRotation(previousPosition.Value, imageConfig);
 
 				boardImage.Mutate(ctx => ctx.DrawImage(moveIndicatorImage,
-					new Point(xCoordinate * ImageConfig.DefaultSquareSize, yCoordinate * ImageConfig.DefaultSquareSize), 1f));
+					new Point(
+						(int)Math.Round(imageConfig.SquareOriginX + (xCoordinate * imageConfig.SquareStepX)),
+						(int)Math.Round(imageConfig.SquareOriginY + (yCoordinate * imageConfig.SquareStepY))),
+					1f));
 			}
 
 			if (currentPosition is not null && !currentPosition.Value.Equals(Coordinate.Empty))
 			{
 				using Image<Rgba32> moveIndicatorImage = _imageCache.GetImage(_imageResourcePathManager.GetMoveIndicatorResourcePath(imageConfig));
+				ResizeMoveIndicatorIfNeeded(moveIndicatorImage, imageConfig);
 
-				(int xCoordinate, int yCoordinate) = GetCoordinatesAfterRotation(currentPosition.Value);
+				(int xCoordinate, int yCoordinate) = GetCoordinatesAfterRotation(currentPosition.Value, imageConfig);
 
 				boardImage.Mutate(ctx => ctx.DrawImage(moveIndicatorImage,
-					new Point(xCoordinate * ImageConfig.DefaultSquareSize, yCoordinate * ImageConfig.DefaultSquareSize), 1f));
+					new Point(
+						(int)Math.Round(imageConfig.SquareOriginX + (xCoordinate * imageConfig.SquareStepX)),
+						(int)Math.Round(imageConfig.SquareOriginY + (yCoordinate * imageConfig.SquareStepY))),
+					1f));
 			}
 		}
 
 		return boardImage;
 	}
 
-	private void PreloadImages()
+	private void PreloadImages(ImageConfig imageConfig)
 	{
 		PieceType[] pieceTypes = Enum.GetValues(typeof(PieceType))
 			.Cast<PieceType>()
@@ -91,13 +103,42 @@ public class DefaultImageGenerationService : IImageGenerationService
 
 		foreach (Side side in sides)
 			foreach (PieceType pieceType in pieceTypes)
-				_imageCache.GetImage(_imageResourcePathManager.GetPieceResourcePath(pieceType, side));
+				_imageCache.GetImage(_imageResourcePathManager.GetPieceResourcePath(pieceType, side, imageConfig));
 
 		// Preload board image
-		_imageCache.GetImage(_imageResourcePathManager.GetBoardResourcePath());
+		_imageCache.GetImage(_imageResourcePathManager.GetBoardResourcePath(imageConfig));
 
 		// Preload move indicator image
-		_imageCache.GetImage(_imageResourcePathManager.GetMoveIndicatorResourcePath());
+		if (imageConfig.UseMoveIndicator)
+			_imageCache.GetImage(_imageResourcePathManager.GetMoveIndicatorResourcePath(imageConfig));
+	}
+
+	private static (int Width, int Height) GetBoardDimensions(Image<Rgba32> boardImage, ImageConfig imageConfig)
+	{
+		int width = imageConfig.BoardWidth > 0 ? imageConfig.BoardWidth : boardImage.Width;
+		int height = imageConfig.BoardHeight > 0 ? imageConfig.BoardHeight : boardImage.Height;
+		return (width, height);
+	}
+
+	private static void ResizePieceImageIfNeeded(Image<Rgba32> pieceImage, ImageConfig imageConfig)
+	{
+		int pieceWidth = imageConfig.PieceWidth > 0 ? imageConfig.PieceWidth : ImageConfig.DefaultSquareSize;
+		int pieceHeight = imageConfig.PieceHeight > 0 ? imageConfig.PieceHeight : ImageConfig.DefaultSquareSize;
+		if (pieceImage.Width != pieceWidth || pieceImage.Height != pieceHeight)
+			pieceImage.Mutate(x => x.Resize(pieceWidth, pieceHeight));
+	}
+
+	private static void ResizeMoveIndicatorIfNeeded(Image<Rgba32> moveIndicatorImage, ImageConfig imageConfig)
+	{
+		int indicatorWidth = imageConfig.MoveIndicatorWidth > 0 ? imageConfig.MoveIndicatorWidth : imageConfig.PieceWidth;
+		int indicatorHeight = imageConfig.MoveIndicatorHeight > 0 ? imageConfig.MoveIndicatorHeight : imageConfig.PieceHeight;
+		if (indicatorWidth <= 0)
+			indicatorWidth = ImageConfig.DefaultSquareSize;
+		if (indicatorHeight <= 0)
+			indicatorHeight = ImageConfig.DefaultSquareSize;
+
+		if (moveIndicatorImage.Width != indicatorWidth || moveIndicatorImage.Height != indicatorHeight)
+			moveIndicatorImage.Mutate(x => x.Resize(indicatorWidth, indicatorHeight));
 	}
 
 	private (int xCoordinate, int yCoordinate) GetCoordinatesAfterRotation(Coordinate originalCoordinate, ImageConfig? imageConfig = null)

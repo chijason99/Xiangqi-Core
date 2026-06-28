@@ -2,6 +2,30 @@
 
 public static class FileHelper
 {
+	internal static byte[] ReadAllBytes(Stream stream)
+	{
+		ArgumentNullException.ThrowIfNull(stream);
+
+		if (!stream.CanRead)
+			throw new ArgumentException("The supplied stream must be readable.", nameof(stream));
+
+		if (stream.CanSeek)
+		{
+			long remainingLength = stream.Length - stream.Position;
+
+			if (remainingLength is < 0 or > int.MaxValue)
+				throw new IOException("The supplied stream is too large to read into memory.");
+
+			byte[] buffer = GC.AllocateUninitializedArray<byte>((int)remainingLength);
+			stream.ReadExactly(buffer);
+			return buffer;
+		}
+
+		using MemoryStream memoryStream = new();
+		stream.CopyTo(memoryStream);
+		return memoryStream.ToArray();
+	}
+
 	public static string PrepareFilePath(string filePath, string expectedExtension, string defaultFileName = "Unknown")
 	{
 		ArgumentException.ThrowIfNullOrWhiteSpace(expectedExtension, nameof(expectedExtension));

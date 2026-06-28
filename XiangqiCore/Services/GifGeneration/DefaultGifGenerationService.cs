@@ -34,7 +34,9 @@ public class DefaultGifGenerationService : IGifGenerationService
 		List<string> fensList = moveHistory is not null ? [.. moveHistory.Select(x => x.FenAfterMove)] : fens!.ToList();
 
 		// Note : Will have to dispose the image after use
-		Image<Rgba32> gif = new(width: ImageConfig.DefaultBoardWidth, height: ImageConfig.DefaultBoardHeight);
+		int boardWidth = imageConfig.BoardWidth > 0 ? imageConfig.BoardWidth : ImageConfig.DefaultBoardWidth;
+		int boardHeight = imageConfig.BoardHeight > 0 ? imageConfig.BoardHeight : ImageConfig.DefaultBoardHeight;
+		Image<Rgba32> gif = new(width: boardWidth, height: boardHeight);
 		GifMetadata gifMetaData = gif.Metadata.GetGifMetadata();
 
 		// Infinite loop
@@ -95,7 +97,9 @@ public class DefaultGifGenerationService : IGifGenerationService
 		List<string> fensList = moveHistory is not null ? [.. moveHistory.Select(x => x.FenAfterMove)] : fens!.ToList();
 
 		// Note : Will have to dispose the image after use
-		Image<Rgba32> gif = new(width: ImageConfig.DefaultBoardWidth, height: ImageConfig.DefaultBoardHeight);
+		int boardWidth = imageConfig.BoardWidth > 0 ? imageConfig.BoardWidth : ImageConfig.DefaultBoardWidth;
+		int boardHeight = imageConfig.BoardHeight > 0 ? imageConfig.BoardHeight : ImageConfig.DefaultBoardHeight;
+		Image<Rgba32> gif = new(width: boardWidth, height: boardHeight);
 		GifMetadata gifMetaData = gif.Metadata.GetGifMetadata();
 
 		// Infinite loop

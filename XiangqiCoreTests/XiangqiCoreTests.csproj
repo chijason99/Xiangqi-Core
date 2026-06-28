@@ -29,4 +29,15 @@
     <ProjectReference Include="..\XiangqiCore\XiangqiCore.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Content Include="..\..\XQSensei\Assets\*.cbr">
+      <Link>Assets\%(Filename)%(Extension)</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\XQSensei\Assets\*.CBL">
+      <Link>Assets\%(Filename)%(Extension)</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
+
 </Project>
